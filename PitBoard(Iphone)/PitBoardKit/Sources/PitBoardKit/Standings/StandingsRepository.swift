@@ -227,7 +227,11 @@ public final class StandingsRepository: @unchecked Sendable {
         FormulaEStandingsSource()
     ]
 
-    fileprivate static func makeWecDriversSource() -> AcoCarDriversSource {
+    // 04/09/2026: internal (no fileprivate) — un valor por defecto de un parámetro de
+    // init() no puede referenciar un símbolo fileprivate/private, sin importar la
+    // visibilidad del propio init (lo detectó el CI de GitHub Actions al compilar de
+    // verdad por primera vez).
+    static func makeWecDriversSource() -> AcoCarDriversSource {
         AcoCarDriversSource(
             category: .wec,
             listingUrl: "https://www.fiawec.com/en/page/grid",
@@ -238,7 +242,7 @@ public final class StandingsRepository: @unchecked Sendable {
         )
     }
 
-    fileprivate static func makeLeMansCupDriversSource() -> AcoCarDriversSource {
+    static func makeLeMansCupDriversSource() -> AcoCarDriversSource {
         let year = Calendar(identifier: .gregorian).component(.year, from: Date())
         return AcoCarDriversSource(
             category: .lemansCup,
