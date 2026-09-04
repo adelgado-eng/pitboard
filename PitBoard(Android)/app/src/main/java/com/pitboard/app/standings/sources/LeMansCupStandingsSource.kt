@@ -49,9 +49,17 @@ class LeMansCupStandingsSource : StandingsSource {
     )
 
     override suspend fun fetch(nowUtc: Long): List<StandingEntity> {
-        val classificationDoc = Jsoup.parse(fetchHtml(classificationUrl), classificationUrl)
-        val logoByCarNumber = runCatching { fetchLogosByCarNumber() }.getOrElse { emptyMap() }
+        val classificationHtml = fetchHtml(classificationUrl)
+        val logoByCarNumber = runCatching { parseLogosByCarNumber(fetchHtml(gridUrl)) }.getOrElse { emptyMap() }
 
+        return parseClassificationHtml(classificationHtml, logoByCarNumber, nowUtc)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separadas de fetch() para poder testear el
+    // parsing (incluido el cruce de logo por número de coche entre las dos páginas) contra
+    // fixtures HTML sin red — ver LeMansCupStandingsSourceTest.
+    internal fun parseClassificationHtml(html: String, logoByCarNumber: Map<String, String>, nowUtc: Long): List<StandingEntity> {
+        val classificationDoc = Jsoup.parse(html, classificationUrl)
         return sections.flatMap { (buttonText, standingsClass) ->
             findSection(classificationDoc, buttonText)
                 ?.let { parseRows(it, standingsClass, logoByCarNumber, nowUtc) }
@@ -59,11 +67,9 @@ class LeMansCupStandingsSource : StandingsSource {
         }
     }
 
-    /** Logo de equipo por número de coche, sacado de la página de listado (ver KDoc) — mapa
-     *  vacío (nunca excepción) si esa página fallara, para no tumbar toda la clasificación
-     *  solo porque los logos no se pudieran obtener. */
-    private fun fetchLogosByCarNumber(): Map<String, String> {
-        val doc = Jsoup.parse(fetchHtml(gridUrl), gridUrl)
+    /** Logo de equipo por número de coche, sacado de la página de listado (ver KDoc). */
+    internal fun parseLogosByCarNumber(html: String): Map<String, String> {
+        val doc = Jsoup.parse(html, gridUrl)
         return doc.select("div.card-team").mapNotNull { card ->
             val carUrl = card.selectFirst("a.stretched-link")?.attr("href").orEmpty()
             val carNumber = carUrl.trimEnd('/').substringAfterLast('/').takeIf { it.toIntOrNull() != null }

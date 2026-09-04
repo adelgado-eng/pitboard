@@ -60,7 +60,10 @@ open class SpeedSportStandingsSource(
         return driverRows + teamRows
     }
 
-    private fun parseStandingsTable(table: Element, type: StandingType, nowUtc: Long): List<StandingEntity> {
+    // 04/09/2026 (Fase 1 del diagnóstico): internal (no private) para poder testear el
+    // parsing con un fixture HTML real sin red — ver SpeedSportStandingsSourceTest. Ya
+    // tomaba un Element en vez de una URL, así que no hace falta separar nada más.
+    internal fun parseStandingsTable(table: Element, type: StandingType, nowUtc: Long): List<StandingEntity> {
         val headers = table.select("th").map { it.text() }
         val pointsIndex = headers.indexOfFirst {
             it.contains("Points", ignoreCase = true) || it.contains("Pts", ignoreCase = true)

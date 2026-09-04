@@ -57,58 +57,30 @@ class FormulaEStandingsSource : StandingsSource {
     override val category: StandingsCategory = StandingsCategory.FORMULA_E
 
     override suspend fun fetch(nowUtc: Long): List<StandingEntity> {
-        val championshipId = fetchCurrentChampionshipId() ?: return emptyList()
+        val championshipId = parseChampionshipsJson(fetchJson("$API_BASE/championships")) ?: return emptyList()
 
-        val driverRows = runCatching { fetchDriverRows(championshipId) }.getOrElse { emptyList() }
-        val teamRows = runCatching { fetchTeamRows(championshipId) }.getOrElse { emptyList() }
+        val driverRows = runCatching {
+            parseDriverRowsJson(fetchJson("$API_BASE/standings/drivers?championshipId=$championshipId"))
+        }.getOrElse { emptyList() }
+        val teamRows = runCatching {
+            parseTeamRowsJson(fetchJson("$API_BASE/standings/teams?championshipId=$championshipId"))
+        }.getOrElse { emptyList() }
 
-        val driverEntities = driverRows
-            .sortedByDescending { it.points }
-            .mapIndexed { index, row ->
-                StandingEntity(
-                    category = category,
-                    standingsClass = StandingsClass.OVERALL,
-                    type = StandingType.DRIVER,
-                    entrantKey = row.key,
-                    position = index + 1,
-                    name = row.name,
-                    team = row.team,
-                    points = row.points,
-                    photoUrl = row.imageId?.let { "$STATIC_FILES_BASE/drivers/$championshipId/right/large/$it.png" },
-                    updatedAtUtc = nowUtc
-                )
-            }
-
-        val teamEntities = teamRows
-            .sortedByDescending { it.points }
-            .mapIndexed { index, row ->
-                StandingEntity(
-                    category = category,
-                    standingsClass = StandingsClass.OVERALL,
-                    type = StandingType.TEAM,
-                    entrantKey = row.key,
-                    position = index + 1,
-                    name = row.name,
-                    team = "",
-                    points = row.points,
-                    photoUrl = row.imageId?.let { "$STATIC_FILES_BASE/badges/$it.svg" },
-                    updatedAtUtc = nowUtc
-                )
-            }
-
-        return driverEntities + teamEntities
+        return buildDriverEntities(driverRows, championshipId, nowUtc) + buildTeamEntities(teamRows, championshipId, nowUtc)
     }
 
-    private fun fetchCurrentChampionshipId(): String? {
-        val json = fetchJson("$API_BASE/championships")
+    // 04/09/2026 (Fase 1 del diagnóstico): fetchCurrentChampionshipId/fetchDriverRows/
+    // fetchTeamRows separadas en "red" (fetchJson, sin cambios) + "parsing puro" (las
+    // funciones de abajo) para poder testear contra fixtures JSON reales sin red — ver
+    // FormulaEStandingsSourceTest.
+    internal fun parseChampionshipsJson(json: String): String? {
         val adapter = StandingsMoshi.instance.adapter(FormulaEChampionshipsResponse::class.java)
         val championships = adapter.fromJson(json)?.championships.orEmpty()
         return championships.firstOrNull { it.status.equals("Present", ignoreCase = true) }?.id
             ?: championships.lastOrNull()?.id
     }
 
-    private fun fetchDriverRows(championshipId: String): List<Row> {
-        val json = fetchJson("$API_BASE/standings/drivers?championshipId=$championshipId")
+    internal fun parseDriverRowsJson(json: String): List<Row> {
         val listType = Types.newParameterizedType(List::class.java, FormulaEDriverStanding::class.java)
         val adapter = StandingsMoshi.instance.adapter<List<FormulaEDriverStanding>>(listType)
         val rows = adapter.fromJson(json).orEmpty()
@@ -128,8 +100,7 @@ class FormulaEStandingsSource : StandingsSource {
         }
     }
 
-    private fun fetchTeamRows(championshipId: String): List<Row> {
-        val json = fetchJson("$API_BASE/standings/teams?championshipId=$championshipId")
+    internal fun parseTeamRowsJson(json: String): List<Row> {
         val listType = Types.newParameterizedType(List::class.java, FormulaETeamStanding::class.java)
         val adapter = StandingsMoshi.instance.adapter<List<FormulaETeamStanding>>(listType)
         val rows = adapter.fromJson(json).orEmpty()
@@ -147,6 +118,40 @@ class FormulaEStandingsSource : StandingsSource {
         }
     }
 
+    internal fun buildDriverEntities(rows: List<Row>, championshipId: String, nowUtc: Long): List<StandingEntity> =
+        rows.sortedByDescending { it.points }
+            .mapIndexed { index, row ->
+                StandingEntity(
+                    category = category,
+                    standingsClass = StandingsClass.OVERALL,
+                    type = StandingType.DRIVER,
+                    entrantKey = row.key,
+                    position = index + 1,
+                    name = row.name,
+                    team = row.team,
+                    points = row.points,
+                    photoUrl = row.imageId?.let { "$STATIC_FILES_BASE/drivers/$championshipId/right/large/$it.png" },
+                    updatedAtUtc = nowUtc
+                )
+            }
+
+    internal fun buildTeamEntities(rows: List<Row>, championshipId: String, nowUtc: Long): List<StandingEntity> =
+        rows.sortedByDescending { it.points }
+            .mapIndexed { index, row ->
+                StandingEntity(
+                    category = category,
+                    standingsClass = StandingsClass.OVERALL,
+                    type = StandingType.TEAM,
+                    entrantKey = row.key,
+                    position = index + 1,
+                    name = row.name,
+                    team = "",
+                    points = row.points,
+                    photoUrl = row.imageId?.let { "$STATIC_FILES_BASE/badges/$it.svg" },
+                    updatedAtUtc = nowUtc
+                )
+            }
+
     private fun fetchJson(url: String): String {
         val request = Request.Builder()
             .url(url)
@@ -158,7 +163,8 @@ class FormulaEStandingsSource : StandingsSource {
         }
     }
 
-    private data class Row(
+    // internal (no private): expuesta a test — ver parseDriverRowsJson/parseTeamRowsJson.
+    internal data class Row(
         val key: String,
         val name: String,
         val team: String,

@@ -1,9 +1,9 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1788457887.9336967,
-    "seen": 1788473064.9658332,
-    "ast_hash": "57d1d6a40e09aea8d9c671fe55866440",
-    "semantic_hash": "57d1d6a40e09aea8d9c671fe55866440"
+    "mtime": 1788540260.7415605,
+    "seen": 1788553755.7578309,
+    "ast_hash": "cc6f27357795256d7d53a63e1cf3a838",
+    "semantic_hash": "cc6f27357795256d7d53a63e1cf3a838"
   },
   "app/release/output-metadata.json": {
     "mtime": 1786742150.0,
@@ -42,16 +42,16 @@
     "semantic_hash": "dc638ef51cc75a4173b5c8b31497da1a"
   },
   "app/src/main/java/com/pitboard/app/MainActivity.kt": {
-    "mtime": 1788455787.5730684,
-    "seen": 1788473064.9693372,
-    "ast_hash": "7eb00e69cf60f55fa1f59220222ae8e3",
-    "semantic_hash": "7eb00e69cf60f55fa1f59220222ae8e3"
+    "mtime": 1788530276.1886609,
+    "seen": 1788553755.7618444,
+    "ast_hash": "73da687f2d65e34dcd85e3a65f33f65d",
+    "semantic_hash": "73da687f2d65e34dcd85e3a65f33f65d"
   },
   "app/src/main/java/com/pitboard/app/PitBoardApplication.kt": {
-    "mtime": 1788457970.9498787,
-    "seen": 1788473064.9693372,
-    "ast_hash": "337d54d39070a40da0beba230e95ce20",
-    "semantic_hash": "337d54d39070a40da0beba230e95ce20"
+    "mtime": 1788542167.2240028,
+    "seen": 1788553755.7618444,
+    "ast_hash": "e88529a3064fe5df2c029dcfabfae0cf",
+    "semantic_hash": "e88529a3064fe5df2c029dcfabfae0cf"
   },
   "app/src/main/java/com/pitboard/app/data/AppDatabase.kt": {
     "mtime": 1788377679.1670961,
@@ -60,10 +60,10 @@
     "semantic_hash": "8ca41f0ccab0551282b2b4e6b3e34868"
   },
   "app/src/main/java/com/pitboard/app/data/AppSettingsRepository.kt": {
-    "mtime": 1788455755.6118753,
-    "seen": 1788473064.9693372,
-    "ast_hash": "037321b160e9d76328125d7d123ebc46",
-    "semantic_hash": "037321b160e9d76328125d7d123ebc46"
+    "mtime": 1788531819.628742,
+    "seen": 1788553755.7618444,
+    "ast_hash": "9f4a29c33edb57aef938f26c918b874b",
+    "semantic_hash": "9f4a29c33edb57aef938f26c918b874b"
   },
   "app/src/main/java/com/pitboard/app/data/DatabaseMigrations.kt": {
     "mtime": 1787878584.840585,
@@ -84,10 +84,10 @@
     "semantic_hash": "2fd475ccfdc38e969abb2e8823ec4d4a"
   },
   "app/src/main/java/com/pitboard/app/data/SessionBadgeType.kt": {
-    "mtime": 1787156783.5858867,
-    "seen": 1787863371.5360267,
-    "ast_hash": "9d71bd3a772add8f47fdf94a01362ba6",
-    "semantic_hash": "9d71bd3a772add8f47fdf94a01362ba6"
+    "mtime": 1788530963.427011,
+    "seen": 1788553755.7658572,
+    "ast_hash": "5f9c5cbd75193401c4b78b01f57a3fa4",
+    "semantic_hash": "5f9c5cbd75193401c4b78b01f57a3fa4"
   },
   "app/src/main/java/com/pitboard/app/notifications/EventReminderWorker.kt": {
     "mtime": 1787444151.0882235,
@@ -108,16 +108,16 @@
     "semantic_hash": "8a2963b4abce42c8441f5f039524f9da"
   },
   "app/src/main/java/com/pitboard/app/standings/StandingDao.kt": {
-    "mtime": 1787608766.2429295,
-    "seen": 1787863371.5360267,
-    "ast_hash": "d84381fabeaff4cefff39a801c36c0d5",
-    "semantic_hash": "d84381fabeaff4cefff39a801c36c0d5"
+    "mtime": 1788533959.2066715,
+    "seen": 1788553755.7784019,
+    "ast_hash": "0fd22afac8512d9fc7a5eb79ad29782b",
+    "semantic_hash": "0fd22afac8512d9fc7a5eb79ad29782b"
   },
   "app/src/main/java/com/pitboard/app/standings/StandingEntity.kt": {
-    "mtime": 1788457226.5649748,
-    "seen": 1788473064.972353,
-    "ast_hash": "4ff5b7020302782b8d2afee7f6503086",
-    "semantic_hash": "4ff5b7020302782b8d2afee7f6503086"
+    "mtime": 1788518703.4904852,
+    "seen": 1788553755.7784019,
+    "ast_hash": "33fedff186cf8affa032c0d6daa65326",
+    "semantic_hash": "33fedff186cf8affa032c0d6daa65326"
   },
   "app/src/main/java/com/pitboard/app/standings/StandingsConverters.kt": {
     "mtime": 1787608786.8969038,
@@ -150,10 +150,10 @@
     "semantic_hash": "8341bdd455c7e8c4310b4facdd933152"
   },
   "app/src/main/java/com/pitboard/app/standings/StandingsSyncWorker.kt": {
-    "mtime": 1788378141.4972062,
-    "seen": 1788473064.972353,
-    "ast_hash": "7139f086d44cb894ccffc8e41cc61b47",
-    "semantic_hash": "7139f086d44cb894ccffc8e41cc61b47"
+    "mtime": 1788536336.3532145,
+    "seen": 1788553755.7797415,
+    "ast_hash": "4e5b87d3ffe3cdd284bbf1a0f99d17a8",
+    "semantic_hash": "4e5b87d3ffe3cdd284bbf1a0f99d17a8"
   },
   "app/src/main/java/com/pitboard/app/standings/sources/ElmsStandingsSource.kt": {
     "mtime": 1788113348.5225482,
@@ -174,10 +174,10 @@
     "semantic_hash": "7f64278b75835e7e5e3d25d9438bdfd0"
   },
   "app/src/main/java/com/pitboard/app/standings/sources/IndyCarStandingsSource.kt": {
-    "mtime": 1788056140.4432304,
-    "seen": 1788473064.9733527,
-    "ast_hash": "c3a41bd5c7bcfd39838048b1478e8e98",
-    "semantic_hash": "c3a41bd5c7bcfd39838048b1478e8e98"
+    "mtime": 1788518793.8543682,
+    "seen": 1788553755.7857609,
+    "ast_hash": "35bd28e20ce2dc92fbee06a5985edd84",
+    "semantic_hash": "35bd28e20ce2dc92fbee06a5985edd84"
   },
   "app/src/main/java/com/pitboard/app/standings/sources/MotoGpStandingsSource.kt": {
     "mtime": 1788354809.8814785,
@@ -186,10 +186,10 @@
     "semantic_hash": "6088461b1116073754dd375baaf67652"
   },
   "app/src/main/java/com/pitboard/app/standings/sources/NascarStandingsSource.kt": {
-    "mtime": 1788359353.4204192,
-    "seen": 1788473064.9733527,
-    "ast_hash": "c4101ee28a55bc5fde26b57b871332b6",
-    "semantic_hash": "c4101ee28a55bc5fde26b57b871332b6"
+    "mtime": 1788519023.06047,
+    "seen": 1788553755.7877676,
+    "ast_hash": "6f5d574950d3bbda4051c9d8cc9457fe",
+    "semantic_hash": "6f5d574950d3bbda4051c9d8cc9457fe"
   },
   "app/src/main/java/com/pitboard/app/standings/sources/PorscheSupercupStandingsSource.kt": {
     "mtime": 1788365094.7209425,
@@ -198,64 +198,64 @@
     "semantic_hash": "effda2a49db6f3bc6434796aff52129f"
   },
   "app/src/main/java/com/pitboard/app/sync/SyncWorker.kt": {
-    "mtime": 1788113200.3384686,
-    "seen": 1788473064.9733527,
-    "ast_hash": "e5a56486656687de930abb17c704cec9",
-    "semantic_hash": "e5a56486656687de930abb17c704cec9"
+    "mtime": 1788536344.9555476,
+    "seen": 1788553755.7917795,
+    "ast_hash": "ddb72dafb5bb45eb8cf37997effc655d",
+    "semantic_hash": "ddb72dafb5bb45eb8cf37997effc655d"
   },
   "app/src/main/java/com/pitboard/app/ui/CategoryStandingsScreen.kt": {
-    "mtime": 1788470849.8834498,
-    "seen": 1788473064.9733527,
-    "ast_hash": "3322c06cb08de9a45c69100a525fa7c7",
-    "semantic_hash": "3322c06cb08de9a45c69100a525fa7c7"
+    "mtime": 1788533951.7409968,
+    "seen": 1788553755.7917795,
+    "ast_hash": "a6a86c63ddead75c65fecad113952222",
+    "semantic_hash": "a6a86c63ddead75c65fecad113952222"
   },
   "app/src/main/java/com/pitboard/app/ui/EventsScreen.kt": {
-    "mtime": 1788472326.1623738,
-    "seen": 1788473064.9733527,
-    "ast_hash": "659bbe9d3b40ad27e8617d9943dd6735",
-    "semantic_hash": "659bbe9d3b40ad27e8617d9943dd6735"
+    "mtime": 1788531154.81131,
+    "seen": 1788553755.7917795,
+    "ast_hash": "5b7b8838b79e55bdd02d6471abb93b19",
+    "semantic_hash": "5b7b8838b79e55bdd02d6471abb93b19"
   },
   "app/src/main/java/com/pitboard/app/ui/SettingsScreen.kt": {
-    "mtime": 1788299878.2732954,
-    "seen": 1788473064.9733527,
-    "ast_hash": "f3acdc2675658dfc201c48e3252487d4",
-    "semantic_hash": "f3acdc2675658dfc201c48e3252487d4"
+    "mtime": 1788530355.6600542,
+    "seen": 1788553755.7917795,
+    "ast_hash": "1d5205968f21086784550df3790f693b",
+    "semantic_hash": "1d5205968f21086784550df3790f693b"
   },
   "app/src/main/java/com/pitboard/app/ui/StandingsScreen.kt": {
-    "mtime": 1788382851.3620348,
-    "seen": 1788473064.9733527,
-    "ast_hash": "a3dc63accc7d1bb878a91379a654a6f1",
-    "semantic_hash": "a3dc63accc7d1bb878a91379a654a6f1"
+    "mtime": 1788531591.7119849,
+    "seen": 1788553755.7917795,
+    "ast_hash": "c9fe52e2b43b18dcfaf470d5ec4a294f",
+    "semantic_hash": "c9fe52e2b43b18dcfaf470d5ec4a294f"
   },
   "app/src/main/java/com/pitboard/app/util/DateTimeFormatters.kt": {
-    "mtime": 1788468447.6330614,
-    "seen": 1788473064.977369,
-    "ast_hash": "37c59047547caff74c9b6159cf26a30f",
-    "semantic_hash": "37c59047547caff74c9b6159cf26a30f"
+    "mtime": 1788529455.0308971,
+    "seen": 1788553755.7957916,
+    "ast_hash": "8bf13b5c089bc4b4a6670377bdc3de82",
+    "semantic_hash": "8bf13b5c089bc4b4a6670377bdc3de82"
   },
   "app/src/main/java/com/pitboard/app/util/EventWeekendGrouper.kt": {
-    "mtime": 1787182806.4324205,
-    "seen": 1787863371.5360267,
-    "ast_hash": "92487b7faa3d0726b800ac9463aa05f3",
-    "semantic_hash": "92487b7faa3d0726b800ac9463aa05f3"
+    "mtime": 1788530956.5868168,
+    "seen": 1788553755.7957916,
+    "ast_hash": "b5439e40223f22b9d274fdebc952284d",
+    "semantic_hash": "b5439e40223f22b9d274fdebc952284d"
   },
   "app/src/main/java/com/pitboard/app/widget/RaceWidget.kt": {
-    "mtime": 1788352536.5061517,
-    "seen": 1788473064.977369,
-    "ast_hash": "ca0b982083cf86044d38dc267c5b47bd",
-    "semantic_hash": "ca0b982083cf86044d38dc267c5b47bd"
+    "mtime": 1788531877.4153123,
+    "seen": 1788553755.7957916,
+    "ast_hash": "68d234052abef95abc9755454d4b85ee",
+    "semantic_hash": "68d234052abef95abc9755454d4b85ee"
   },
   "app/src/main/java/com/pitboard/app/widget/RaceWidgetConfigActivity.kt": {
-    "mtime": 1788299976.4919858,
-    "seen": 1788473064.977369,
-    "ast_hash": "0ef1369286bb0a53ba92fae6910b1d77",
-    "semantic_hash": "0ef1369286bb0a53ba92fae6910b1d77"
+    "mtime": 1788534070.4194746,
+    "seen": 1788553755.7957916,
+    "ast_hash": "5399035aa8dfbeafb5e72e2d71d136ba",
+    "semantic_hash": "5399035aa8dfbeafb5e72e2d71d136ba"
   },
   "app/src/main/java/com/pitboard/app/widget/RaceWidgetReceiver.kt": {
-    "mtime": 1787326714.3742344,
-    "seen": 1787863371.5360267,
-    "ast_hash": "bfe5a5bc21223ad2862c8863ec97bbc1",
-    "semantic_hash": "bfe5a5bc21223ad2862c8863ec97bbc1"
+    "mtime": 1788533886.009691,
+    "seen": 1788553755.7957916,
+    "ast_hash": "9cfe131ea8926780a1b5bb59499cafad",
+    "semantic_hash": "9cfe131ea8926780a1b5bb59499cafad"
   },
   "app/src/main/java/com/pitboard/app/widget/WidgetPrefsRepository.kt": {
     "mtime": 1788299936.1082718,
@@ -444,10 +444,10 @@
     "semantic_hash": "fffade3e5ed4eb0f4ecd6b9b9ed47758"
   },
   "app/src/main/java/com/pitboard/app/schedule/RaceScheduleSyncWorker.kt": {
-    "mtime": 1788299614.685457,
-    "seen": 1788473064.9713528,
-    "ast_hash": "e6db987679526238e0b53f154822aee5",
-    "semantic_hash": "e6db987679526238e0b53f154822aee5"
+    "mtime": 1788536354.3070488,
+    "seen": 1788553755.7698731,
+    "ast_hash": "f4012f3e477c66e868901c473af5adc4",
+    "semantic_hash": "f4012f3e477c66e868901c473af5adc4"
   },
   "app/src/main/java/com/pitboard/app/schedule/SessionBadgeMatcher.kt": {
     "mtime": 1788341659.2240298,
@@ -970,5 +970,65 @@
     "seen": 1788473120.2694104,
     "ast_hash": "01c74c55ad85cc4a5f2e12e9727a8cb2",
     "semantic_hash": ""
+  },
+  "app/src/main/java/com/pitboard/app/i18n/AppLanguage.kt": {
+    "mtime": 1788530089.808694,
+    "seen": 1788553755.7658572,
+    "ast_hash": "fbd2a3cc813d3597d5fd65af937447b2",
+    "semantic_hash": "fbd2a3cc813d3597d5fd65af937447b2"
+  },
+  "app/src/main/java/com/pitboard/app/i18n/Strings.kt": {
+    "mtime": 1788531829.4965098,
+    "seen": 1788553755.7658572,
+    "ast_hash": "f264a23edccb40c8194dea383f83b446",
+    "semantic_hash": "f264a23edccb40c8194dea383f83b446"
+  },
+  "app/src/main/java/com/pitboard/app/standings/CarBasedStandingsClasses.kt": {
+    "mtime": 1788533933.5915923,
+    "seen": 1788553755.7758942,
+    "ast_hash": "90ca7a7458365060c2fe569aff411314",
+    "semantic_hash": "90ca7a7458365060c2fe569aff411314"
+  },
+  "app/src/main/java/com/pitboard/app/ui/LanguagePickerScreen.kt": {
+    "mtime": 1788530237.9392347,
+    "seen": 1788553755.7917795,
+    "ast_hash": "797a47e52c12b00fb59516ba84d19c22",
+    "semantic_hash": "797a47e52c12b00fb59516ba84d19c22"
+  },
+  "app/src/main/java/com/pitboard/app/weather/CircuitCoordinates.kt": {
+    "mtime": 1788529479.267452,
+    "seen": 1788553755.7957916,
+    "ast_hash": "fa382182cac6eca6f290f863ba9c50b8",
+    "semantic_hash": "fa382182cac6eca6f290f863ba9c50b8"
+  },
+  "app/src/main/java/com/pitboard/app/weather/WeatherRepository.kt": {
+    "mtime": 1788529505.6761281,
+    "seen": 1788553755.7957916,
+    "ast_hash": "877acbb88652f8c8187f6e620af89d10",
+    "semantic_hash": "877acbb88652f8c8187f6e620af89d10"
+  },
+  "app/src/main/java/com/pitboard/app/widget/StandingsWidget.kt": {
+    "mtime": 1788542887.8405187,
+    "seen": 1788553755.7957916,
+    "ast_hash": "4db1f9e24555268d403a576701cd496f",
+    "semantic_hash": "4db1f9e24555268d403a576701cd496f"
+  },
+  "app/src/main/java/com/pitboard/app/widget/StandingsWidgetConfigActivity.kt": {
+    "mtime": 1788534116.83339,
+    "seen": 1788553755.7957916,
+    "ast_hash": "b2042492bf3e10df92a7be2f6d1584e2",
+    "semantic_hash": "b2042492bf3e10df92a7be2f6d1584e2"
+  },
+  "app/src/main/java/com/pitboard/app/widget/StandingsWidgetPrefsRepository.kt": {
+    "mtime": 1788533984.1978674,
+    "seen": 1788553755.7957916,
+    "ast_hash": "e7191475fc6db3d6a1f235499aa7f01a",
+    "semantic_hash": "e7191475fc6db3d6a1f235499aa7f01a"
+  },
+  "app/src/main/java/com/pitboard/app/widget/StandingsWidgetReceiver.kt": {
+    "mtime": 1788534046.258124,
+    "seen": 1788553755.7957916,
+    "ast_hash": "995b0b708e790e504c80d9cc5c81b3bd",
+    "semantic_hash": "995b0b708e790e504c80d9cc5c81b3bd"
   }
 }

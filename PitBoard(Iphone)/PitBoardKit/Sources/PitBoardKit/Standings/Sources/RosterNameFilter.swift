@@ -18,6 +18,13 @@ public enum RosterNameFilter {
 
     public static func fetchKnownNames(_ url: String) async throws -> Set<String> {
         let html = try await HTTPClient.fetchHTML(url)
+        return try parseNames(html, url: url)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetchKnownNames() para poder
+    // testear la heurística de "parece un nombre propio" contra un fixture HTML sin red
+    // — ver RosterNameFilterTests.
+    static func parseNames(_ html: String, url: String) throws -> Set<String> {
         let doc = try SwiftSoup.parse(html, url)
         let candidates = try doc.select("h1, h2, h3, h4, li, a, strong, b, td").array()
 

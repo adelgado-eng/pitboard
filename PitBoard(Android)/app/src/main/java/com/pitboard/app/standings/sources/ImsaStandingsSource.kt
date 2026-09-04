@@ -124,13 +124,18 @@ class ImsaStandingsSource {
             if (!response.isSuccessful) error("$url: HTTP ${response.code}")
             response.body?.string() ?: error("$url: cuerpo vacío")
         }
+        parseClassIds(json)
+    }.getOrElse { emptyMap() }
 
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de resolveClassIds() para poder
+    // testear el parsing contra un fixture JSON real sin red — ver ImsaStandingsSourceTest.
+    internal fun parseClassIds(json: String): Map<String, String> {
         val listType = Types.newParameterizedType(List::class.java, ImsaGalaxyClass::class.java)
         val adapter = StandingsMoshi.instance.adapter<List<ImsaGalaxyClass>>(listType)
-        adapter.fromJson(json).orEmpty()
+        return adapter.fromJson(json).orEmpty()
             .filter { it.shortcode != null }
             .associate { it.shortcode!!.uppercase() to it.id.toString() }
-    }.getOrElse { emptyMap() }
+    }
 
     private fun fetchClassTeamRows(standingsClass: StandingsClass, classId: String, year: Int): List<TeamRow> {
         val body = FormBody.Builder()
@@ -165,7 +170,9 @@ class ImsaStandingsSource {
     /** "#04 Crowdstrike Racing by APR" -> número de coche + nombre de equipo. Algunas
      *  filas no traen el `<a>` de enlace (equipo sin ficha propia todavía) — se lee igual
      *  el texto de la celda, solo que esa fila se queda sin logo ni pilotos. */
-    private fun parseTeamRow(row: Element, standingsClass: StandingsClass, position: Int): TeamRow? {
+    // internal (no private): expuesta a test — ver ImsaStandingsSourceTest. TeamRow pasa a
+    // internal por el mismo motivo (una función internal no puede devolver un tipo private).
+    internal fun parseTeamRow(row: Element, standingsClass: StandingsClass, position: Int): TeamRow? {
         val cell = row.selectFirst("td.team-col") ?: return null
         val text = cell.text().trim()
         val match = CAR_NUMBER_TEAM.find(text) ?: return null
@@ -191,6 +198,14 @@ class ImsaStandingsSource {
             if (!response.isSuccessful) error("$teamUrl: HTTP ${response.code}")
             response.body?.string() ?: error("$teamUrl: cuerpo vacío")
         }
+        parseTeamPage(html, teamUrl, row.standingsClass, row.carNumber, nowUtc)
+    }.getOrNull()
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetchTeamPage() para poder testear
+    // la detección de logo (descarta el logo fijo de la serie y el placeholder "nologo",
+    // ninguno de los dos por posición fija — ver KDoc de la clase) contra un fixture HTML
+    // sin red — ver ImsaStandingsSourceTest.
+    internal fun parseTeamPage(html: String, teamUrl: String, standingsClass: StandingsClass, carNumber: String, nowUtc: Long): TeamPage {
         val doc = Jsoup.parse(html, teamUrl)
 
         val logoUrl = doc.select(".team-logos img").map { it.absUrl("src") }
@@ -206,8 +221,8 @@ class ImsaStandingsSource {
 
             CarDriverEntity(
                 category = StandingsCategory.IMSA,
-                standingsClass = row.standingsClass,
-                carNumber = row.carNumber,
+                standingsClass = standingsClass,
+                carNumber = carNumber,
                 entryKey = normalize(name),
                 name = name,
                 photoUrl = photoUrl,
@@ -215,8 +230,8 @@ class ImsaStandingsSource {
             )
         }
 
-        TeamPage(logoUrl, drivers)
-    }.getOrNull()
+        return TeamPage(logoUrl, drivers)
+    }
 
     private fun normalize(s: String): String =
         java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD)
@@ -226,7 +241,8 @@ class ImsaStandingsSource {
             .replace(Regex("\\s+"), " ")
             .trim()
 
-    private data class TeamRow(
+    // internal (no private): expuestas a test — ver parseTeamRow/parseTeamPage arriba.
+    internal data class TeamRow(
         val standingsClass: StandingsClass,
         val position: Int,
         val carNumber: String,
@@ -235,7 +251,7 @@ class ImsaStandingsSource {
         val teamUrl: String?
     )
 
-    private data class TeamPage(val logoUrl: String?, val drivers: List<CarDriverEntity>)
+    internal data class TeamPage(val logoUrl: String?, val drivers: List<CarDriverEntity>)
 
     companion object {
         private const val USER_AGENT = "Mozilla/5.0 (Linux; Android 14) PitBoard/1.0"

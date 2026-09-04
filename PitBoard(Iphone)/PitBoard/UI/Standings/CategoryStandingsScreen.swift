@@ -18,6 +18,7 @@ struct CategoryStandingsScreen: View {
     @State private var carClass: StandingsClass
     @State private var selectedCar: StandingModel?
     @State private var previewImage: ImagePreview?
+    @Environment(AppSettingsRepository.self) private var settings
 
     init(category: StandingsCategory) {
         self.category = category
@@ -26,10 +27,10 @@ struct CategoryStandingsScreen: View {
             sort: [SortDescriptor(\.position)]
         )
         _categoryCarDrivers = Query(filter: #Predicate<CarDriverModel> { $0.category == category })
-        _carClass = State(initialValue: Self.carBasedClasses[category]?.first?.0 ?? .overall)
+        _carClass = State(initialValue: CarBasedStandingsClasses.carBasedClasses[category]?.first?.0 ?? .overall)
     }
 
-    private var carClasses: [(StandingsClass, String)]? { Self.carBasedClasses[category] }
+    private var carClasses: [(StandingsClass, String)]? { CarBasedStandingsClasses.carBasedClasses[category] }
     private var isCarBased: Bool { carClasses != nil }
     private var effectiveStandingsClass: StandingsClass { isCarBased ? carClass : .overall }
 
@@ -50,7 +51,7 @@ struct CategoryStandingsScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             if let lastUpdated {
-                Text("Actualizado: \(DateTimeFormatters.formatLastUpdated(lastUpdated))")
+                Text(String(format: settings.t("standings_last_updated"), DateTimeFormatters.formatLastUpdated(lastUpdated)))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -65,9 +66,9 @@ struct CategoryStandingsScreen: View {
                             FilterChipView(title: label, selected: carClass == cls) { carClass = cls }
                         }
                     } else {
-                        FilterChipView(title: "Pilotos", selected: mode == .driver) { mode = .driver }
+                        FilterChipView(title: settings.t("standings_drivers"), selected: mode == .driver) { mode = .driver }
                         if category.hasTeamStandings {
-                            FilterChipView(title: "Equipos", selected: mode == .team) { mode = .team }
+                            FilterChipView(title: settings.t("standings_teams"), selected: mode == .team) { mode = .team }
                         }
                     }
                 }
@@ -135,25 +136,6 @@ struct CategoryStandingsScreen: View {
         }
     }
 
-    // Órdenes pedidos explícitamente, coinciden con el orden real de las pestañas de cada
-    // web de origen (ver comentarios en CategoryStandingsScreen.kt).
-    private static let elmsClasses: [(StandingsClass, String)] = [
-        (.lmp2, "LMP2"), (.lmp2ProAm, "LMP2 Pro/Am"), (.lmp3, "LMP3"), (.lmgt3, "GT3")
-    ]
-    private static let imsaClasses: [(StandingsClass, String)] = [
-        (.gtp, "GTP"), (.lmp2, "LMP2"), (.gtdPro, "GTD Pro"), (.gtd, "GTD")
-    ]
-    private static let wecClasses: [(StandingsClass, String)] = [
-        (.hypercar, "Hypercar"), (.lmgt3, "LMGT3")
-    ]
-    private static let lemansCupClasses: [(StandingsClass, String)] = [
-        (.lmp3, "LMP3"), (.lmp3ProAm, "LMP3 Pro/Am"), (.gt3, "GT3")
-    ]
-    /// Categorías "por coche": sus filas de equipo representan un coche concreto, clicable
-    /// para ver sus pilotos (ver `CarDriversSheetView`).
-    private static let carBasedClasses: [StandingsCategory: [(StandingsClass, String)]] = [
-        .elms: elmsClasses, .imsa: imsaClasses, .wec: wecClasses, .lemansCup: lemansCupClasses
-    ]
 }
 
 /// Vista previa tocada — URL, nombre a mostrar y si es un LOGO de equipo (true) o una
@@ -176,12 +158,13 @@ private struct StandingsListView: View {
     let onImageClick: (String, String) -> Void
 
     @Environment(\.pitBoardColors) private var colors
+    @Environment(AppSettingsRepository.self) private var settings
 
     var body: some View {
         if rows.isEmpty {
             VStack {
                 Spacer()
-                Text("Sin datos todavía para esta categoría")
+                Text(settings.t("standings_no_category_data"))
                     .font(.body)
                     .foregroundStyle(colors.onSurfaceVariant)
                 Spacer()
@@ -209,6 +192,7 @@ private struct StandingRowView: View {
     let onImageClick: (() -> Void)?
 
     @Environment(\.pitBoardColors) private var colors
+    @Environment(AppSettingsRepository.self) private var settings
 
     var body: some View {
         HStack(spacing: 0) {
@@ -231,7 +215,7 @@ private struct StandingRowView: View {
 
             Spacer()
 
-            Text("\(formatPoints(row.points)) pts")
+            Text(String(format: settings.t("standings_points"), formatPoints(row.points)))
                 .font(.title3.weight(.bold))
                 .foregroundStyle(colors.primary)
         }
@@ -278,6 +262,7 @@ private struct CarDriversSheetView: View {
     let onDriverImageClick: (String, String) -> Void
 
     @Environment(\.pitBoardColors) private var colors
+    @Environment(AppSettingsRepository.self) private var settings
 
     var body: some View {
         ScrollView {
@@ -289,7 +274,7 @@ private struct CarDriversSheetView: View {
                 }
 
                 if drivers.isEmpty {
-                    Text("Sin datos de pilotos todavía para este coche")
+                    Text(settings.t("standings_no_driver_data"))
                         .font(.body)
                         .foregroundStyle(colors.onSurfaceVariant)
                         .padding(.vertical, 24)

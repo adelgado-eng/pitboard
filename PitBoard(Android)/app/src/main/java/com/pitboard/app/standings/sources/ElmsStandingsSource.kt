@@ -85,6 +85,14 @@ class ElmsStandingsSource : StandingsSource {
             response.body?.string() ?: error("$pageUrl: cuerpo vacío")
         }
 
+        return parseHtml(html, nowUtc)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // emparejado título-tabla y el plan B por número de coche (los dos bugs reales que
+    // documenta el KDoc de esta clase) contra un fixture HTML sin red — ver
+    // ElmsStandingsSourceTest.
+    internal fun parseHtml(html: String, nowUtc: Long): List<StandingEntity> {
         val doc = Jsoup.parse(html, pageUrl)
 
         // Títulos "<Clase> Teams Classification": se queda solo con los elementos "hoja" que

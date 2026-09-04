@@ -58,6 +58,12 @@ class WecStandingsSource : StandingsSource {
             response.body?.string() ?: error("$pageUrl: cuerpo vacío")
         }
 
+        return parseHtml(html, nowUtc)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el parsing
+    // contra un fixture HTML real sin red — ver WecStandingsSourceTest.
+    internal fun parseHtml(html: String, nowUtc: Long): List<StandingEntity> {
         val doc = Jsoup.parse(html, pageUrl)
 
         val hypercarRows = findSection(doc, "FIA Hypercar World Endurance Drivers Championship")

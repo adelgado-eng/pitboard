@@ -21,6 +21,19 @@ public enum SessionBadgeType: String, CaseIterable, Codable, Sendable {
         }
     }
 
+    /// Misma etiqueta que `label` pero como clave de `Strings` — `label` se deja igual a
+    /// propósito (lo sigue usando `NotificationScheduler` para el texto de los avisos) y
+    /// esta clave nueva es solo para quien quiera traducirla (ver EventsScreen.swift).
+    public var labelKey: String {
+        switch self {
+        case .race: "session_race"
+        case .qualy: "session_qualy"
+        case .sprint: "session_sprint"
+        case .practice: "session_practice"
+        case .other: "session_other"
+        }
+    }
+
     public var defaultMinutes: Int {
         switch self {
         case .race: 60

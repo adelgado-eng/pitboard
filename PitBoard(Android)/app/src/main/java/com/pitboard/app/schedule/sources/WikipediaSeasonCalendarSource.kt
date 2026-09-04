@@ -65,8 +65,16 @@ class WikipediaSeasonCalendarSource(
     override suspend fun fetch(): List<EventEntity> {
         val year = Year.now().value
         val url = "https://en.wikipedia.org/wiki/" + (explicitArticleTitle ?: "${year}_$articleSlugSuffix")
-        val html = fetchHtml(url)
-        val doc = Jsoup.parse(html, url)
+        return parseHtml(fetchHtml(url), year)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear los dos
+    // bugs reales que documenta el KDoc de esta clase (año duplicado en la fecha, filas con
+    // celdas fusionadas por rowspan) contra un fixture HTML sin red — ver
+    // WikipediaSeasonCalendarSourceTest. El año se recibe como parámetro (no Year.now()
+    // interno) para que el test sea determinista sin importar cuándo se ejecute.
+    internal fun parseHtml(html: String, year: Int): List<EventEntity> {
+        val doc = Jsoup.parse(html, "https://en.wikipedia.org/wiki/x")
 
         val table = doc.select("table.wikitable").firstOrNull { candidate ->
             val headerRowTexts = headerRowTexts(candidate)

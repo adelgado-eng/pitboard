@@ -40,6 +40,17 @@ public final class WikipediaSeasonCalendarSource: RaceScheduleSource, @unchecked
         let title = explicitArticleTitle ?? "\(year)_\(wikipediaSlug)"
         let url = "https://en.wikipedia.org/wiki/\(title)"
         let html = try await HTTPClient.fetchHTML(url)
+        return try parseHTML(html, year: year)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear los dos
+    // bugs reales que el propio comentario de esta clase documenta como corregidos a mano
+    // (año duplicado en la fecha, filas con celdas fusionadas por rowspan) contra un
+    // fixture HTML sin red — ver WikipediaSeasonCalendarSourceTests. El año se recibe
+    // como parámetro (no calculado con Date() internamente) para que el test sea
+    // determinista sin importar cuándo se ejecute.
+    func parseHTML(_ html: String, year: Int) throws -> [EventDraft] {
+        let url = "https://en.wikipedia.org/wiki/placeholder"
         let doc = try SwiftSoup.parse(html, url)
 
         let tables = try doc.select("table.wikitable").array()

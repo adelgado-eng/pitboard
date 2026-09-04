@@ -14,6 +14,13 @@ public final class IndyCarScheduleSource: RaceScheduleSource, @unchecked Sendabl
 
     public func fetch() async throws -> [EventDraft] {
         let html = try await HTTPClient.fetchHTML("https://www.indycar.com/schedule")
+        return try parseHTML(html)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // descarte de carreras ya disputadas (clase "completed") contra un fixture HTML sin
+    // red — ver IndyCarScheduleSourceTests.
+    func parseHTML(_ html: String) throws -> [EventDraft] {
         let doc = try SwiftSoup.parse(html)
         let cards = try doc.select("div.event-card").array()
 

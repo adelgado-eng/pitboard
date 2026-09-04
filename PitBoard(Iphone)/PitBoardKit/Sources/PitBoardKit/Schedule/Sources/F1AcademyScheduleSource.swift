@@ -16,7 +16,13 @@ public final class F1AcademyScheduleSource: RaceScheduleSource, @unchecked Senda
     public func fetch() async throws -> [EventDraft] {
         let url = "https://www.f1academy.com/Racing-Series/Calendar"
         let html = try await HTTPClient.fetchHTML(url)
+        return try parseHTML(html)
+    }
 
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear la
+    // lectura del bloque __NEXT_DATA__ contra un fixture HTML sin red — ver
+    // F1AcademyScheduleSourceTests.
+    func parseHTML(_ html: String) throws -> [EventDraft] {
         let doc = try SwiftSoup.parse(html)
         guard let script = try doc.select("script[id=__NEXT_DATA__]").first() else { return [] }
         let json = script.data()

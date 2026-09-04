@@ -72,12 +72,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.LaunchedEffect
 import com.pitboard.app.data.AppDatabase
 import com.pitboard.app.data.AppSettingsRepository
 import com.pitboard.app.data.EventEntity
 import com.pitboard.app.data.RaceSeries
 import com.pitboard.app.data.SeriesConfigEntity
 import com.pitboard.app.data.SessionBadgeType
+import com.pitboard.app.data.TimeDisplayMode
+import com.pitboard.app.i18n.tr
 import com.pitboard.app.schedule.RaceScheduleRepository
 import com.pitboard.app.standings.ConnectivityHelper
 import com.pitboard.app.ui.theme.BadgeColors
@@ -88,6 +91,8 @@ import com.pitboard.app.ui.components.OfflineBanner
 import com.pitboard.app.util.EventWeekendGrouper
 import com.pitboard.app.util.EventWeekendGroups
 import com.pitboard.app.util.SeasonWindow
+import com.pitboard.app.weather.WeatherRepository
+import com.pitboard.app.weather.WeatherResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -125,6 +130,10 @@ class EventsViewModel(application: Application) : AndroidViewModel(application) 
 
     val selectedSeries: StateFlow<Set<RaceSeries>> = settings.eventScreenActiveSeries
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
+
+    /** Qué hora se ve de un vistazo en las filas de la lista — ver TimeDisplayMode. */
+    val timeDisplayMode: StateFlow<TimeDisplayMode> = settings.timeDisplayMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TimeDisplayMode.DEVICE)
 
     /** Tipos de sesión activos (Carrera/Clasificación/Sprint/Libres, ver SessionBadgeType) —
      *  a diferencia de selectedSeries no entra en la consulta a Room: con el número de
@@ -196,6 +205,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
     val seriesConfigByKey by viewModel.seriesConfigByKey.collectAsState()
     val selectedSeries by viewModel.selectedSeries.collectAsState()
     val selectedSessionTypes by viewModel.selectedSessionTypes.collectAsState()
+    val timeDisplayMode by viewModel.timeDisplayMode.collectAsState()
 
     // Igual que en Clasificaciones: se comprueba una vez al entrar, no en vivo — si la
     // conexión cambia mientras la pantalla está abierta, se refleja en el siguiente "Actualizar"
@@ -214,10 +224,15 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
     var searchQuery by remember { mutableStateOf("") }
     val quickFiltersActive = searchQuery.isNotBlank() || selectedSeries.isNotEmpty() || selectedSessionTypes.isNotEmpty()
 
+    // tr() es @Composable (lee el idioma activo de LocalAppLanguage) y no se puede llamar
+    // dentro del onClick de más abajo (contexto normal, no @Composable) — se resuelve aquí,
+    // en contexto de composición, y el lambda solo lee esta variable ya capturada.
+    val offlineToastMessage = tr("events_offline_toast")
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Eventos", fontWeight = FontWeight.Bold) },
+                title = { Text(tr("events_title"), fontWeight = FontWeight.Bold) },
                 actions = {
                     if (viewModel.syncing) {
                         // Mismo hueco que el botón, para que la barra no dé un salto al
@@ -237,17 +252,17 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                                 if (ConnectivityHelper.isOnline(context)) {
                                     viewModel.refreshNow()
                                 } else {
-                                    Toast.makeText(context, "Sin conexión — no se puede actualizar ahora", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, offlineToastMessage, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         ) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Actualizar")
+                            Icon(Icons.Default.Refresh, contentDescription = tr("events_refresh"))
                         }
                     }
                     IconButton(onClick = { showFilterPanel = !showFilterPanel }) {
                         Icon(
                             Icons.Default.FilterAlt,
-                            contentDescription = "Buscar y filtrar",
+                            contentDescription = tr("events_search_and_filter"),
                             tint = if (quickFiltersActive) {
                                 MaterialTheme.colorScheme.primary
                             } else {
@@ -256,7 +271,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                         )
                     }
                     IconButton(onClick = { showSeriesEditor = true }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar series")
+                        Icon(Icons.Default.Edit, contentDescription = tr("events_edit_series"))
                     }
                 }
             )
@@ -299,12 +314,12 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Buscar por palabra clave…") },
+                        placeholder = { Text(tr("events_search_placeholder")) },
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                         trailingIcon = {
                             if (searchQuery.isNotEmpty()) {
                                 IconButton(onClick = { searchQuery = "" }) {
-                                    Icon(Icons.Default.Close, contentDescription = "Borrar búsqueda")
+                                    Icon(Icons.Default.Close, contentDescription = tr("events_clear_search"))
                                 }
                             }
                         },
@@ -322,7 +337,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                         FilterChip(
                             selected = selectedSeries.isEmpty(),
                             onClick = { viewModel.updateActiveSeries(emptySet()) },
-                            label = { Text("Todas") }
+                            label = { Text(tr("events_filter_all_series")) }
                         )
                         RaceSeries.entries.forEach { series ->
                             val active = series in selectedSeries
@@ -348,7 +363,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                         FilterChip(
                             selected = selectedSessionTypes.isEmpty(),
                             onClick = { viewModel.updateActiveSessionTypes(emptySet()) },
-                            label = { Text("Todas las sesiones") }
+                            label = { Text(tr("events_filter_all_sessions")) }
                         )
                         SESSION_TYPE_FILTER_OPTIONS.forEach { badge ->
                             val active = badge in selectedSessionTypes
@@ -359,7 +374,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                                         if (active) selectedSessionTypes - badge else selectedSessionTypes + badge
                                     )
                                 },
-                                label = { Text(SessionBadgeType.label(badge)) }
+                                label = { Text(tr(SessionBadgeType.labelKey(badge))) }
                             )
                         }
                     }
@@ -375,15 +390,15 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                 // única salida era abrir el panel de embudo a mano).
                 EmptyState(
                     icon = Icons.Default.SearchOff,
-                    title = "Ningún evento de estas series",
-                    message = "No hay eventos guardados para las series que has elegido. Prueba a quitar el filtro o a actualizar.",
+                    title = tr("events_empty_filtered_title"),
+                    message = tr("events_empty_filtered_message"),
                     action = {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Button(onClick = { viewModel.updateActiveSeries(emptySet()) }) {
-                                Text("Quitar filtro")
+                                Text(tr("events_remove_filter"))
                             }
                             Button(onClick = { viewModel.refreshNow() }) {
-                                Text("Actualizar")
+                                Text(tr("events_refresh"))
                             }
                         }
                     }
@@ -391,25 +406,25 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
             } else if (noEventsAtAll && !isOnline) {
                 EmptyState(
                     icon = Icons.Default.WifiOff,
-                    title = "Necesitas conexión",
-                    message = "Todavía no se ha guardado ningún evento en este dispositivo. Conéctate a wifi o datos móviles al menos una vez."
+                    title = tr("events_empty_offline_title"),
+                    message = tr("events_empty_offline_message")
                 )
             } else if (noEventsAtAll) {
                 EmptyState(
                     icon = Icons.Default.Event,
-                    title = "Sin eventos",
-                    message = "Todavía no se ha sincronizado ningún calendario. Prueba a tocar Actualizar.",
+                    title = tr("events_empty_title"),
+                    message = tr("events_empty_message"),
                     action = {
                         Button(onClick = { viewModel.refreshNow() }) {
-                            Text("Actualizar")
+                            Text(tr("events_refresh"))
                         }
                     }
                 )
             } else if (nothingMatchesQuickFilters) {
                 EmptyState(
                     icon = Icons.Default.SearchOff,
-                    title = "Ningún evento coincide",
-                    message = "Prueba con otra palabra clave, serie o tipo de sesión.",
+                    title = tr("events_empty_no_match_title"),
+                    message = tr("events_empty_no_match_message"),
                     action = if (quickFiltersActive) {
                         {
                             Button(
@@ -419,7 +434,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                                     viewModel.updateActiveSessionTypes(emptySet())
                                 }
                             ) {
-                                Text("Borrar búsqueda y filtros")
+                                Text(tr("events_clear_search_and_filters"))
                             }
                         }
                     } else null
@@ -437,7 +452,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                         item {
                             Column {
                                 Text(
-                                    text = groups?.weekendLabel.orEmpty().uppercase(),
+                                    text = tr(groups?.weekendLabelKey.orEmpty()).uppercase(),
                                     style = MaterialTheme.typography.labelMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
@@ -455,6 +470,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                                             EventRow(
                                                 event = event,
                                                 config = seriesConfigByKey[event.series],
+                                                timeDisplayMode = timeDisplayMode,
                                                 onClick = { detailsEvent = event }
                                             )
                                             if (index < weekendEvents.size - 1) {
@@ -474,7 +490,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                     if (laterEvents.isNotEmpty()) {
                         item {
                             Text(
-                                text = "MÁS ADELANTE",
+                                text = tr("events_later_section"),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -485,6 +501,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                             EventCard(
                                 event = event,
                                 config = seriesConfigByKey[event.series],
+                                timeDisplayMode = timeDisplayMode,
                                 onClick = { detailsEvent = event }
                             )
                         }
@@ -538,16 +555,16 @@ private fun SeriesConfigSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Editar series",
+                        tr("events_edit_series"),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar")
+                        Icon(Icons.Default.Close, contentDescription = tr("events_close"))
                     }
                 }
                 Text(
-                    "Toca una serie para cambiar sus iniciales o su color.",
+                    tr("events_edit_series_subtitle"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 8.dp)
@@ -604,13 +621,13 @@ private fun SeriesConfigRow(config: SeriesConfigEntity, onClick: () -> Unit) {
             ) {
                 Text(config.series.displayName, style = MaterialTheme.typography.titleSmall)
                 Text(
-                    "Tag: ${config.tag}",
+                    tr("events_series_tag_prefix").format(config.tag),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Text(
-                "Editar",
+                tr("events_edit"),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -635,17 +652,17 @@ private fun EditSeriesConfigDialog(
                 OutlinedTextField(
                     value = tag,
                     onValueChange = { tag = it.uppercase().take(5) },
-                    label = { Text("Tag corto (máx. 5)") },
+                    label = { Text(tr("events_tag_label")) },
                     singleLine = true
                 )
                 OutlinedTextField(
                     value = colorHex,
                     onValueChange = { colorHex = it },
-                    label = { Text("Color (#RRGGBB)") },
+                    label = { Text(tr("events_color_label")) },
                     singleLine = true
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Vista previa: ", style = MaterialTheme.typography.bodySmall)
+                    Text(tr("events_preview_label"), style = MaterialTheme.typography.bodySmall)
                     ColorSwatch(hex = colorHex)
                 }
             }
@@ -653,10 +670,10 @@ private fun EditSeriesConfigDialog(
         confirmButton = {
             TextButton(onClick = {
                 onSave(config.copy(tag = tag.ifBlank { config.tag }, colorHex = colorHex))
-            }) { Text("Guardar") }
+            }) { Text(tr("events_save")) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss) { Text(tr("events_cancel")) }
         }
     )
 }
@@ -672,7 +689,12 @@ private fun ColorSwatch(hex: String) {
 }
 
 @Composable
-private fun EventRow(event: EventEntity, config: SeriesConfigEntity?, onClick: () -> Unit) {
+private fun EventRow(
+    event: EventEntity,
+    config: SeriesConfigEntity?,
+    timeDisplayMode: TimeDisplayMode,
+    onClick: () -> Unit
+) {
     val tagColor = ColorContrast.ensureContrast(
         config?.colorHex?.let { ColorContrast.safeParseColor(it) } ?: BadgeColors.fallback,
         MaterialTheme.colorScheme.surface
@@ -715,7 +737,7 @@ private fun EventRow(event: EventEntity, config: SeriesConfigEntity?, onClick: (
                 maxLines = 2
             )
             Text(
-                DateTimeFormatters.formatEventDateTime(event.startTimeUtc),
+                DateTimeFormatters.formatEventDateTime(event.startTimeUtc, timeDisplayMode, event.timeZoneId),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 2.dp)
@@ -737,6 +759,14 @@ private fun EventRow(event: EventEntity, config: SeriesConfigEntity?, onClick: (
 @Composable
 private fun EventDetailsSheet(event: EventEntity, onDismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Clima del circuito bajo demanda: solo se pide al abrir ESTE evento (nunca para toda la
+    // lista de golpe), y solo si Open-Meteo puede tener algo que decir (circuito reconocido +
+    // dentro de los ~15 días de previsión) — ver WeatherRepository.
+    var weather by remember(event.id) { mutableStateOf<WeatherResult?>(null) }
+    LaunchedEffect(event.id) {
+        weather = WeatherRepository.fetch(event.fullTitle, event.startTimeUtc, System.currentTimeMillis())
+    }
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(
@@ -769,15 +799,25 @@ private fun EventDetailsSheet(event: EventEntity, onDismiss: () -> Unit) {
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                DetailLine("Tu hora local", DateTimeFormatters.formatEventDateTimeLong(event.startTimeUtc))
+                DetailLine(tr("events_detail_your_time"), DateTimeFormatters.formatEventDateTimeLong(event.startTimeUtc))
                 event.timeZoneId?.let { zoneId ->
                     DateTimeFormatters.formatEventDateTimeInZone(event.startTimeUtc, zoneId)?.let { local ->
-                        DetailLine("Hora local del circuito ($zoneId)", local)
+                        DetailLine(tr("events_detail_track_time").format(zoneId), local)
                     }
                 }
-                DetailLine("Serie", event.series.displayName)
+                DetailLine(tr("events_detail_series"), event.series.displayName)
                 if (event.inferredBadge.isNotEmpty()) {
-                    DetailLine("Tipo de sesión", SessionBadgeType.label(event.inferredBadge))
+                    DetailLine(tr("events_detail_session_type"), tr(SessionBadgeType.labelKey(event.inferredBadge)))
+                }
+                // Sin fila cuando el circuito no se reconoce o está demasiado lejos en el
+                // futuro — no aporta nada un "Clima: —" para el 90% de los eventos de la
+                // temporada que todavía no tienen previsión.
+                when (val w = weather) {
+                    is WeatherResult.Available -> DetailLine(
+                        tr("events_detail_weather"),
+                        tr("events_detail_weather_value").format(w.tempCelsius.toInt(), w.rainProbabilityPercent)
+                    )
+                    else -> {}
                 }
             }
         }
@@ -802,13 +842,18 @@ private fun DetailLine(label: String, value: String) {
 }
 
 @Composable
-private fun EventCard(event: EventEntity, config: SeriesConfigEntity?, onClick: () -> Unit) {
+private fun EventCard(
+    event: EventEntity,
+    config: SeriesConfigEntity?,
+    timeDisplayMode: TimeDisplayMode,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
     ) {
-        EventRow(event, config, onClick)
+        EventRow(event, config, timeDisplayMode, onClick)
     }
 }
 

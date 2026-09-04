@@ -2,6 +2,12 @@ import Foundation
 
 public struct EventWeekendGroups: Sendable {
     public var weekendLabel: String
+    /// Misma etiqueta que `weekendLabel` pero como clave de `Strings` (ej.
+    /// "events_weekend_today") en vez de texto fijo en español — `weekendLabel` se deja
+    /// igual a propósito (los tests existentes y cualquier otro consumidor lo siguen
+    /// leyendo tal cual) y esta clave nueva es solo para quien quiera traducirla (ver
+    /// EventsScreen.swift). Vacía cuando `weekendLabel` también lo está (sin eventos).
+    public var weekendLabelKey: String
     public var weekendEvents: [EventModel]
     public var laterEvents: [EventModel]
 }
@@ -12,7 +18,7 @@ public struct EventWeekendGroups: Sendable {
 public enum EventWeekendGrouper {
     public static func split(_ events: [EventModel], zone: TimeZone = .current, now: Date = Date()) -> EventWeekendGroups {
         guard let first = events.first else {
-            return EventWeekendGroups(weekendLabel: "", weekendEvents: [], laterEvents: [])
+            return EventWeekendGroups(weekendLabel: "", weekendLabelKey: "", weekendEvents: [], laterEvents: [])
         }
 
         var calendar = Calendar(identifier: .gregorian)
@@ -29,25 +35,30 @@ public enum EventWeekendGrouper {
             let sunday = calendar.date(byAdding: .day, value: daysForwardToSunday, to: firstDate),
             let sundayEnd = calendar.date(byAdding: .day, value: 1, to: sunday).map({ $0.addingTimeInterval(-1) })
         else {
-            return EventWeekendGroups(weekendLabel: "", weekendEvents: [], laterEvents: [])
+            return EventWeekendGroups(weekendLabel: "", weekendLabelKey: "", weekendEvents: [], laterEvents: [])
         }
 
         let today = calendar.startOfDay(for: now)
         let label: String
+        let labelKey: String
         if firstDate == today {
             label = "Hoy"
+            labelKey = "events_weekend_today"
         } else if today >= friday && today <= sunday {
             label = "Este fin de semana"
+            labelKey = "events_weekend_this"
         } else if friday == nextFriday(strictlyAfter: today, calendar: calendar) {
             label = "Próximo fin de semana"
+            labelKey = "events_weekend_next"
         } else {
             label = "Próxima cita"
+            labelKey = "events_weekend_upcoming"
         }
 
         let weekend = events.filter { $0.startTimeUtc >= friday && $0.startTimeUtc <= sundayEnd }
         let later = events.filter { $0.startTimeUtc > sundayEnd }
 
-        return EventWeekendGroups(weekendLabel: label, weekendEvents: weekend, laterEvents: later)
+        return EventWeekendGroups(weekendLabel: label, weekendLabelKey: labelKey, weekendEvents: weekend, laterEvents: later)
     }
 
     /// Equivalente de `TemporalAdjusters.next(DayOfWeek.FRIDAY)`: el próximo viernes

@@ -1,6 +1,8 @@
 package com.pitboard.app.ui
 
 import android.app.Application
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -24,9 +26,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.BatteryAlert
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
@@ -72,6 +76,8 @@ import com.pitboard.app.data.AppSettingsRepository
 import com.pitboard.app.data.AppTheme
 import com.pitboard.app.data.RaceSeries
 import com.pitboard.app.data.SeriesConfigEntity
+import com.pitboard.app.data.TimeDisplayMode
+import com.pitboard.app.i18n.tr
 import com.pitboard.app.notifications.NotificationPermission
 import com.pitboard.app.notifications.NotificationScheduler
 import com.pitboard.app.standings.StandingsScheduler
@@ -98,6 +104,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     val minutesBefore = appSettingsRepository.notificationMinutesBefore
     val appTheme = appSettingsRepository.appTheme
     val standingsEnabled = appSettingsRepository.standingsEnabled
+    val timeDisplayMode = appSettingsRepository.timeDisplayMode
 
     val seriesConfigs: StateFlow<List<SeriesConfigEntity>> =
         database.seriesConfigDao().observeAll()
@@ -170,6 +177,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch { appSettingsRepository.setAppTheme(theme) }
     }
 
+    fun setTimeDisplayMode(mode: TimeDisplayMode) {
+        viewModelScope.launch { appSettingsRepository.setTimeDisplayMode(mode) }
+    }
+
     /** Activa/desactiva la sincronización semanal de clasificaciones. Al activar, además
      *  programa el ciclo semanal (próximo lunes 12:00) y lanza una sincronización
      *  inmediata — así el usuario no tiene que esperar hasta el lunes para ver algo. Al
@@ -200,6 +211,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     val minutesBefore by viewModel.minutesBefore.collectAsState(initial = 60)
     val appTheme by viewModel.appTheme.collectAsState(initial = AppTheme.SYSTEM)
     val standingsEnabled by viewModel.standingsEnabled.collectAsState(initial = false)
+    val timeDisplayMode by viewModel.timeDisplayMode.collectAsState(initial = TimeDisplayMode.DEVICE)
     val seriesConfigs by viewModel.seriesConfigs.collectAsState()
     val activeSeries by viewModel.notificationActiveSeries.collectAsState()
 
@@ -234,7 +246,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Ajustes", fontWeight = FontWeight.Bold) })
+            TopAppBar(title = { Text(tr("settings_title"), fontWeight = FontWeight.Bold) })
         }
     ) { padding ->
         Column(
@@ -246,16 +258,16 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // TARJETA: NOTIFICACIONES
-            SettingsCard(title = "Notificaciones", icon = Icons.Default.Notifications) {
+            SettingsCard(title = tr("settings_notifications_title"), icon = Icons.Default.Notifications) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text("Activar avisos", style = MaterialTheme.typography.bodyLarge)
+                        Text(tr("settings_notifications_enable"), style = MaterialTheme.typography.bodyLarge)
                         Text(
-                            "Avisar antes de las sesiones",
+                            tr("settings_notifications_subtitle"),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -287,7 +299,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 if (notificationsEnabled) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
 
-                    Text("¿Cuándo avisar?", style = MaterialTheme.typography.labelMedium)
+                    Text(tr("settings_notifications_when"), style = MaterialTheme.typography.labelMedium)
                     Row(
                         modifier = Modifier.padding(top = 4.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -303,15 +315,15 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Text("¿Qué sesiones?", style = MaterialTheme.typography.labelMedium)
+                    Text(tr("settings_notifications_which_sessions"), style = MaterialTheme.typography.labelMedium)
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         SessionTypeToggle(
-                            label = "Competición (Carrera, Clasif., Sprint)",
+                            label = tr("settings_notifications_competitive"),
                             checked = competitiveEnabled,
                             onCheckedChange = viewModel::setCompetitiveEnabled
                         )
                         SessionTypeToggle(
-                            label = "Entrenamientos (Libres)",
+                            label = tr("settings_notifications_practice"),
                             checked = practiceEnabled,
                             onCheckedChange = viewModel::setPracticeEnabled
                         )
@@ -328,10 +340,14 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Series activas", style = MaterialTheme.typography.bodyMedium)
+                            Text(tr("settings_notifications_active_series"), style = MaterialTheme.typography.bodyMedium)
                             val count = activeSeries.size
                             Text(
-                                if (count == RaceSeries.entries.size) "Todas las series" else "$count series seleccionadas",
+                                if (count == RaceSeries.entries.size) {
+                                    tr("settings_notifications_all_series")
+                                } else {
+                                    tr("settings_notifications_series_count").format(count)
+                                },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -346,17 +362,16 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             }
 
             // TARJETA: CLASIFICACIONES
-            SettingsCard(title = "Clasificaciones", icon = Icons.Default.EmojiEvents) {
+            SettingsCard(title = tr("settings_standings_title"), icon = Icons.Default.EmojiEvents) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text("Activar clasificaciones", style = MaterialTheme.typography.bodyLarge)
+                        Text(tr("settings_standings_enable"), style = MaterialTheme.typography.bodyLarge)
                         Text(
-                            "F1, MotoGP, NASCAR y más. Al activarlas aparece su pestaña en la barra de abajo; " +
-                                "se actualizan cada lunes a las 12:00 y necesitan wifi o datos móviles.",
+                            tr("settings_standings_subtitle"),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -369,18 +384,18 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             }
 
             // TARJETA: APARIENCIA
-            SettingsCard(title = "Apariencia", icon = Icons.Default.Palette) {
+            SettingsCard(title = tr("settings_appearance_title"), icon = Icons.Default.Palette) {
                 Text(
-                    "Elige el tema de la aplicación",
+                    tr("settings_appearance_subtitle"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
-                        AppTheme.LIGHT to "☀️ Claro",
-                        AppTheme.DARK to "🌙 Oscuro",
-                        AppTheme.SYSTEM to "📱 Auto"
+                        AppTheme.LIGHT to tr("settings_theme_light"),
+                        AppTheme.DARK to tr("settings_theme_dark"),
+                        AppTheme.SYSTEM to tr("settings_theme_auto")
                     ).forEach { (theme, label) ->
                         FilterChip(
                             selected = appTheme == theme,
@@ -391,13 +406,51 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 }
             }
 
+            // TARJETA: ZONA HORARIA
+            SettingsCard(title = tr("settings_timezone_title"), icon = Icons.Default.Public) {
+                Text(
+                    tr("settings_timezone_subtitle"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(
+                        TimeDisplayMode.DEVICE to tr("settings_timezone_device"),
+                        TimeDisplayMode.TRACK to tr("settings_timezone_track")
+                    ).forEach { (mode, label) ->
+                        FilterChip(
+                            selected = timeDisplayMode == mode,
+                            onClick = { viewModel.setTimeDisplayMode(mode) },
+                            label = { Text(label) }
+                        )
+                    }
+                }
+            }
+
+            // TARJETA: AYUDA (avisos/widget que no llegan por ahorro de batería del fabricante)
+            SettingsCard(title = tr("settings_battery_help_title"), icon = Icons.Default.BatteryAlert) {
+                Text(
+                    tr("settings_battery_help_subtitle"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+                Button(onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://dontkillmyapp.com"))
+                    runCatching { context.startActivity(intent) }
+                }) {
+                    Text(tr("settings_battery_help_button"))
+                }
+            }
+
             // 30/08/2026 (2): aquí había una tarjeta "Sincronización" con un botón
             // "Actualizar ahora" que releía todos los .ics importados. Se ha quitado junto
             // con el resto del resincronizado (ver IcsImportRepository): el .ics es una
             // copia local que no cambia sola, así que el botón no podía traer nada nuevo.
 
             Text(
-                "PitBoard v0.1.0\n🏁 Hecho para fans del motor",
+                tr("settings_footer"),
                 modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelSmall,
@@ -410,23 +463,19 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
         AlertDialog(
             onDismissRequest = { showPermissionBlockedDialog = false },
             icon = { Icon(Icons.Default.Notifications, contentDescription = null) },
-            title = { Text("Permiso de notificaciones") },
+            title = { Text(tr("settings_notifications_permission_title")) },
             text = {
-                Text(
-                    "Android tiene bloqueados los avisos de PitBoard, así que la app ya no " +
-                        "puede volver a pedirte el permiso desde aquí. Abre los ajustes del " +
-                        "sistema y activa las notificaciones para PitBoard."
-                )
+                Text(tr("settings_notifications_permission_body"))
             },
             confirmButton = {
                 TextButton(onClick = {
                     showPermissionBlockedDialog = false
                     waitingForSystemSettings = true
                     NotificationPermission.openSystemNotificationSettings(context)
-                }) { Text("Abrir ajustes") }
+                }) { Text(tr("settings_open_settings")) }
             },
             dismissButton = {
-                TextButton(onClick = { showPermissionBlockedDialog = false }) { Text("Ahora no") }
+                TextButton(onClick = { showPermissionBlockedDialog = false }) { Text(tr("settings_not_now")) }
             }
         )
     }
@@ -494,12 +543,12 @@ private fun NotificationSeriesPicker(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Series con avisos", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    Text(tr("settings_series_with_alerts_title"), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                     IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, contentDescription = "Cerrar") }
                 }
 
                 Text(
-                    "Desactiva aquellas series de las que no quieras recibir notificaciones.",
+                    tr("settings_series_with_alerts_subtitle"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 20.dp)
@@ -542,7 +591,7 @@ private fun NotificationSeriesPicker(
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     shape = MaterialTheme.shapes.small
                 ) {
-                    Text("Listo")
+                    Text(tr("settings_done"))
                 }
             }
         }

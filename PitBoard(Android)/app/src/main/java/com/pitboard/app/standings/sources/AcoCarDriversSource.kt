@@ -40,25 +40,32 @@ class AcoCarDriversSource(
 
     suspend fun fetch(nowUtc: Long): List<CarDriverEntity> {
         val listingHtml = fetchHtml(listingUrl)
-        val listingDoc = Jsoup.parse(listingHtml, listingUrl)
+        val carRefs = parseCarRefs(listingHtml)
 
-        data class CarRef(val standingsClass: StandingsClass, val carUrl: String)
+        return coroutineScope {
+            carRefs.chunked(CONCURRENCY).flatMap { chunk ->
+                chunk.map { (standingsClass, carUrl) ->
+                    async(Dispatchers.IO) { fetchCarDrivers(carUrl, standingsClass, nowUtc) }
+                }.awaitAll()
+            }
+        }.flatten()
+    }
 
-        val carRefs = listingDoc.select("div.card-team").mapNotNull { card ->
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear la
+    // resolución de clase por el badge (span.fs-11) y la extracción de la url de cada
+    // coche contra un fixture HTML sin red — ver AcoCarDriversSourceTest. Devuelve pares
+    // en vez de una data class propia para no tener que exponer un tipo nuevo solo para
+    // el test.
+    internal fun parseCarRefs(html: String): List<Pair<StandingsClass, String>> {
+        val listingDoc = Jsoup.parse(html, listingUrl)
+        return listingDoc.select("div.card-team").mapNotNull { card ->
             val classText = card.selectFirst("span.fs-11")?.text()?.trim().orEmpty()
             val standingsClass = classMatchers.firstOrNull { (_, matches) -> matches(classText) }?.first
                 ?: return@mapNotNull null
             val carUrl = card.selectFirst("a.stretched-link")?.absUrl("href")?.takeIf { it.isNotBlank() }
                 ?: return@mapNotNull null
-            CarRef(standingsClass, carUrl)
+            standingsClass to carUrl
         }
-
-        return coroutineScope {
-            carRefs.chunked(CONCURRENCY).flatMap { chunk ->
-                chunk.map { ref -> async(Dispatchers.IO) { fetchCarDrivers(ref.carUrl, ref.standingsClass, nowUtc) } }
-                    .awaitAll()
-            }
-        }.flatten()
     }
 
     private fun fetchCarDrivers(carUrl: String, standingsClass: StandingsClass, nowUtc: Long): List<CarDriverEntity> =
@@ -70,25 +77,30 @@ class AcoCarDriversSource(
             val carNumber = carUrl.trimEnd('/').substringAfterLast('/')
             if (carNumber.isBlank() || carNumber.toIntOrNull() == null) return@runCatching emptyList()
 
-            val html = fetchHtml(carUrl)
-            val doc = Jsoup.parse(html, carUrl)
-
-            doc.select("a.card-driver").mapNotNull { card ->
-                val name = card.selectFirst("div.py-4")?.text()?.trim().orEmpty()
-                if (name.isBlank()) return@mapNotNull null
-                val photoUrl = card.selectFirst("img")?.absUrl("src")?.takeIf { it.isNotBlank() }
-
-                CarDriverEntity(
-                    category = category,
-                    standingsClass = standingsClass,
-                    carNumber = carNumber,
-                    entryKey = normalize(name),
-                    name = name,
-                    photoUrl = photoUrl,
-                    updatedAtUtc = nowUtc
-                )
-            }
+            parseCarPage(fetchHtml(carUrl), carUrl, carNumber, standingsClass, nowUtc)
         }.getOrElse { emptyList() }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetchCarDrivers() para poder testear
+    // el parsing de la ficha de coche (foto real vía <img src>, sin el truco de carga
+    // perezosa que sí usa imsa.com) contra un fixture HTML sin red.
+    internal fun parseCarPage(html: String, carUrl: String, carNumber: String, standingsClass: StandingsClass, nowUtc: Long): List<CarDriverEntity> {
+        val doc = Jsoup.parse(html, carUrl)
+        return doc.select("a.card-driver").mapNotNull { card ->
+            val name = card.selectFirst("div.py-4")?.text()?.trim().orEmpty()
+            if (name.isBlank()) return@mapNotNull null
+            val photoUrl = card.selectFirst("img")?.absUrl("src")?.takeIf { it.isNotBlank() }
+
+            CarDriverEntity(
+                category = category,
+                standingsClass = standingsClass,
+                carNumber = carNumber,
+                entryKey = normalize(name),
+                name = name,
+                photoUrl = photoUrl,
+                updatedAtUtc = nowUtc
+            )
+        }
+    }
 
     private fun normalize(s: String): String =
         java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD)

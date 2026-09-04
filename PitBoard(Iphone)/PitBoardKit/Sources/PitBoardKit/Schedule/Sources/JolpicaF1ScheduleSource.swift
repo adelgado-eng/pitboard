@@ -10,7 +10,14 @@ public final class JolpicaF1ScheduleSource: RaceScheduleSource, @unchecked Senda
     public init() {}
 
     public func fetch() async throws -> [EventDraft] {
-        let response: JolpicaResponse = try await HTTPClient.fetchJSON("https://api.jolpi.ca/ergast/f1/current.json")
+        let json = try await HTTPClient.fetchHTML("https://api.jolpi.ca/ergast/f1/current.json")
+        return try parseJSON(json)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // parsing contra un fixture JSON real sin red — ver JolpicaF1ScheduleSourceTests.
+    func parseJSON(_ json: String) throws -> [EventDraft] {
+        let response = try JSONDecoder().decode(JolpicaResponse.self, from: Data(json.utf8))
         let races = response.mrData?.raceTable?.races ?? []
         return races.flatMap { sessions(for: $0) }
     }

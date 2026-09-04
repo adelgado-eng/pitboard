@@ -20,6 +20,13 @@ public final class IndyCarStandingsSource: StandingsSource, @unchecked Sendable 
 
     public func fetch(nowUtc: Date) async throws -> [StandingDraft] {
         let html = try await HTTPClient.fetchHTML(standingsUrl)
+        return try parseHTML(html, nowUtc: nowUtc)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // recorte del "?w=80" y el "Logo" pegado al alt del escudo contra un fixture HTML sin
+    // red — ver IndyCarStandingsSourceTests.
+    func parseHTML(_ html: String, nowUtc: Date) throws -> [StandingDraft] {
         let doc = try SwiftSoup.parse(html, standingsUrl)
         let tables = try doc.select("table").array()
         guard let table = try tables.first(where: { t in

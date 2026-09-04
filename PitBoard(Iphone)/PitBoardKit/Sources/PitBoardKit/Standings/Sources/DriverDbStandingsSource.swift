@@ -133,7 +133,10 @@ public final class DriverDbStandingsSource: StandingsSource, @unchecked Sendable
         return nil
     }
 
-    private func parseDriverRows(table: Element, nowUtc: Date) throws -> [StandingDraft] {
+    // 04/09/2026 (Fase 1 del diagnóstico): internal (no private) — ya tomaba un Element en
+    // vez de una URL, así que no hace falta separar nada más. Ver
+    // DriverDbStandingsSourceTests.
+    func parseDriverRows(table: Element, nowUtc: Date) throws -> [StandingDraft] {
         let headers = try table.select("th").array().map { try $0.text().trimmingCharacters(in: .whitespacesAndNewlines) }
 
         let posIndex = headers.firstIndex { $0.localizedCaseInsensitiveContains("Pos") }

@@ -37,7 +37,10 @@ public final class GtWorldChallengeScheduleSource: RaceScheduleSource, @unchecke
         return allSessions
     }
 
-    private func extractItemListUrls(_ calendarHtml: String) throws -> [String] {
+    // 04/09/2026 (Fase 1 del diagnóstico): internal (no private) — ya tomaba un String
+    // sin red, así que no hace falta separar nada más. Ver
+    // GtWorldChallengeScheduleSourceTests.
+    func extractItemListUrls(_ calendarHtml: String) throws -> [String] {
         let doc = try SwiftSoup.parse(calendarHtml, baseUrl)
         let scripts = try doc.select("script[type=application/ld+json]").array()
         for script in scripts {
@@ -51,6 +54,14 @@ public final class GtWorldChallengeScheduleSource: RaceScheduleSource, @unchecke
 
     private func sessionsForEvent(_ eventUrl: String) async throws -> [EventDraft] {
         let html = try await HTTPClient.fetchHTML(eventUrl)
+        return try parseEventHTML(html, eventUrl: eventUrl)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de sessionsForEvent() para poder
+    // testear el parsing de la sección "Timetable" (día en el <caption>, hora GMT usada
+    // directamente como UTC) contra un fixture HTML sin red — ver
+    // GtWorldChallengeScheduleSourceTests.
+    func parseEventHTML(_ html: String, eventUrl: String) throws -> [EventDraft] {
         let doc = try SwiftSoup.parse(html, eventUrl)
 
         let trimmed = eventUrl.hasSuffix("/") ? String(eventUrl.dropLast()) : eventUrl

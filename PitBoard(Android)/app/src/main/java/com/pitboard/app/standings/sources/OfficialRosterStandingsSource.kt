@@ -68,8 +68,9 @@ open class OfficialRosterStandingsSource(
     private val rosterPhotoUrlExtractor: ((nameCell: Element) -> String?)? = null
 ) : StandingsSource {
 
-    private data class RosterRow(val name: String, val points: Double, val photoUrl: String? = null)
-    private data class Enrichment(val photoUrl: String?, val team: String)
+    // internal (no private): expuestas a test — ver parseRosterHtml/parseDriverDbHtml.
+    internal data class RosterRow(val name: String, val points: Double, val photoUrl: String? = null)
+    internal data class Enrichment(val photoUrl: String?, val team: String)
 
     override suspend fun fetch(nowUtc: Long): List<StandingEntity> = coroutineScope {
         val rosterRows = fetchRoster()
@@ -169,8 +170,13 @@ open class OfficialRosterStandingsSource(
             .orEmpty()
     }
 
-    private fun fetchRoster(): List<RosterRow> {
-        val html = fetchHtml(rosterUrl)
+    private fun fetchRoster(): List<RosterRow> = parseRosterHtml(fetchHtml(rosterUrl))
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetchRoster() para poder testear el
+    // parsing (incluida la limpieza de nombre pegado al código de piloto, ver
+    // cleanDriverName) contra un fixture HTML real sin red — ver
+    // OfficialRosterStandingsSourceTest.
+    internal fun parseRosterHtml(html: String): List<RosterRow> {
         val doc = Jsoup.parse(html, rosterUrl)
         val table = doc.select("table").firstOrNull { t ->
             headerCells(t).any { it.text().contains("Driver", ignoreCase = true) }
@@ -207,7 +213,13 @@ open class OfficialRosterStandingsSource(
 
     private fun fetchDriverDbEnrichment(slug: String): Map<String, Enrichment> {
         val url = "https://www.driverdb.com/championships/$slug/${Year.now().value}/standings"
-        val html = fetchHtml(url)
+        return parseDriverDbHtml(fetchHtml(url), url)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetchDriverDbEnrichment() para poder
+    // testear el parsing (incluido el filtro del guion largo "—" como equipo, ver
+    // OfficialRosterStandingsSourceTest) contra un fixture HTML real sin red.
+    internal fun parseDriverDbHtml(html: String, url: String): Map<String, Enrichment> {
         val doc = Jsoup.parse(html, url)
         val table = doc.select("table").firstOrNull { t ->
             t.select("th").any { it.text().contains("Driver", ignoreCase = true) }

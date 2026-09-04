@@ -46,6 +46,13 @@ public final class ImsaScheduleSource: RaceScheduleSource, @unchecked Sendable {
 
     private func sessionsForEvent(_ eventUrl: String) async throws -> [EventDraft] {
         let html = try await HTTPClient.fetchHTML(eventUrl)
+        return try parseEventHTML(html, eventUrl: eventUrl)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de sessionsForEvent() para poder
+    // testear el recorrido día/sesión (agrupado por el <div> de cabecera de día, filtro
+    // de clases de apoyo) contra un fixture HTML sin red — ver ImsaScheduleSourceTests.
+    func parseEventHTML(_ html: String, eventUrl: String) throws -> [EventDraft] {
         let doc = try SwiftSoup.parse(html, eventUrl)
 
         let trimmed = eventUrl.hasSuffix("/") ? String(eventUrl.dropLast()) : eventUrl

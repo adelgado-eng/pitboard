@@ -34,17 +34,17 @@ struct RaceWidgetView: View {
             backgroundColor
 
             if entry.allEvents.isEmpty {
-                Text("Sin eventos")
+                Text(Strings.get("events_empty_title", language: entry.appLanguage))
                     .font(.caption)
                     .foregroundStyle(palette.chalkDim)
             } else {
                 switch family {
                 case .systemSmall:
-                    HeroRowView(event: entry.allEvents[0], tag: tag(for: entry.allEvents[0]), tagColor: tagColor(for: entry.allEvents[0]), palette: palette, wordCount: entry.configuration.clampedWordCount)
+                    HeroRowView(event: entry.allEvents[0], tag: tag(for: entry.allEvents[0]), tagColor: tagColor(for: entry.allEvents[0]), palette: palette, wordCount: entry.configuration.clampedWordCount, language: entry.appLanguage)
                 case .systemLarge, .systemExtraLarge:
                     EventListView(entry: entry, palette: palette, tagColor: tagColor(for:))
                 default:
-                    MiniRowView(event: entry.allEvents[0], tag: tag(for: entry.allEvents[0]), tagColor: tagColor(for: entry.allEvents[0]), palette: palette, showTrackTime: entry.configuration.showTrackTime, wordCount: entry.configuration.clampedWordCount)
+                    MiniRowView(event: entry.allEvents[0], tag: tag(for: entry.allEvents[0]), tagColor: tagColor(for: entry.allEvents[0]), palette: palette, showTrackTime: entry.configuration.showTrackTime, wordCount: entry.configuration.clampedWordCount, language: entry.appLanguage)
                 }
             }
         }
@@ -70,6 +70,7 @@ private struct HeroRowView: View {
     let tagColor: Color
     let palette: WidgetPalette
     let wordCount: Int
+    let language: AppLanguage
 
     var body: some View {
         let textOnTag = ColorContrast.readableTextColor(background: tagColor)
@@ -79,7 +80,7 @@ private struct HeroRowView: View {
                 Text(tag)
                     .font(.caption.bold())
                     .foregroundStyle(textOnTag)
-                Text("D-\(widgetDaysUntil(event.startTimeUtc))")
+                Text(Strings.get("widget_days_prefix", language: language) + "\(widgetDaysUntil(event.startTimeUtc))")
                     .font(.system(size: 10))
                     .foregroundStyle(textOnTag.opacity(0.85))
             }
@@ -110,6 +111,7 @@ private struct MiniRowView: View {
     let palette: WidgetPalette
     let showTrackTime: Bool
     let wordCount: Int
+    let language: AppLanguage
 
     var body: some View {
         HStack(spacing: 8) {
@@ -126,7 +128,7 @@ private struct MiniRowView: View {
                     .foregroundStyle(palette.chalk)
                     .lineLimit(1)
                 if showTrackTime, let trackTime = widgetTrackTimeLabel(startTimeUtc: event.startTimeUtc, timeZoneId: event.timeZoneId) {
-                    Text("Pista: \(trackTime)")
+                    Text(String(format: Strings.get("widget_track_time", language: language), trackTime))
                         .font(.system(size: 10))
                         .foregroundStyle(palette.chalkDim)
                         .lineLimit(1)
@@ -135,7 +137,7 @@ private struct MiniRowView: View {
 
             Spacer(minLength: 4)
 
-            Text("D-\(widgetDaysUntil(event.startTimeUtc))")
+            Text(Strings.get("widget_days_prefix", language: language) + "\(widgetDaysUntil(event.startTimeUtc))")
                 .font(.system(size: 12))
                 .foregroundStyle(palette.chalkDim)
         }
@@ -163,13 +165,13 @@ private struct EventListView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     if !entry.weekendEvents.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text(entry.weekendLabel.uppercased())
+                            Text(Strings.get(entry.weekendLabelKey, language: entry.appLanguage).uppercased())
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundStyle(palette.chalkDim)
 
                             VStack(spacing: 0) {
                                 ForEach(Array(entry.weekendEvents.enumerated()), id: \.offset) { index, event in
-                                    EventItemRow(event: event, tagColor: tagColor(event), tag: entry.seriesTagColors[event.series]?.tag ?? event.series.defaultTag, palette: palette, wordCount: entry.configuration.clampedWordCount, showTrackTime: entry.configuration.showTrackTime)
+                                    EventItemRow(event: event, tagColor: tagColor(event), tag: entry.seriesTagColors[event.series]?.tag ?? event.series.defaultTag, palette: palette, wordCount: entry.configuration.clampedWordCount, showTrackTime: entry.configuration.showTrackTime, language: entry.appLanguage)
                                     if index < entry.weekendEvents.count - 1 {
                                         Divider().background(palette.chalkDim.opacity(0.2))
                                     }
@@ -180,7 +182,7 @@ private struct EventListView: View {
                     }
 
                     ForEach(Array(entry.laterEvents.enumerated()), id: \.offset) { _, event in
-                        EventItemRow(event: event, tagColor: tagColor(event), tag: entry.seriesTagColors[event.series]?.tag ?? event.series.defaultTag, palette: palette, wordCount: entry.configuration.clampedWordCount, showTrackTime: entry.configuration.showTrackTime)
+                        EventItemRow(event: event, tagColor: tagColor(event), tag: entry.seriesTagColors[event.series]?.tag ?? event.series.defaultTag, palette: palette, wordCount: entry.configuration.clampedWordCount, showTrackTime: entry.configuration.showTrackTime, language: entry.appLanguage)
                             .background(palette.cardBg, in: RoundedRectangle(cornerRadius: 16))
                     }
                 }
@@ -197,6 +199,7 @@ private struct EventItemRow: View {
     let palette: WidgetPalette
     let wordCount: Int
     let showTrackTime: Bool
+    let language: AppLanguage
 
     var body: some View {
         let textOnTag = ColorContrast.readableTextColor(background: tagColor)
@@ -210,7 +213,7 @@ private struct EventItemRow: View {
                 Text(tag)
                     .font(.caption.bold())
                     .foregroundStyle(textOnTag)
-                Text("D-\(widgetDaysUntil(event.startTimeUtc))")
+                Text(Strings.get("widget_days_prefix", language: language) + "\(widgetDaysUntil(event.startTimeUtc))")
                     .font(.system(size: 10))
                     .foregroundStyle(textOnTag.opacity(0.8))
             }

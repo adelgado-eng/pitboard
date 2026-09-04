@@ -20,6 +20,13 @@ public final class EspnNascarScheduleSource: RaceScheduleSource, @unchecked Send
     public func fetch() async throws -> [EventDraft] {
         let url = "https://www.espn.com/racing/schedule/_/series/\(espnSeriesSlug)"
         let html = try await HTTPClient.fetchHTML(url)
+        return try parseHTML(html)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // troceo de celdas por <br> contra un fixture HTML sin red — ver
+    // EspnNascarScheduleSourceTests.
+    func parseHTML(_ html: String) throws -> [EventDraft] {
         let doc = try SwiftSoup.parse(html)
         guard let table = try doc.select("table.tablehead").first() else { return [] }
 

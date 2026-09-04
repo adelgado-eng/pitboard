@@ -21,8 +21,16 @@ public final class MotoGpPulseliveScheduleSource: RaceScheduleSource, @unchecked
     public func fetch() async throws -> [EventDraft] {
         let year = Calendar(identifier: .gregorian).component(.year, from: Date())
         let url = "https://api.pulselive.motogp.com/motogp/v1/events?seasonYear=\(year)"
-        let events = try await HTTPClient.fetchJSON(url, as: [PulseliveEvent].self)
+        let json = try await HTTPClient.fetchHTML(url)
+        return try parseJSON(json)
+    }
 
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // filtrado por tipo de evento ("GP", sin tests ni presentaciones) y por clase
+    // (acrónimo MGP/MT2/MT3) contra un fixture JSON real sin red — ver
+    // MotoGpPulseliveScheduleSourceTests.
+    func parseJSON(_ json: String) throws -> [EventDraft] {
+        let events = try JSONDecoder().decode([PulseliveEvent].self, from: Data(json.utf8))
         return events
             .filter { $0.kind == "GP" }
             .flatMap { sessionsForEvent($0) }

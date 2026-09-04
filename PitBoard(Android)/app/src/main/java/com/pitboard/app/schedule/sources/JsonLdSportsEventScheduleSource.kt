@@ -47,19 +47,28 @@ class JsonLdSportsEventScheduleSource(
         val roundHrefPrefix = roundHrefPrefixTemplate.replace("{year}", year.toString())
 
         val listingHtml = fetchHtml(listingUrl)
-        val listingDoc = Jsoup.parse(listingHtml, baseUrl)
-
-        val roundUrls = listingDoc.select("a[href]")
-            .filter { it.attr("href").startsWith(roundHrefPrefix) }
-            .mapNotNull { it.attr("abs:href").takeIf { url -> url.isNotBlank() } }
-            .distinct()
-            .filterNot { url -> excludeSlugContaining.any { it.lowercase() in url.lowercase() } }
+        val roundUrls = extractRoundUrls(listingHtml, roundHrefPrefix)
 
         return roundUrls.flatMap { roundUrl -> runCatching { sessionsForRound(roundUrl) }.getOrElse { emptyList() } }
     }
 
-    private fun sessionsForRound(roundUrl: String): List<EventEntity> {
-        val html = fetchHtml(roundUrl)
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el filtro
+    // de enlaces de ronda (prefijo + exclusión de slugs de test) contra un fixture HTML sin
+    // red — ver JsonLdSportsEventScheduleSourceTest.
+    internal fun extractRoundUrls(listingHtml: String, roundHrefPrefix: String): List<String> {
+        val listingDoc = Jsoup.parse(listingHtml, baseUrl)
+        return listingDoc.select("a[href]")
+            .filter { it.attr("href").startsWith(roundHrefPrefix) }
+            .mapNotNull { it.attr("abs:href").takeIf { url -> url.isNotBlank() } }
+            .distinct()
+            .filterNot { url -> excludeSlugContaining.any { it.lowercase() in url.lowercase() } }
+    }
+
+    private fun sessionsForRound(roundUrl: String): List<EventEntity> = parseRoundHtml(fetchHtml(roundUrl), roundUrl)
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de sessionsForRound() para poder
+    // testear el parsing del JSON-LD de una ronda contra un fixture HTML sin red.
+    internal fun parseRoundHtml(html: String, roundUrl: String): List<EventEntity> {
         val doc = Jsoup.parse(html, roundUrl)
         val adapter = StandingsMoshi.instance.adapter(JsonLdSportsEvent::class.java)
 

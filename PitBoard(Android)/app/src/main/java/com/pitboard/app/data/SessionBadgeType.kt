@@ -25,6 +25,18 @@ object SessionBadgeType {
         else -> "Otros"
     }
 
+    /** Misma etiqueta que [label] pero como clave de com.pitboard.app.i18n.Strings — [label]
+     *  se deja igual a propósito (lo sigue usando EventReminderWorker.kt para el texto de las
+     *  notificaciones) y esta clave nueva es solo para quien quiera traducirla (ver
+     *  EventsScreen.kt). */
+    fun labelKey(badge: String): String = when (badge) {
+        RACE -> "session_race"
+        QUALY -> "session_qualy"
+        SPRINT -> "session_sprint"
+        PRACTICE -> "session_practice"
+        else -> "session_other"
+    }
+
     fun defaultMinutes(badge: String): Int = when (badge) {
         RACE -> 60
         QUALY, SPRINT -> 30

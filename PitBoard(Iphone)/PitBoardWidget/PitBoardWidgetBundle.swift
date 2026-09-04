@@ -6,6 +6,7 @@ import PitBoardKit
 struct PitBoardWidgetBundle: WidgetBundle {
     var body: some Widget {
         PitBoardWidget()
+        StandingsWidget()
     }
 }
 
@@ -27,6 +28,28 @@ struct PitBoardWidget: Widget {
         }
         .configurationDisplayName("PitBoard")
         .description("Próximos eventos de tus series de motorsport favoritas.")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .contentMarginsDisabled()
+    }
+}
+
+/// Widget de Clasificación — un único tipo, configurable por instancia (categoría +
+/// Pilotos/Equipos, o clase de coche en WEC/ELMS/IMSA/Le Mans Cup): varias copias del mismo
+/// widget, cada una apuntando a una categoría distinta, en vez de un tipo de widget por cada
+/// una de las 15 categorías.
+struct StandingsWidget: Widget {
+    let kind: String = "StandingsWidget"
+
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(
+            kind: kind,
+            intent: StandingsWidgetConfigurationIntent.self,
+            provider: StandingsWidgetProvider()
+        ) { entry in
+            StandingsWidgetView(entry: entry)
+        }
+        .configurationDisplayName("PitBoard — Clasificación")
+        .description("Clasificación de pilotos o equipos de tu categoría favorita.")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         .contentMarginsDisabled()
     }

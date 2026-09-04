@@ -4,24 +4,17 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 
 /**
- * Tres receivers para las tres entradas que ahora aparecen en el selector de widgets de
- * Samsung (2×1, 2×2, 4×2) — Android exige un <receiver> distinto por cada tamaño que
- * quieras que aparezca como opción separada; no hay forma de declarar "un widget con 3
- * tamaños" en una sola entrada.
- *
- * Los tres apuntan a la MISMA clase RaceWidget (mismo contenido, misma lógica) — lo único
- * que cambia es el AppWidgetProviderInfo (race_widget_info_*.xml) que cada uno referencia
- * desde el manifest. RaceWidget decide qué diseño pintar leyendo el tamaño real con
- * LocalSize.current, así que no hace falta triplicar el composable ni la configuración.
+ * 04/09/2026: un único receiver — antes había 3 (Small/Medium/Large), uno por cada
+ * AppWidgetProviderInfo con un rango de tamaño fijo, porque así se hacía cuando el widget
+ * solo admitía unos pocos tamaños "preset" en el selector de Samsung. Desde Android 12
+ * (API 31) un solo AppWidgetProviderInfo puede declarar minWidth/minHeight hasta
+ * maxResizeWidth/maxResizeHeight con resizeMode="horizontal|vertical" (ver
+ * race_widget_info.xml) y el usuario arrastra las esquinas para agrandarlo/encogerlo — RaceWidget
+ * ya leía el tamaño real con LocalSize.current para decidir el diseño (mini fila/hero/lista),
+ * así que fusionar a un único receiver no cambia nada del contenido, solo simplifica el
+ * manifest. En Android 8–11 (pre-API 31) el widget se coloca fijo al tamaño mínimo
+ * declarado — sin el arrastre libre, pero funcional.
  */
-class RaceWidgetReceiverSmall : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget: GlanceAppWidget = RaceWidget.instance
-}
-
-class RaceWidgetReceiverMedium : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget: GlanceAppWidget = RaceWidget.instance
-}
-
-class RaceWidgetReceiverLarge : GlanceAppWidgetReceiver() {
+class RaceWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = RaceWidget.instance
 }

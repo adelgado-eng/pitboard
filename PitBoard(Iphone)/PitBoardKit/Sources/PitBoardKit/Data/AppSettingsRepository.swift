@@ -7,6 +7,15 @@ public enum AppTheme: String, Codable, Sendable, CaseIterable {
     case system = "SYSTEM"
 }
 
+/// Qué hora mostrar como PRINCIPAL en las listas de eventos (EventsScreen) — equivalente
+/// exacto de `TimeDisplayMode` en Android. `.device` es el comportamiento de siempre (hora
+/// del dispositivo); el detalle de un evento (EventDetailsSheet) sigue enseñando las dos
+/// siempre, esto solo decide cuál se ve de un vistazo en la lista.
+public enum TimeDisplayMode: String, Codable, Sendable, CaseIterable {
+    case device = "DEVICE"
+    case track = "TRACK"
+}
+
 /// Preferencias del usuario — equivalente exacto de `AppSettingsRepository.kt`
 /// (DataStore). Usa `UserDefaults(suiteName:)` sobre el mismo App Group que la base de
 /// datos: a diferencia de Android (donde DataStore vive solo en el proceso de la app),
@@ -37,6 +46,14 @@ public final class AppSettingsRepository: @unchecked Sendable {
     /// opt-in explícito, igual que en Android.
     public private(set) var standingsEnabled: Bool
     public private(set) var appTheme: AppTheme
+    /// Hora principal en la lista de Eventos: la del dispositivo (por defecto) o la del
+    /// circuito, cuando la fuente la trae.
+    public private(set) var timeDisplayMode: TimeDisplayMode
+    /// Idioma elegido a mano por el usuario — `nil` significa "todavía no ha pasado por el
+    /// selector de primer arranque" (ver `LanguagePickerScreen`/`RootTabView`), distinto de
+    /// "eligió español": mientras sea `nil`, la app enseña el selector en vez del contenido
+    /// normal.
+    public private(set) var appLanguage: AppLanguage?
     /// Series sin avisos. Vacío = ninguna excluida (todas notifican).
     public private(set) var notificationDisabledSeries: Set<RaceSeries>
     /// Series activas en el filtro rápido de Eventos. Vacío = todas.
@@ -61,6 +78,8 @@ public final class AppSettingsRepository: @unchecked Sendable {
         self.practiceNotificationsEnabled = defaults.object(forKey: Keys.practiceNotificationsEnabled) as? Bool ?? false
         self.standingsEnabled = defaults.object(forKey: Keys.standingsEnabled) as? Bool ?? false
         self.appTheme = (defaults.string(forKey: Keys.appTheme)).flatMap(AppTheme.init(rawValue:)) ?? .system
+        self.timeDisplayMode = (defaults.string(forKey: Keys.timeDisplayMode)).flatMap(TimeDisplayMode.init(rawValue:)) ?? .device
+        self.appLanguage = (defaults.string(forKey: Keys.appLanguage)).flatMap(AppLanguage.init(rawValue:))
         self.notificationDisabledSeries = Set(
             (defaults.stringArray(forKey: Keys.notificationDisabledSeries) ?? []).compactMap(RaceSeries.init(rawValue:))
         )
@@ -107,6 +126,23 @@ public final class AppSettingsRepository: @unchecked Sendable {
         defaults.set(theme.rawValue, forKey: Keys.appTheme)
     }
 
+    public func setTimeDisplayMode(_ mode: TimeDisplayMode) {
+        timeDisplayMode = mode
+        defaults.set(mode.rawValue, forKey: Keys.timeDisplayMode)
+    }
+
+    public func setAppLanguage(_ language: AppLanguage) {
+        appLanguage = language
+        defaults.set(language.rawValue, forKey: Keys.appLanguage)
+    }
+
+    /// Atajo: el texto de `key` en el idioma activo — ej. `settings.t("settings_title")`. Cae
+    /// a español mientras el usuario todavía no ha elegido idioma (selector de primer
+    /// arranque en curso).
+    public func t(_ key: String) -> String {
+        Strings.get(key, language: appLanguage ?? .spanish)
+    }
+
     public func setNotificationDisabledSeries(_ series: Set<RaceSeries>) {
         notificationDisabledSeries = series
         if series.isEmpty {
@@ -139,6 +175,8 @@ public final class AppSettingsRepository: @unchecked Sendable {
         static let practiceNotificationsEnabled = "practice_notifications_enabled"
         static let standingsEnabled = "standings_enabled"
         static let appTheme = "app_theme"
+        static let timeDisplayMode = "time_display_mode"
+        static let appLanguage = "app_language"
         static let notificationDisabledSeries = "notification_disabled_series"
         static let eventScreenSeries = "event_screen_series"
         static let eventScreenSessionTypes = "event_screen_session_types"

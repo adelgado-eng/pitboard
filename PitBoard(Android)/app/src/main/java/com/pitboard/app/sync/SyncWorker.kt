@@ -12,6 +12,7 @@ import com.pitboard.app.data.AppDatabase
 import com.pitboard.app.data.AppSettingsRepository
 import com.pitboard.app.notifications.NotificationScheduler
 import com.pitboard.app.widget.RaceWidget
+import com.pitboard.app.widget.StandingsWidget
 import java.util.concurrent.TimeUnit
 
 /**
@@ -39,6 +40,10 @@ class SyncWorker(
             // de "eventos pasados" (EventDao.observeUpcoming, paso 13) se aplique con la
             // hora actual sin que el usuario tenga que abrir la app
             RaceWidget.instance.updateAll(applicationContext)
+            // 04/09/2026: mismo motivo que RaceWidget — este ciclo cada 30 min es la red de
+            // seguridad que le faltaba al widget de Clasificación si su primera actualización
+            // se pierde por la gestión de batería de Samsung (ver StandingsSyncWorker).
+            StandingsWidget.instance.updateAll(applicationContext)
 
             // Y reprograma los recordatorios de los eventos que siguen por venir (ver
             // ExistingWorkPolicy.REPLACE en NotificationScheduler, paso 32)

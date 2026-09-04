@@ -56,6 +56,13 @@ class ElmsDriversSource {
             response.body?.string() ?: error("$pageUrl: cuerpo vacío")
         }
 
+        return parseHtml(html, nowUtc)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // agrupado por clase (recordando el último <h2> visto) contra un fixture HTML sin red —
+    // ver ElmsDriversSourceTest.
+    internal fun parseHtml(html: String, nowUtc: Long): List<CarDriverEntity> {
         val doc = Jsoup.parse(html, pageUrl)
 
         var currentClass: StandingsClass? = null

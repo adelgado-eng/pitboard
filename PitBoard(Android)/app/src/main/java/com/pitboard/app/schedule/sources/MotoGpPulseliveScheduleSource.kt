@@ -43,6 +43,14 @@ class MotoGpPulseliveScheduleSource(
             response.body?.string() ?: error("$url: cuerpo vacío")
         }
 
+        return parseJson(json)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // filtrado por tipo de evento ("GP", sin tests ni presentaciones) y por clase
+    // (acrónimo MGP/MT2/MT3) contra un fixture JSON real sin red — ver
+    // MotoGpPulseliveScheduleSourceTest.
+    internal fun parseJson(json: String): List<EventEntity> {
         val listType = Types.newParameterizedType(List::class.java, PulseliveEvent::class.java)
         val adapter = StandingsMoshi.instance.adapter<List<PulseliveEvent>>(listType)
         val events = adapter.fromJson(json).orEmpty()

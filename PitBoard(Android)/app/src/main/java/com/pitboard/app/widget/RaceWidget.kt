@@ -49,10 +49,14 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.pitboard.app.data.AppDatabase
+import com.pitboard.app.data.AppSettingsRepository
 import com.pitboard.app.data.AppTheme
 import com.pitboard.app.data.EventEntity
 import com.pitboard.app.data.RaceSeries
 import com.pitboard.app.data.SeriesConfigEntity
+import com.pitboard.app.i18n.AppLanguage
+import com.pitboard.app.i18n.LocalAppLanguage
+import com.pitboard.app.i18n.tr
 import com.pitboard.app.util.ColorContrast
 import com.pitboard.app.util.DateTimeFormatters
 import com.pitboard.app.util.EventWeekendGrouper
@@ -60,6 +64,7 @@ import com.pitboard.app.util.SeasonWindow
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -68,6 +73,10 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 
 private val FALLBACK_COLOR = Color(0xFF5F6570)
+
+/** Intentos como mucho para cargar los datos del widget antes de dejarlo con el fallback
+ *  de la bandera (que ahora sí se puede tocar para forzar otro intento, ver provideGlance). */
+private const val RELOAD_ATTEMPTS = 3
 
 /** Colores de texto y tarjetas internas del widget. Antes eran fijos (siempre oscuro);
  *  ahora dependen de la apariencia elegida al configurar el widget (Claro/Oscuro/Auto). El
@@ -109,56 +118,88 @@ class RaceWidget : GlanceAppWidget() {
         provideContent {
             val contextLocal = LocalContext.current
 
+            // 04/09/2026: bug real reportado — el widget se quedaba con la bandera 🏁 fija
+            // para siempre. Causa: si la carga fallaba UNA sola vez (ej. la única conexión
+            // de SQLCipher ocupada un instante por un SyncWorker escribiendo a la vez —
+            // ver el comentario de JournalMode.TRUNCATE en AppDatabase), la excepción se
+            // registraba en Logcat y `value` se quedaba en null para siempre: nada volvía a
+            // intentarlo hasta la siguiente actualización periódica del sistema (~30 min), y
+            // el fallback de la bandera no tenía ningún `clickable` para forzarlo a mano.
+            // Ahora se reintenta unas pocas veces con una espera corta, y el fallback se
+            // puede tocar para pedir una actualización inmediata (mismo UpdateAction que ya
+            // usa WidgetUI).
             val state by produceState<WidgetReadyState?>(initialValue = null) {
-                try {
-                    val db = AppDatabase.getInstance(contextLocal)
-                    val savedConfig = WidgetPrefsRepository.load(contextLocal, id)
-                    val appWidgetId = run {
-                        val manager = GlanceAppWidgetManager(contextLocal)
-                        var resolved = AppWidgetManager.INVALID_APPWIDGET_ID
-                        repeat(5) {
-                            resolved = try { manager.getAppWidgetId(id) } catch (_: Exception) { AppWidgetManager.INVALID_APPWIDGET_ID }
-                            if (resolved != AppWidgetManager.INVALID_APPWIDGET_ID) return@run resolved
-                            delay(200.milliseconds)
+                repeat(RELOAD_ATTEMPTS) { attempt ->
+                    try {
+                        val db = AppDatabase.getInstance(contextLocal)
+                        val savedConfig = WidgetPrefsRepository.load(contextLocal, id)
+                        // Mismo idioma que el resto de la app (elegido en el selector de
+                        // primer arranque) — SPANISH si todavía no se ha elegido ninguno.
+                        val appLanguage = AppSettingsRepository(contextLocal).appLanguageNow() ?: AppLanguage.SPANISH
+                        val appWidgetId = run {
+                            val manager = GlanceAppWidgetManager(contextLocal)
+                            var resolved = AppWidgetManager.INVALID_APPWIDGET_ID
+                            repeat(5) {
+                                resolved = try { manager.getAppWidgetId(id) } catch (_: Exception) { AppWidgetManager.INVALID_APPWIDGET_ID }
+                                if (resolved != AppWidgetManager.INVALID_APPWIDGET_ID) return@run resolved
+                                delay(200.milliseconds)
+                            }
+                            resolved
                         }
-                        resolved
-                    }
 
-                    val config = savedConfig
-                    val seriesConfigs = db.seriesConfigDao().getAll().associateBy { it.series }
-                    val activeSeries = WidgetPrefsRepository.effectiveSeries(config).toList()
-                    val now = System.currentTimeMillis()
+                        val config = savedConfig
+                        val seriesConfigs = db.seriesConfigDao().getAll().associateBy { it.series }
+                        val activeSeries = WidgetPrefsRepository.effectiveSeries(config).toList()
+                        val now = System.currentTimeMillis()
 
-                    val events = db.eventDao().getFilteredUpcoming(
-                        now,
-                        SeasonWindow.endOfCurrentYearUtc(now),
-                        activeSeries,
-                        WidgetPrefsRepository.queryLimitFor(config.eventCount)
-                    )
+                        val events = db.eventDao().getFilteredUpcoming(
+                            now,
+                            SeasonWindow.endOfCurrentYearUtc(now),
+                            activeSeries,
+                            WidgetPrefsRepository.queryLimitFor(config.eventCount)
+                        )
 
-                    val useDark = when (config.appearance) {
-                        AppTheme.LIGHT -> false
-                        AppTheme.DARK -> true
-                        AppTheme.SYSTEM -> {
-                            val nightMode = contextLocal.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                            nightMode == Configuration.UI_MODE_NIGHT_YES
+                        val useDark = when (config.appearance) {
+                            AppTheme.LIGHT -> false
+                            AppTheme.DARK -> true
+                            AppTheme.SYSTEM -> {
+                                val nightMode = contextLocal.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                                nightMode == Configuration.UI_MODE_NIGHT_YES
+                            }
                         }
-                    }
 
-                    value = WidgetReadyState(
-                        config,
-                        events.distinctBy { it.fullTitle to it.startTimeUtc }.take(WidgetPrefsRepository.queryLimitFor(config.eventCount)),
-                        seriesConfigs,
-                        appWidgetId,
-                        useDark
-                    )
-                } catch (e: Exception) {
-                    Log.e("RaceWidget", "Load error", e)
+                        value = WidgetReadyState(
+                            config,
+                            events.distinctBy { it.fullTitle to it.startTimeUtc }.take(WidgetPrefsRepository.queryLimitFor(config.eventCount)),
+                            seriesConfigs,
+                            appWidgetId,
+                            useDark,
+                            appLanguage
+                        )
+                        return@produceState
+                    } catch (e: CancellationException) {
+                        // Nunca se traga: si se lanza es porque Glance está recomponiendo o
+                        // destruyendo esta sesión, no un fallo real que haya que reintentar.
+                        throw e
+                    } catch (e: Exception) {
+                        Log.e("RaceWidget", "Load error (intento ${attempt + 1}/$RELOAD_ATTEMPTS)", e)
+                        if (attempt < RELOAD_ATTEMPTS - 1) delay(500.milliseconds)
+                    }
                 }
             }
 
             GlanceTheme {
-                state?.let { WidgetUI(it) } ?: Box(GlanceModifier.fillMaxSize().background(DarkWidgetPalette.cardBg).cornerRadius(24.dp), contentAlignment = Alignment.Center) {
+                state?.let {
+                    CompositionLocalProvider(LocalAppLanguage provides it.appLanguage) {
+                        WidgetUI(it)
+                    }
+                } ?: Box(
+                    GlanceModifier.fillMaxSize()
+                        .background(DarkWidgetPalette.cardBg)
+                        .cornerRadius(24.dp)
+                        .clickable(actionRunCallback<UpdateAction>()),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text("🏁", style = TextStyle(fontSize = 24.sp))
                 }
             }
@@ -170,7 +211,8 @@ class RaceWidget : GlanceAppWidget() {
         val events: List<EventEntity>,
         val seriesConfigs: Map<RaceSeries, SeriesConfigEntity>,
         val appWidgetId: Int,
-        val useDark: Boolean
+        val useDark: Boolean,
+        val appLanguage: AppLanguage
     )
 
     @Composable
@@ -188,7 +230,7 @@ class RaceWidget : GlanceAppWidget() {
                 }
 
                 if (state.events.isEmpty()) {
-                    Box(GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Sin eventos", style = TextStyle(color = ColorProvider(palette.chalkDim))) }
+                    Box(GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(tr("events_empty_title"), style = TextStyle(color = ColorProvider(palette.chalkDim))) }
                 } else {
                     when {
                         size.height < 80.dp -> MiniRow(state.events.first(), state.seriesConfigs, state.config)
@@ -229,7 +271,7 @@ class RaceWidget : GlanceAppWidget() {
             if (groups.weekendEvents.isNotEmpty()) {
                 item {
                     Column(GlanceModifier.fillMaxWidth().padding(bottom = 12.dp)) {
-                        Text(groups.weekendLabel.uppercase(), style = TextStyle(color = ColorProvider(palette.chalkDim), fontWeight = FontWeight.Bold, fontSize = 11.sp), modifier = GlanceModifier.padding(bottom = 6.dp, start = 4.dp))
+                        Text(tr(groups.weekendLabelKey).uppercase(), style = TextStyle(color = ColorProvider(palette.chalkDim), fontWeight = FontWeight.Bold, fontSize = 11.sp), modifier = GlanceModifier.padding(bottom = 6.dp, start = 4.dp))
                         Column(GlanceModifier.fillMaxWidth().background(palette.cardBg).cornerRadius(20.dp)) {
                             groups.weekendEvents.forEachIndexed { idx, event ->
                                 EventItem(event, seriesConfigs, config, false)
@@ -259,7 +301,7 @@ class RaceWidget : GlanceAppWidget() {
             Row(GlanceModifier.fillMaxWidth().height(64.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(GlanceModifier.width(44.dp).fillMaxHeight().background(contrastColor).cornerRadius(8.dp).padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalAlignment = Alignment.CenterVertically) {
                     Text(cat?.tag ?: event.series.defaultTag, style = TextStyle(color = ColorProvider(textOnTag), fontWeight = FontWeight.Bold))
-                    Text("D-${daysUntil(event.startTimeUtc)}", style = TextStyle(color = ColorProvider(textOnTag.copy(alpha = 0.8f)), fontSize = 10.sp))
+                    Text("${tr("widget_days_prefix")}${daysUntil(event.startTimeUtc)}", style = TextStyle(color = ColorProvider(textOnTag.copy(alpha = 0.8f)), fontSize = 10.sp))
                 }
                 Column(GlanceModifier.defaultWeight().padding(horizontal = 10.dp)) {
                     Text(eventDisplayName(event.fullTitle, event.series.displayName, config.wordCount), style = TextStyle(color = ColorProvider(palette.chalk), fontWeight = FontWeight.Medium), maxLines = 1)
@@ -284,9 +326,9 @@ class RaceWidget : GlanceAppWidget() {
             Box(GlanceModifier.width(8.dp)) {}
             Column(GlanceModifier.defaultWeight()) {
                 Text(eventDisplayName(event.fullTitle, event.series.displayName, config.wordCount), style = TextStyle(color = ColorProvider(palette.chalk), fontWeight = FontWeight.Medium), maxLines = 1)
-                if (config.showTrackTime) trackTimeLabel(event.startTimeUtc, event.timeZoneId)?.let { Text("Pista: $it", style = TextStyle(color = ColorProvider(palette.chalkDim), fontSize = 10.sp), maxLines = 1) }
+                if (config.showTrackTime) trackTimeLabel(event.startTimeUtc, event.timeZoneId)?.let { Text(tr("widget_track_time").format(it), style = TextStyle(color = ColorProvider(palette.chalkDim), fontSize = 10.sp), maxLines = 1) }
             }
-            Text("D-${daysUntil(event.startTimeUtc)}", style = TextStyle(color = ColorProvider(palette.chalkDim), fontSize = 12.sp))
+            Text("${tr("widget_days_prefix")}${daysUntil(event.startTimeUtc)}", style = TextStyle(color = ColorProvider(palette.chalkDim), fontSize = 12.sp))
         }
     }
 
@@ -300,7 +342,7 @@ class RaceWidget : GlanceAppWidget() {
             Box(GlanceModifier.width(56.dp).height(40.dp).background(color).cornerRadius(12.dp), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(cat?.tag ?: event.series.defaultTag, style = TextStyle(color = ColorProvider(textOnTag), fontWeight = FontWeight.Bold))
-                    Text("D-${daysUntil(event.startTimeUtc)}", style = TextStyle(color = ColorProvider(textOnTag.copy(alpha = 0.85f)), fontSize = 10.sp))
+                    Text("${tr("widget_days_prefix")}${daysUntil(event.startTimeUtc)}", style = TextStyle(color = ColorProvider(textOnTag.copy(alpha = 0.85f)), fontSize = 10.sp))
                 }
             }
             Box(GlanceModifier.height(8.dp)) {}

@@ -73,14 +73,14 @@ struct StandingsScreen: View {
             if !settings.standingsEnabled {
                 EmptyStateView(
                     systemImage: "trophy.fill",
-                    title: "Clasificaciones desactivadas",
-                    message: "Actívalas en Ajustes para ver la clasificación de F1, MotoGP y más — necesita conexión a internet."
+                    title: settings.t("standings_empty_disabled_title"),
+                    message: settings.t("standings_empty_disabled_message")
                 )
             } else if !isOnline && !hasAnyCache {
                 EmptyStateView(
                     systemImage: "wifi.slash",
-                    title: "Necesitas conexión",
-                    message: "Todavía no hay ninguna clasificación guardada. Conéctate a wifi o datos móviles al menos una vez."
+                    title: settings.t("events_empty_offline_title"),
+                    message: settings.t("standings_empty_offline_message")
                 )
             } else {
                 VStack(spacing: 0) {
@@ -101,7 +101,7 @@ struct StandingsScreen: View {
                 }
             }
         }
-        .navigationTitle("Clasificaciones")
+        .navigationTitle(settings.t("standings_title"))
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 if syncing {
@@ -121,10 +121,10 @@ struct StandingsScreen: View {
                 }
             }
         }
-        .alert("Sin conexión", isPresented: $showOfflineAlert) {
-            Button("Vale", role: .cancel) {}
+        .alert(settings.t("standings_offline_alert_title"), isPresented: $showOfflineAlert) {
+            Button(settings.t("standings_offline_alert_ok"), role: .cancel) {}
         } message: {
-            Text("No se puede actualizar ahora.")
+            Text(settings.t("standings_offline_alert_message"))
         }
         .sheet(isPresented: Binding(get: { syncReport != nil }, set: { if !$0 { syncReport = nil } })) {
             if let report = syncReport {
@@ -151,6 +151,7 @@ private struct CategoryRow: View {
     let leader: StandingModel?
 
     @Environment(\.pitBoardColors) private var colors
+    @Environment(AppSettingsRepository.self) private var settings
 
     var body: some View {
         HStack(spacing: 12) {
@@ -168,11 +169,11 @@ private struct CategoryRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(category.displayName).font(.body)
                 if let leader {
-                    Text("Lidera \(leader.name) · \(formatPoints(leader.points)) pts")
+                    Text(String(format: settings.t("standings_leading"), leader.name, formatPoints(leader.points)))
                         .font(.caption)
                         .foregroundStyle(colors.onSurfaceVariant)
                 } else {
-                    Text("Sin datos todavía")
+                    Text(settings.t("standings_no_data_yet"))
                         .font(.caption)
                         .foregroundStyle(colors.onSurfaceVariant)
                 }
@@ -195,6 +196,7 @@ private struct SyncReportView: View {
     let report: StandingsRepository.SyncResult
     @Environment(\.dismiss) private var dismiss
     @Environment(\.pitBoardColors) private var colors
+    @Environment(AppSettingsRepository.self) private var settings
 
     private var failed: [StandingsRepository.CategoryOutcome] {
         report.outcomes.filter { !$0.ok }
@@ -204,7 +206,7 @@ private struct SyncReportView: View {
         NavigationStack {
             List {
                 if failed.isEmpty {
-                    Text("Todo actualizado correctamente.")
+                    Text(settings.t("standings_sync_all_ok"))
                         .foregroundStyle(colors.onSurfaceVariant)
                 } else {
                     ForEach(failed, id: \.category) { outcome in
@@ -221,11 +223,11 @@ private struct SyncReportView: View {
                     }
                 }
             }
-            .navigationTitle("Sincronización: \(report.succeeded.count) de \(report.outcomes.count) OK")
+            .navigationTitle(String(format: settings.t("standings_sync_result"), report.succeeded.count, report.outcomes.count))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Cerrar") { dismiss() }
+                    Button(settings.t("events_close")) { dismiss() }
                 }
             }
         }

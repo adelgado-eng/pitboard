@@ -46,8 +46,12 @@ class ImsaScheduleSource : RaceScheduleSource {
         return eventUrls.flatMap { url -> runCatching { sessionsForEvent(url) }.getOrElse { emptyList() } }
     }
 
-    private fun sessionsForEvent(eventUrl: String): List<EventEntity> {
-        val html = fetchHtml(eventUrl)
+    private fun sessionsForEvent(eventUrl: String): List<EventEntity> = parseEventHtml(fetchHtml(eventUrl), eventUrl)
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de sessionsForEvent() para poder
+    // testear el recorrido día/sesión (agrupado por el <div> de cabecera de día, filtro de
+    // clases de apoyo) contra un fixture HTML sin red — ver ImsaScheduleSourceTest.
+    internal fun parseEventHtml(html: String, eventUrl: String): List<EventEntity> {
         val doc = Jsoup.parse(html, eventUrl)
         val slug = eventUrl.trimEnd('/').substringAfterLast('/')
         // La página no tiene <h1> — el nombre de la ronda sale del <title> ("2026 Rolex 24 At

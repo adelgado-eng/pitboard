@@ -58,6 +58,8 @@ import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import com.pitboard.app.data.AppDatabase
+import com.pitboard.app.i18n.tr
+import com.pitboard.app.standings.CarBasedStandingsClasses
 import com.pitboard.app.standings.CarDriverEntity
 import com.pitboard.app.standings.StandingEntity
 import com.pitboard.app.standings.StandingType
@@ -69,48 +71,6 @@ import kotlinx.coroutines.flow.flowOf
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-// Orden pedido explícitamente para ELMS: LMP2, LMP2 Pro/Am, LMP3 y GT3 (28/08/2026,
-// coincide con el orden real de las pestañas en europeanlemansseries.com) — nunca
-// pilotos/equipos como el resto, porque ElmsStandingsSource solo guarda equipos por clase.
-private val ELMS_CLASSES = listOf(
-    StandingsClass.LMP2 to "LMP2",
-    StandingsClass.LMP2_PRO_AM to "LMP2 Pro/Am",
-    StandingsClass.LMP3 to "LMP3",
-    StandingsClass.LMGT3 to "GT3"
-)
-
-// Mismo orden que las pestañas de imsa.com/weathertech/standings/ (GTP es la clase por
-// defecto de esa web) — igual que ELMS, siempre como filas de coche/equipo.
-private val IMSA_CLASSES = listOf(
-    StandingsClass.GTP to "GTP",
-    StandingsClass.LMP2 to "LMP2",
-    StandingsClass.GTD_PRO to "GTD Pro",
-    StandingsClass.GTD to "GTD"
-)
-
-// Orden real de las pestañas en fiawec.com (Hypercar es la clase "principal").
-private val WEC_CLASSES = listOf(
-    StandingsClass.HYPERCAR to "Hypercar",
-    StandingsClass.LMGT3 to "LMGT3"
-)
-
-// Mismo orden que las secciones de lemanscup.com/en/page/classification.
-private val LEMANS_CUP_CLASSES = listOf(
-    StandingsClass.LMP3 to "LMP3",
-    StandingsClass.LMP3_PRO_AM to "LMP3 Pro/Am",
-    StandingsClass.GT3 to "GT3"
-)
-
-/** Categorías "por coche" (ELMS, IMSA, WEC, Le Mans Cup): sus filas de equipo representan
- *  un coche concreto, clicable para ver sus pilotos (ver CarDriversSheet) — el resto de
- *  categorías son de un piloto por coche y no tienen esta noción. */
-private val CAR_BASED_CLASSES: Map<StandingsCategory, List<Pair<StandingsClass, String>>> = mapOf(
-    StandingsCategory.ELMS to ELMS_CLASSES,
-    StandingsCategory.IMSA to IMSA_CLASSES,
-    StandingsCategory.WEC to WEC_CLASSES,
-    StandingsCategory.LEMANS_CUP to LEMANS_CUP_CLASSES
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,7 +85,7 @@ fun CategoryStandingsScreen(category: StandingsCategory, onBack: () -> Unit) {
         )
     }
 
-    val carClasses = CAR_BASED_CLASSES[category]
+    val carClasses = CarBasedStandingsClasses.CAR_BASED_CLASSES[category]
     val isCarBased = carClasses != null
     // Coche de ELMS/IMSA tocado en la lista, para el desplegable de sus pilotos — null = cerrado.
     var selectedCar by remember { mutableStateOf<StandingEntity?>(null) }
@@ -214,7 +174,7 @@ fun CategoryStandingsScreen(category: StandingsCategory, onBack: () -> Unit) {
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, contentDescription = tr("standings_back"))
                     }
                 }
             )
@@ -223,7 +183,7 @@ fun CategoryStandingsScreen(category: StandingsCategory, onBack: () -> Unit) {
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             lastUpdated?.let { timestamp ->
                 Text(
-                    "Actualizado: ${formatLastUpdated(timestamp)}",
+                    tr("standings_last_updated").format(formatLastUpdated(timestamp)),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -248,13 +208,13 @@ fun CategoryStandingsScreen(category: StandingsCategory, onBack: () -> Unit) {
                     FilterChip(
                         selected = mode == StandingType.DRIVER,
                         onClick = { mode = StandingType.DRIVER },
-                        label = { Text("Pilotos") }
+                        label = { Text(tr("standings_drivers")) }
                     )
                     if (category.hasTeamStandings) {
                         FilterChip(
                             selected = mode == StandingType.TEAM,
                             onClick = { mode = StandingType.TEAM },
-                            label = { Text("Equipos") }
+                            label = { Text(tr("standings_teams")) }
                         )
                     }
                 }
@@ -337,7 +297,7 @@ private fun CarDriversSheet(
 
             if (drivers.isEmpty()) {
                 Text(
-                    "Sin datos de pilotos todavía para este coche",
+                    tr("standings_no_driver_data"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 24.dp)
@@ -404,7 +364,7 @@ private fun StandingsList(
     if (rows.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                "Sin datos todavía para esta categoría",
+                tr("standings_no_category_data"),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -528,7 +488,7 @@ private fun StandingRow(row: StandingEntity, onClick: (() -> Unit)? = null, onIm
         }
 
         Text(
-            "${formatPoints(row.points)} pts",
+            tr("standings_points").format(formatPoints(row.points)),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -605,7 +565,7 @@ private fun ImagePreviewDialog(imageUrl: String, label: String, isLogo: Boolean,
                 onClick = onDismiss,
                 modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)
             ) {
-                Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Color.White)
+                Icon(Icons.Default.Close, contentDescription = tr("events_close"), tint = Color.White)
             }
         }
     }

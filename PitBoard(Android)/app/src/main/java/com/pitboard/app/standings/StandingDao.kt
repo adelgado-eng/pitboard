@@ -23,6 +23,24 @@ interface StandingDao {
         type: StandingType
     ): Flow<List<StandingEntity>>
 
+    /** Igual que [observe] pero de un solo disparo (no Flow) y con límite — para el widget de
+     *  Clasificación, que lee la lista una vez por actualización en vez de observarla en
+     *  vivo (mismo patrón que EventDao.getFilteredUpcoming para el widget de Eventos). */
+    @Query(
+        """
+        SELECT * FROM standings
+        WHERE category = :category AND standingsClass = :standingsClass AND type = :type
+        ORDER BY position ASC
+        LIMIT :limit
+        """
+    )
+    suspend fun getStandings(
+        category: StandingsCategory,
+        standingsClass: StandingsClass,
+        type: StandingType,
+        limit: Int
+    ): List<StandingEntity>
+
     @Query("SELECT MAX(updatedAtUtc) FROM standings WHERE category = :category")
     fun observeLastUpdated(category: StandingsCategory): Flow<Long?>
 

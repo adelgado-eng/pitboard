@@ -33,6 +33,13 @@ object RosterNameFilter {
             response.body?.string() ?: error("$url: cuerpo vacío")
         }
 
+        return parseNames(html, url)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetchKnownNames() para poder testear
+    // la heurística de "parece un nombre propio" contra un fixture HTML sin red — ver
+    // RosterNameFilterTest.
+    internal fun parseNames(html: String, url: String): Set<String> {
         val doc = Jsoup.parse(html, url)
         return doc.select("h1, h2, h3, h4, li, a, strong, b, td")
             .map { it.ownText().trim() }

@@ -25,6 +25,13 @@ public final class FormulaEScheduleSource: RaceScheduleSource, @unchecked Sendab
 
     public func fetch() async throws -> [EventDraft] {
         let html = try await HTTPClient.fetchHTML(calendarUrl)
+        return try parseHTML(html)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear la
+    // lectura del JSON-LD embebido contra un fixture HTML sin red — ver
+    // FormulaEScheduleSourceTests.
+    func parseHTML(_ html: String) throws -> [EventDraft] {
         let doc = try SwiftSoup.parse(html, calendarUrl)
 
         let scripts = try doc.select("script[type=application/ld+json]").array()

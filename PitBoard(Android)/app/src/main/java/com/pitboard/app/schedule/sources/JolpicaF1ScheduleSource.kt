@@ -30,6 +30,12 @@ class JolpicaF1ScheduleSource : RaceScheduleSource {
             response.body?.string() ?: error("jolpica: cuerpo vacío")
         }
 
+        return parseJson(json)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el parsing
+    // contra un fixture JSON real sin red — ver JolpicaF1ScheduleSourceTest.
+    internal fun parseJson(json: String): List<EventEntity> {
         val adapter = StandingsMoshi.instance.adapter(JolpicaResponse::class.java)
         val races = adapter.fromJson(json)?.mrData?.raceTable?.races.orEmpty()
 

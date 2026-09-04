@@ -10,7 +10,10 @@ import SwiftSoup
 /// de fotos de ESPN da una foto de estudio fiable — nascar.com resultó poco fiable
 /// página a página (fotos desactualizadas o 404 para pilotos de temporada parcial).
 public final class NascarStandingsSource: StandingsSource, @unchecked Sendable {
-    private let inner: OfficialRosterStandingsSource
+    // 04/09/2026 (Fase 1 del diagnóstico): internal (no private) para poder testear el
+    // extractor de foto de ESPN a través de OfficialRosterStandingsSource.parseRosterHTML
+    // — ver OfficialRosterStandingsSourceTests.
+    let inner: OfficialRosterStandingsSource
 
     public init() {
         inner = OfficialRosterStandingsSource(

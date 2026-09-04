@@ -183,7 +183,10 @@ open class DriverDbStandingsSource(
         }
     }
 
-    private fun parseDriverRows(table: Element, nowUtc: Long): List<StandingEntity> {
+    // 04/09/2026 (Fase 1 del diagnóstico): internal (no private) para poder testear el
+    // parsing con un fixture HTML real sin red — ver DriverDbStandingsSourceTest. Ya
+    // tomaba un Element en vez de una URL, así que no hace falta separar nada más.
+    internal fun parseDriverRows(table: Element, nowUtc: Long): List<StandingEntity> {
         val headers = table.select("th").map { it.text().trim() }
 
         val posIndex = headers.indexOfFirst { it.contains("Pos", ignoreCase = true) }

@@ -43,7 +43,9 @@ class GtWorldChallengeScheduleSource(
         return eventUrls.flatMap { url -> runCatching { sessionsForEvent(url) }.getOrElse { emptyList() } }
     }
 
-    private fun extractItemListUrls(calendarHtml: String): List<String> {
+    // 04/09/2026 (Fase 1 del diagnóstico): internal (no private) — ver
+    // GtWorldChallengeScheduleSourceTest.
+    internal fun extractItemListUrls(calendarHtml: String): List<String> {
         val doc = Jsoup.parse(calendarHtml, baseUrl)
         val adapter = StandingsMoshi.instance.adapter(JsonLdItemList::class.java)
         return doc.select("script[type=application/ld+json]")
@@ -53,8 +55,12 @@ class GtWorldChallengeScheduleSource(
             .mapNotNull { it.url }
     }
 
-    private fun sessionsForEvent(eventUrl: String): List<EventEntity> {
-        val html = fetchHtml(eventUrl)
+    private fun sessionsForEvent(eventUrl: String): List<EventEntity> = parseEventHtml(fetchHtml(eventUrl), eventUrl)
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de sessionsForEvent() para poder
+    // testear el parsing de la sección "Timetable" (día en el <caption>, hora GMT usada
+    // directamente como UTC) contra un fixture HTML sin red.
+    internal fun parseEventHtml(html: String, eventUrl: String): List<EventEntity> {
         val doc = Jsoup.parse(html, eventUrl)
 
         val slug = eventUrl.trimEnd('/').substringAfterLast('/')

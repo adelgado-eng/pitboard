@@ -136,7 +136,9 @@ public final class MotorsportStandingsHTMLSource: StandingsSource, @unchecked Se
         return initial + " " + parts.dropFirst().joined(separator: " ")
     }
 
-    private struct ParsedRow {
+    // 04/09/2026 (Fase 1 del diagnóstico): internal (no private) — ver
+    // MotorsportStandingsHTMLSourceTests.
+    struct ParsedRow {
         var name: String
         var team: String
         var points: Double
@@ -145,6 +147,12 @@ public final class MotorsportStandingsHTMLSource: StandingsSource, @unchecked Se
 
     private func parseTable(url: String, knownTeamNames: [String] = []) async throws -> [ParsedRow] {
         let html = try await HTTPClient.fetchHTML(url)
+        return try parseTableHTML(html, knownTeamNames: knownTeamNames)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de parseTable() para poder testear el
+    // parsing contra un fixture HTML real sin red — ver MotorsportStandingsHTMLSourceTests.
+    func parseTableHTML(_ html: String, knownTeamNames: [String] = []) throws -> [ParsedRow] {
         let doc = try SwiftSoup.parse(html)
 
         let tables = try doc.select("table").array()

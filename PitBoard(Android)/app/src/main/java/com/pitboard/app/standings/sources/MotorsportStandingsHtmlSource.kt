@@ -141,17 +141,31 @@ open class MotorsportStandingsHtmlSource(
             .replace(Regex("\\s+"), " ")
             .trim()
 
-    protected fun parseTable(url: String, knownTeamNames: List<String> = emptyList()): List<ParsedRow> {
+    // internal (no protected): solo se usa dentro de esta misma clase, y protected no puede
+    // devolver un tipo internal (ParsedRow) — el compilador lo rechaza porque una subclase
+    // fuera del módulo podría ver la firma sin poder ver el tipo que devuelve.
+    private fun parseTable(url: String, knownTeamNames: List<String> = emptyList()): List<ParsedRow> {
+        val html = fetchHtml(url)
+        return parseTableHtml(html, knownTeamNames)
+    }
+
+    private fun fetchHtml(url: String): String {
         val request = Request.Builder()
             .url(url)
             .header("User-Agent", "Mozilla/5.0 (Linux; Android 14) PitBoard/1.0")
             .build()
 
-        val html = StandingsHttpClient.instance.newCall(request).execute().use { response ->
+        return StandingsHttpClient.instance.newCall(request).execute().use { response ->
             if (!response.isSuccessful) error("$url: HTTP ${response.code}")
             response.body?.string() ?: error("$url: cuerpo vacío")
         }
+    }
 
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de parseTable()/fetchHtml() para poder
+    // testear el parsing contra un fixture HTML real sin red — ver
+    // MotorsportStandingsHtmlSourceTest. internal (no protected) para que el test, en el mismo
+    // módulo, pueda instanciar la clase directamente sin necesitar una subclase.
+    internal fun parseTableHtml(html: String, knownTeamNames: List<String> = emptyList()): List<ParsedRow> {
         val doc = Jsoup.parse(html)
         val table = doc.select("table").firstOrNull { table ->
             table.select("th").any {
@@ -259,7 +273,8 @@ open class MotorsportStandingsHtmlSource(
         return photos to logos
     }
 
-    protected data class ParsedRow(val name: String, val team: String, val points: Double, val photoUrl: String? = null)
+    // internal (no protected) por el mismo motivo que parseTableHtml() arriba.
+    internal data class ParsedRow(val name: String, val team: String, val points: Double, val photoUrl: String? = null)
 }
 
 private data class PulseliveRider(

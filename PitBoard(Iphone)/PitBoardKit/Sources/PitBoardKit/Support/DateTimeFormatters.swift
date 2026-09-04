@@ -24,6 +24,18 @@ public enum DateTimeFormatters {
         eventDateFormatter.string(from: date)
     }
 
+    /// Igual que `formatEventDateTime(_:)` pero consciente de `TimeDisplayMode` — equivalente
+    /// exacto de la sobrecarga de `DateTimeFormatters.kt`. En `.track` usa la zona horaria del
+    /// circuito (`eventZoneId`) cuando la fuente la trae; si no la trae, o el modo es
+    /// `.device`, cae en la hora del dispositivo de siempre.
+    public static func formatEventDateTime(_ date: Date, mode: TimeDisplayMode, eventZoneId: String?) -> String {
+        guard mode == .track, let eventZoneId, let timeZone = TimeZone(identifier: eventZoneId) else {
+            return eventDateFormatter.string(from: date)
+        }
+        let f = formatter("EEE d MMM · HH:mm", timeZone: timeZone)
+        return f.string(from: date)
+    }
+
     /// Solo la hora, en la zona horaria local del dispositivo — usado en las notificaciones.
     public static func formatTimeOnly(_ date: Date) -> String {
         timeOnlyFormatter.string(from: date)

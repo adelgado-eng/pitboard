@@ -1,5 +1,6 @@
 package com.pitboard.app.util
 
+import com.pitboard.app.data.TimeDisplayMode
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -40,6 +41,19 @@ object DateTimeFormatters {
 
     fun formatEventDateTime(startTimeUtc: Long): String {
         val zoned = Instant.ofEpochMilli(startTimeUtc).atZone(ZoneId.systemDefault())
+        return eventDateFormatter.format(zoned)
+    }
+
+    /** Igual que [formatEventDateTime] pero consciente de [TimeDisplayMode]: en TRACK usa la
+     *  zona horaria del circuito (`eventZoneId`) cuando la fuente la trae — si no la trae, o el
+     *  modo es DEVICE, cae en la hora del dispositivo de siempre. Usado en las filas de la
+     *  lista de Eventos (EventsScreen) — el detalle de cada evento sigue enseñando las dos
+     *  siempre, esto solo decide cuál se ve de un vistazo en la lista. */
+    fun formatEventDateTime(startTimeUtc: Long, mode: TimeDisplayMode, eventZoneId: String?): String {
+        val zone = (eventZoneId?.takeIf { mode == TimeDisplayMode.TRACK })
+            ?.let { runCatching { ZoneId.of(it) }.getOrNull() }
+            ?: ZoneId.systemDefault()
+        val zoned = Instant.ofEpochMilli(startTimeUtc).atZone(zone)
         return eventDateFormatter.format(zoned)
     }
 

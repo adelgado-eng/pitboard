@@ -34,6 +34,13 @@ class IndyCarScheduleSource : RaceScheduleSource {
             response.body?.string() ?: error("indycar: cuerpo vacío")
         }
 
+        return parseHtml(html)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // descarte de carreras ya disputadas (clase "completed") contra un fixture HTML sin red
+    // — ver IndyCarScheduleSourceTest.
+    internal fun parseHtml(html: String): List<EventEntity> {
         val doc = Jsoup.parse(html)
         return doc.select("div.event-card").mapIndexedNotNull { index, card ->
             // Las tarjetas de carreras ya disputadas llevan "completed" en la clase — no nos

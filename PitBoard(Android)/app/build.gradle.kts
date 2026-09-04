@@ -20,7 +20,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false // lo activaremos más adelante junto con las reglas de ProGuard
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -87,7 +91,20 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // WorkManager (refresco periódico + recordatorios de eventos)
-    implementation("androidx.work:work-runtime-ktx:2.10.0")
+    // 04/09/2026: bajado de 2.10.0 a 2.9.1 — bug real reportado (los widgets de Eventos y
+    // Clasificación se quedaban con el icono de carga fijo para siempre, sin ningún error en
+    // el log). Causa encontrada leyendo el código fuente de Glance 1.1.1: su
+    // androidx.glance.session.SessionWorker fija su propio coroutineContext a Dispatchers.Main
+    // mediante el override @Deprecated de CoroutineWorker.coroutineContext (ver el propio
+    // código fuente de la librería, GlanceAppWidget.kt/SessionWorker.kt). WorkManager 2.10.0
+    // introdujo Configuration.workerCoroutineContext, un mecanismo nuevo para controlar en qué
+    // dispatcher corre CoroutineWorker.doWork(), pensado precisamente para sustituir ese
+    // override antiguo — con WorkManager 2.10.0 el override de Glance deja de tener efecto
+    // real y el trabajo del widget (provideGlance) nunca llega a ejecutarse, sin lanzar
+    // ninguna excepción. El propio POM de glance-appwidget:1.1.1 fija
+    // androidx.work:work-runtime-ktx:2.7.1 como versión esperada; 2.9.1 es la última estable
+    // anterior al cambio de 2.10.0 y compila con el resto del código sin cambios.
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
 
     // Clasificaciones (Fase 0) y calendario automático (ver com.pitboard.app.schedule): red
     // para las fuentes JSON/HTML de cada serie.

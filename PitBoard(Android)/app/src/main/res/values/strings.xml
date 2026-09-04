@@ -2,7 +2,5 @@
 <resources>
     <string name="app_name">PitBoard</string>
     <string name="widget_description">Próximos eventos de motorsport, siempre a la vista en tu pantalla de inicio</string>
-    <string name="widget_description_small">PitBoard — una línea</string>
-    <string name="widget_description_medium">PitBoard — próximo evento</string>
-    <string name="widget_description_large">PitBoard — lista de carreras</string>
+    <string name="widget_description_standings">Clasificación de pilotos o equipos de tu categoría favorita</string>
 </resources>

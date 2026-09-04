@@ -75,7 +75,15 @@ public final class ImsaStandingsSource: @unchecked Sendable {
     /// vacío (nunca lanza) si esa API fallara, para caer al fallback.
     private func resolveClassIds(year: Int) async -> [String: String] {
         let url = "https://dvw6yynr86g3k.cloudfront.net/galaxy/api/classes?series_id=\(Self.seriesId)&season_id=\(year)"
-        guard let classes = try? await HTTPClient.fetchJSON(url, as: [ImsaGalaxyClass].self) else { return [:] }
+        guard let html = try? await HTTPClient.fetchHTML(url) else { return [:] }
+        return (try? parseClassIds(html)) ?? [:]
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de resolveClassIds() para poder
+    // testear el parsing contra un fixture JSON real sin red — ver
+    // ImsaStandingsSourceTests.
+    func parseClassIds(_ json: String) throws -> [String: String] {
+        let classes = try JSONDecoder().decode([ImsaGalaxyClass].self, from: Data(json.utf8))
         var result: [String: String] = [:]
         for entry in classes {
             guard let shortcode = entry.shortcode else { continue }
@@ -109,7 +117,9 @@ public final class ImsaStandingsSource: @unchecked Sendable {
     /// "#04 Crowdstrike Racing by APR" -> número de coche + nombre de equipo. Algunas
     /// filas no traen el `<a>` de enlace (equipo sin ficha propia) — se lee igual el
     /// texto de la celda, esa fila se queda sin logo ni pilotos.
-    private func parseTeamRow(_ row: Element, standingsClass: StandingsClass, position: Int) throws -> TeamRow? {
+    // internal (no private): expuesta a test — ver ImsaStandingsSourceTests. TeamRow pasa
+    // a internal por el mismo motivo.
+    func parseTeamRow(_ row: Element, standingsClass: StandingsClass, position: Int) throws -> TeamRow? {
         guard let cell = try row.select("td.team-col").first() else { return nil }
         let text = try cell.text().trimmingCharacters(in: .whitespacesAndNewlines)
         guard let match = text.range(of: "^#(\\d+)\\s+(.+)$", options: .regularExpression) else { return nil }
@@ -132,34 +142,42 @@ public final class ImsaStandingsSource: @unchecked Sendable {
             // El Referer evita algún 403 puntual — basta con que la petición diga venir
             // de la propia imsa.com.
             let html = try await HTTPClient.fetchHTML(teamUrl, referer: "https://www.imsa.com/weathertech/teams/")
-            let doc = try SwiftSoup.parse(html, teamUrl)
-
-            let logoCandidates = try doc.select(".team-logos img").array().compactMap { try? $0.absUrl("src") }
-            let logoUrl = logoCandidates.first {
-                !$0.localizedCaseInsensitiveContains("weathertech_championship") && !$0.localizedCaseInsensitiveContains("nologo")
-            }
-
-            let cards = try doc.select("div.imsa-card_item_widget").array()
-            let drivers: [CarDriverDraft] = try cards.compactMap { card -> CarDriverDraft? in
-                let name = try card.select("p.imsa-ciw-title").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                guard !name.isEmpty else { return nil }
-                let photoUrl = try card.select("img.imsa-ciw-image").first().flatMap { try? $0.absUrl("data-src") }.flatMap { $0.isEmpty ? nil : $0 }
-
-                return CarDriverDraft(
-                    category: .imsa,
-                    standingsClass: row.standingsClass,
-                    carNumber: row.carNumber,
-                    entryKey: TextNormalizer.normalize(name),
-                    name: name,
-                    photoUrl: photoUrl,
-                    updatedAtUtc: nowUtc
-                )
-            }
-
-            return TeamPage(logoUrl: logoUrl, drivers: drivers)
+            return try parseTeamPage(html, teamUrl: teamUrl, standingsClass: row.standingsClass, carNumber: row.carNumber, nowUtc: nowUtc)
         } catch {
             return nil
         }
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetchTeamPage() para poder testear
+    // la detección de logo (descarta el logo fijo de la serie y el placeholder "nologo",
+    // ninguno de los dos por posición fija) contra un fixture HTML sin red — ver
+    // ImsaStandingsSourceTests.
+    func parseTeamPage(_ html: String, teamUrl: String, standingsClass: StandingsClass, carNumber: String, nowUtc: Date) throws -> TeamPage {
+        let doc = try SwiftSoup.parse(html, teamUrl)
+
+        let logoCandidates = try doc.select(".team-logos img").array().compactMap { try? $0.absUrl("src") }
+        let logoUrl = logoCandidates.first {
+            !$0.localizedCaseInsensitiveContains("weathertech_championship") && !$0.localizedCaseInsensitiveContains("nologo")
+        }
+
+        let cards = try doc.select("div.imsa-card_item_widget").array()
+        let drivers: [CarDriverDraft] = try cards.compactMap { card -> CarDriverDraft? in
+            let name = try card.select("p.imsa-ciw-title").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            guard !name.isEmpty else { return nil }
+            let photoUrl = try card.select("img.imsa-ciw-image").first().flatMap { try? $0.absUrl("data-src") }.flatMap { $0.isEmpty ? nil : $0 }
+
+            return CarDriverDraft(
+                category: .imsa,
+                standingsClass: standingsClass,
+                carNumber: carNumber,
+                entryKey: TextNormalizer.normalize(name),
+                name: name,
+                photoUrl: photoUrl,
+                updatedAtUtc: nowUtc
+            )
+        }
+
+        return TeamPage(logoUrl: logoUrl, drivers: drivers)
     }
 
     private static func firstGroup(of pattern: String, in text: String) -> String? {
@@ -172,7 +190,8 @@ public final class ImsaStandingsSource: @unchecked Sendable {
         return String(text[group])
     }
 
-    private struct TeamRow: Sendable {
+    // internal (no private): expuestas a test — ver parseTeamRow/parseTeamPage arriba.
+    struct TeamRow: Sendable {
         var standingsClass: StandingsClass
         var position: Int
         var carNumber: String
@@ -181,7 +200,7 @@ public final class ImsaStandingsSource: @unchecked Sendable {
         var teamUrl: String?
     }
 
-    private struct TeamPage: Sendable {
+    struct TeamPage: Sendable {
         var logoUrl: String?
         var drivers: [CarDriverDraft]
     }

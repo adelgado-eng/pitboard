@@ -32,9 +32,15 @@ public final class LeMansCupStandingsSource: StandingsSource, @unchecked Sendabl
 
     public func fetch(nowUtc: Date) async throws -> [StandingDraft] {
         let classificationHtml = try await HTTPClient.fetchHTML(classificationUrl)
-        let classificationDoc = try SwiftSoup.parse(classificationHtml, classificationUrl)
         let logoByCarNumber = (try? await fetchLogosByCarNumber()) ?? [:]
+        return try parseClassificationHTML(classificationHtml, logoByCarNumber: logoByCarNumber, nowUtc: nowUtc)
+    }
 
+    // 04/09/2026 (Fase 1 del diagnóstico): separadas de fetch() para poder testear el
+    // parsing (incluido el cruce de logo por número de coche entre las dos páginas)
+    // contra fixtures HTML sin red — ver LeMansCupStandingsSourceTests.
+    func parseClassificationHTML(_ html: String, logoByCarNumber: [String: String], nowUtc: Date) throws -> [StandingDraft] {
+        let classificationDoc = try SwiftSoup.parse(html, classificationUrl)
         var result: [StandingDraft] = []
         for (buttonText, standingsClass) in sections {
             if let section = try findSection(classificationDoc, buttonText: buttonText) {
@@ -48,7 +54,10 @@ public final class LeMansCupStandingsSource: StandingsSource, @unchecked Sendabl
     /// (nunca lanza) si esa página fallara, para no tumbar toda la clasificación solo
     /// porque los logos no se pudieran obtener.
     private func fetchLogosByCarNumber() async throws -> [String: String] {
-        let html = try await HTTPClient.fetchHTML(gridUrl)
+        try parseLogosByCarNumber(try await HTTPClient.fetchHTML(gridUrl))
+    }
+
+    func parseLogosByCarNumber(_ html: String) throws -> [String: String] {
         let doc = try SwiftSoup.parse(html, gridUrl)
         let cards = try doc.select("div.card-team").array()
 

@@ -53,4 +53,37 @@ final class RosterNameFilterTests: XCTestCase {
         let filtered = RosterNameFilter.filterKeepingReal([String](), knownNames: ["Max Verstappen"]) { $0 }
         XCTAssertTrue(filtered.isEmpty)
     }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): parseNames es la parte de fetchKnownNames que
+    // antes no tenía test — la heurística de "parece un nombre propio" en títulos,
+    // enlaces y negritas de la página de referencia.
+    func testParseNamesRecognizesProperNamesInHeadingsLinksAndBold() throws {
+        let html = """
+            <html><body>
+            <h2>2026 MotoGP Rider Line-Ups</h2>
+            <ul>
+              <li>Jorge Martin</li>
+              <li><a>Marc Marquez</a></li>
+              <li><strong>Fabio Di Giannantonio</strong></li>
+              <li>Menú de navegación</li>
+            </ul>
+            </body></html>
+            """
+
+        let names = try RosterNameFilter.parseNames(html, url: "https://example.com")
+
+        XCTAssertTrue(names.contains("Jorge Martin"))
+        XCTAssertTrue(names.contains("Marc Marquez"))
+        XCTAssertTrue(names.contains("Fabio Di Giannantonio"))
+        // "de" no empieza en mayúscula, así que no cumple la heurística de "nombre propio".
+        XCTAssertFalse(names.contains("Menú de navegación"))
+    }
+
+    func testParseNamesWithNothingRecognizableReturnsEmptySetInsteadOfThrowing() throws {
+        let html = "<html><body><p>contenido en minúsculas, sin nombres</p></body></html>"
+
+        let names = try RosterNameFilter.parseNames(html, url: "https://example.com")
+
+        XCTAssertTrue(names.isEmpty)
+    }
 }

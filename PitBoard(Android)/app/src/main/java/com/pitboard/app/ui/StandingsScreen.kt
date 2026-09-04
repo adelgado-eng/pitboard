@@ -58,6 +58,7 @@ import com.pitboard.app.standings.StandingType
 import com.pitboard.app.standings.StandingsCategory
 import com.pitboard.app.standings.StandingsClass
 import com.pitboard.app.standings.StandingsRepository
+import com.pitboard.app.i18n.tr
 import com.pitboard.app.standings.ConnectivityHelper
 import com.pitboard.app.ui.components.EmptyState
 import com.pitboard.app.ui.components.OfflineBanner
@@ -157,6 +158,10 @@ fun StandingsScreen(
     val isOnline = remember { ConnectivityHelper.isOnline(context) }
     val hasAnyCache = remember(leaderByCategory) { leaderByCategory.values.any { it != null } }
 
+    // tr() es @Composable y no se puede llamar dentro del onClick de más abajo — se resuelve
+    // aquí, en contexto de composición (mismo patrón que EventsScreen.kt).
+    val offlineToastMessage = tr("events_offline_toast")
+
     syncReport?.let { report ->
         SyncReportDialog(report = report, onDismiss = viewModel::dismissSyncReport)
     }
@@ -164,7 +169,7 @@ fun StandingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Clasificaciones", fontWeight = FontWeight.Bold) },
+                title = { Text(tr("standings_title"), fontWeight = FontWeight.Bold) },
                 actions = {
                     if (viewModel.syncing) {
                         // Mismo hueco que el botón, para que la barra no dé un salto al
@@ -191,11 +196,11 @@ fun StandingsScreen(
                                 if (ConnectivityHelper.isOnline(context)) {
                                     viewModel.refreshNow()
                                 } else {
-                                    Toast.makeText(context, "Sin conexión — no se puede actualizar ahora", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, offlineToastMessage, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         ) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Actualizar")
+                            Icon(Icons.Default.Refresh, contentDescription = tr("events_refresh"))
                         }
                     }
                 }
@@ -206,14 +211,14 @@ fun StandingsScreen(
             when {
                 !standingsEnabled -> EmptyState(
                     icon = Icons.Default.EmojiEvents,
-                    title = "Clasificaciones desactivadas",
-                    message = "Actívalas en Ajustes para ver la clasificación de F1, MotoGP y más — necesita conexión a internet."
+                    title = tr("standings_empty_disabled_title"),
+                    message = tr("standings_empty_disabled_message")
                 )
 
                 !isOnline && !hasAnyCache -> EmptyState(
                     icon = Icons.Default.WifiOff,
-                    title = "Necesitas conexión",
-                    message = "Todavía no hay ninguna clasificación guardada. Conéctate a wifi o datos móviles al menos una vez."
+                    title = tr("events_empty_offline_title"),
+                    message = tr("standings_empty_offline_message")
                 )
 
                 else -> {
@@ -276,7 +281,11 @@ private fun CategoryRow(category: StandingsCategory, leader: StandingEntity?, on
             Column(Modifier.weight(1f)) {
                 Text(category.displayName, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
                 Text(
-                    text = if (leader != null) "Lidera ${leader.name} · ${formatPoints(leader.points)} pts" else "Sin datos todavía",
+                    text = if (leader != null) {
+                        tr("standings_leading").format(leader.name, formatPoints(leader.points))
+                    } else {
+                        tr("standings_no_data_yet")
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -309,10 +318,10 @@ private fun SyncReportDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Cerrar") }
+            TextButton(onClick = onDismiss) { Text(tr("events_close")) }
         },
         title = {
-            Text("Sincronización: ${report.succeeded.size} de ${report.outcomes.size} OK")
+            Text(tr("standings_sync_result").format(report.succeeded.size, report.outcomes.size))
         },
         text = if (failed.isEmpty()) null else {
             {

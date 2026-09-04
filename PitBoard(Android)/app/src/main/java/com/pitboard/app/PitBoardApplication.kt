@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import android.util.Log
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.SvgDecoder
@@ -12,6 +13,7 @@ import net.sqlcipher.database.SQLiteDatabase
 import okhttp3.OkHttpClient
 
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -22,6 +24,7 @@ import com.pitboard.app.schedule.RaceScheduleScheduler
 import com.pitboard.app.standings.StandingsScheduler
 import com.pitboard.app.util.SeasonWindow
 import com.pitboard.app.widget.RaceWidget
+import com.pitboard.app.widget.StandingsWidget
 import androidx.glance.appwidget.updateAll
 
 /**
@@ -75,7 +78,18 @@ class PitBoardApplication : Application(), ImageLoaderFactory {
         // y, si la BD de eventos está vacía (instalación nueva o recién migrada desde la v6,
         // ver AppDatabase), lanza una sincronización inmediata para no dejar Eventos vacío
         // hasta el primer ciclo diario.
-        GlobalScope.launch {
+        //
+        // 04/09/2026: Dispatchers.IO explícito en los 3 GlobalScope.launch de aquí abajo — bug
+        // real reportado (los widgets se quedaban con el icono de carga fijo, sin ningún error
+        // en el log). AppDatabase.getInstance() aquí desencripta la BD con SQLCipher, un trabajo
+        // pesado que sin dispatcher explícito corre en Dispatchers.Default — el mismo dispatcher
+        // que usa GlanceAppWidgetReceiver.onReceive() para procesar el broadcast que dispara la
+        // primera composición del widget (ver GlanceAppWidgetReceiver.kt de la librería). Si el
+        // pool compartido de Default está saturado por la desencriptación + las 2 sincronizaciones
+        // de aquí abajo justo en el arranque, la corrutina del widget se queda sin hueco, expira
+        // el timeout de 10s de goAsync() y Glance la cancela en silencio (CancellationException
+        // que la propia librería traga sin loguear nada).
+        GlobalScope.launch(Dispatchers.IO) {
             try {
                 val database = AppDatabase.getInstance(this@PitBoardApplication)
                 if (database.seriesConfigDao().count() == 0) {
@@ -102,7 +116,7 @@ class PitBoardApplication : Application(), ImageLoaderFactory {
         // el interruptor a mano (ver SettingsViewModel.setStandingsEnabled): esto es un
         // "una sola vez" para tener algo que enseñar, no arranca el ciclo semanal — mientras
         // el interruptor siga apagado, no debe seguir pidiendo nada a internet por su cuenta.
-        GlobalScope.launch {
+        GlobalScope.launch(Dispatchers.IO) {
             try {
                 val database = AppDatabase.getInstance(this@PitBoardApplication)
                 if (database.standingDao().getLastUpdatedOverall() == null) {
@@ -114,13 +128,15 @@ class PitBoardApplication : Application(), ImageLoaderFactory {
             }
         }
 
-        // Estrategia Samsung: Forzar actualización de widgets al arrancar la app
-        GlobalScope.launch {
+        // Estrategia Samsung: Forzar actualización de widgets al arrancar la app.
+        // 04/09/2026: añadido StandingsWidget aquí también, igual que RaceWidget.
+        GlobalScope.launch(Dispatchers.IO) {
             delay(2000)
             try {
                 RaceWidget.instance.updateAll(this@PitBoardApplication)
-            } catch (_: Exception) {
-                // Silencioso
+                StandingsWidget.instance.updateAll(this@PitBoardApplication)
+            } catch (e: Exception) {
+                Log.e("PitBoardWidgets", "Fallo forzando actualizacion", e)
             }
         }
     }

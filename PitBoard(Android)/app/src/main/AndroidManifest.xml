@@ -16,7 +16,7 @@
 
     <application
         android:name=".PitBoardApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -34,7 +34,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Se abre al arrastrar CUALQUIERA de los 3 widgets al home.
+        <!-- Se abre al arrastrar CUALQUIERA de los widgets al home.
              CORREGIDO: exported="true" — el lanzador de Samsung (una app distinta a la
              nuestra) es quien la invoca desde fuera de nuestro proceso, así que necesita
              exported="true" para poder abrirla. Con "false" el sistema denegaba el intent,
@@ -49,44 +49,45 @@
             </intent-filter>
         </activity>
 
-        <!-- Las 3 opciones que ahora aparecen como entradas separadas en el selector de
-             widgets: 2×1, 2×2 y 4×2. Las tres apuntan a la MISMA clase RaceWidget (mismo
-             contenido, misma base de datos) — solo cambia el AppWidgetProviderInfo
-             (race_widget_info_*.xml) que cada una referencia. exported="false" aquí SÍ es
-             correcto: el sistema entrega estos broadcasts a los proveedores de widgets sin
-             necesitar exported="true" (a diferencia de la activity de arriba). -->
+        <activity
+            android:name=".widget.StandingsWidgetConfigActivity"
+            android:exported="true"
+            android:theme="@style/Theme.PitBoard">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <!-- 04/09/2026: un único receiver por widget (antes había 3 para Eventos, uno por
+             tamaño preset) — desde Android 12 un solo AppWidgetProviderInfo ya declara un
+             rango de tamaño redimensionable a mano (ver race_widget_info.xml). exported="false"
+             aquí SÍ es correcto: el sistema entrega estos broadcasts a los proveedores de
+             widgets sin necesitar exported="true" (a diferencia de las activities de arriba). -->
 
         <receiver
-            android:name=".widget.RaceWidgetReceiverSmall"
+            android:name=".widget.RaceWidgetReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/race_widget_info_small" />
+                android:resource="@xml/race_widget_info" />
         </receiver>
 
+        <!-- Widget de Clasificación: un único tipo, configurable por instancia (categoría +
+             pilotos/equipos, o clase de coche en WEC/ELMS/IMSA/Le Mans Cup) — se pueden
+             colocar varias copias, cada una con su propia configuración, en vez de tener un
+             tipo de widget por cada una de las 15 categorías. -->
         <receiver
-            android:name=".widget.RaceWidgetReceiverMedium"
+            android:name=".widget.StandingsWidgetReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/race_widget_info_medium" />
-        </receiver>
-
-        <receiver
-            android:name=".widget.RaceWidgetReceiverLarge"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/race_widget_info_large" />
+                android:resource="@xml/standings_widget_info" />
         </receiver>
 
     </application>

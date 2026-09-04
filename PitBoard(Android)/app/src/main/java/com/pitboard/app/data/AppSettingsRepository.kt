@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.pitboard.app.i18n.AppLanguage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -14,6 +15,11 @@ import kotlinx.coroutines.flow.map
 private val Context.appSettingsDataStore by preferencesDataStore(name = "app_settings")
 
 enum class AppTheme { LIGHT, DARK, SYSTEM }
+
+/** Qué hora mostrar como PRINCIPAL en las listas de eventos (EventsScreen) — DEVICE es el
+ *  comportamiento de siempre (hora del dispositivo). El detalle de un evento (EventDetailsSheet)
+ *  sigue enseñando las dos siempre, esto solo decide cuál se ve de un vistazo en la lista. */
+enum class TimeDisplayMode { DEVICE, TRACK }
 
 class AppSettingsRepository(private val context: Context) {
 
@@ -48,6 +54,21 @@ class AppSettingsRepository(private val context: Context) {
         .map { prefs ->
             prefs[KEY_APP_THEME]?.let { runCatching { AppTheme.valueOf(it) }.getOrNull() } ?: AppTheme.SYSTEM
         }
+
+    /** Hora principal en la lista de Eventos: la del dispositivo (por defecto, mismo
+     *  comportamiento que siempre) o la del circuito, cuando la fuente la trae. */
+    val timeDisplayMode: Flow<TimeDisplayMode> = context.appSettingsDataStore.data
+        .map { prefs ->
+            prefs[KEY_TIME_DISPLAY_MODE]?.let { runCatching { TimeDisplayMode.valueOf(it) }.getOrNull() }
+                ?: TimeDisplayMode.DEVICE
+        }
+
+    /** Idioma elegido a mano por el usuario — null significa "todavía no ha pasado por el
+     *  selector de primer arranque" (ver LanguagePickerScreen/MainActivity), que es distinto
+     *  de "eligió español": mientras sea null, la app enseña el selector en vez del contenido
+     *  normal. */
+    val appLanguage: Flow<AppLanguage?> = context.appSettingsDataStore.data
+        .map { prefs -> prefs[KEY_APP_LANGUAGE]?.let { runCatching { AppLanguage.valueOf(it) }.getOrNull() } }
 
     /** Series sin avisos. Vacío = ninguna excluida (todas notifican). */
     val notificationDisabledSeries: Flow<Set<RaceSeries>> = context.appSettingsDataStore.data
@@ -114,6 +135,14 @@ class AppSettingsRepository(private val context: Context) {
         context.appSettingsDataStore.edit { prefs -> prefs[KEY_APP_THEME] = theme.name }
     }
 
+    suspend fun setTimeDisplayMode(mode: TimeDisplayMode) {
+        context.appSettingsDataStore.edit { prefs -> prefs[KEY_TIME_DISPLAY_MODE] = mode.name }
+    }
+
+    suspend fun setAppLanguage(language: AppLanguage) {
+        context.appSettingsDataStore.edit { prefs -> prefs[KEY_APP_LANGUAGE] = language.name }
+    }
+
     suspend fun setNotificationDisabledSeries(series: Set<RaceSeries>) {
         context.appSettingsDataStore.edit { prefs ->
             if (series.isEmpty()) {
@@ -149,6 +178,8 @@ class AppSettingsRepository(private val context: Context) {
 
     suspend fun hasCompletedFirstSyncNow(): Boolean = hasCompletedFirstSync.first()
 
+    suspend fun appLanguageNow(): AppLanguage? = appLanguage.first()
+
     suspend fun notificationDisabledSeriesNow(): Set<RaceSeries> =
         notificationDisabledSeries.first()
 
@@ -164,6 +195,8 @@ class AppSettingsRepository(private val context: Context) {
         private val KEY_PRACTICE_NOTIFICATIONS_ENABLED = booleanPreferencesKey("practice_notifications_enabled")
         private val KEY_STANDINGS_ENABLED = booleanPreferencesKey("standings_enabled")
         private val KEY_APP_THEME = stringPreferencesKey("app_theme")
+        private val KEY_TIME_DISPLAY_MODE = stringPreferencesKey("time_display_mode")
+        private val KEY_APP_LANGUAGE = stringPreferencesKey("app_language")
         private val KEY_NOTIFICATION_DISABLED_SERIES =
             stringSetPreferencesKey("notification_disabled_series")
         private val KEY_EVENT_SCREEN_SERIES = stringSetPreferencesKey("event_screen_series")

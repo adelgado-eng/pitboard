@@ -34,6 +34,13 @@ class F1AcademyScheduleSource : RaceScheduleSource {
             response.body?.string() ?: error("$url: cuerpo vacío")
         }
 
+        return parseHtml(html)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear la lectura
+    // del bloque __NEXT_DATA__ contra un fixture HTML sin red — ver
+    // F1AcademyScheduleSourceTest.
+    internal fun parseHtml(html: String): List<EventEntity> {
         val json = Jsoup.parse(html).selectFirst("script[id=__NEXT_DATA__]")?.data() ?: return emptyList()
         val adapter = StandingsMoshi.instance.adapter(NextDataRoot::class.java)
         val races = adapter.fromJson(json)?.props?.pageProps?.pageData?.Races.orEmpty()

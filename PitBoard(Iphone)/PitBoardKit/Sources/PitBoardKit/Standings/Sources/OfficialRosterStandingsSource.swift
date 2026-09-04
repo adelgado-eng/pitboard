@@ -39,13 +39,15 @@ public final class OfficialRosterStandingsSource: StandingsSource, @unchecked Se
         self.rosterPhotoUrlExtractor = rosterPhotoUrlExtractor
     }
 
-    private struct RosterRow {
+    // 04/09/2026 (Fase 1 del diagnóstico): internal (no private) — ver
+    // OfficialRosterStandingsSourceTests.
+    struct RosterRow {
         var name: String
         var points: Double
         var photoUrl: String? = nil
     }
 
-    private struct Enrichment {
+    struct Enrichment {
         var photoUrl: String?
         var team: String
     }
@@ -138,7 +140,14 @@ public final class OfficialRosterStandingsSource: StandingsSource, @unchecked Se
     }
 
     private func fetchRoster() async throws -> [RosterRow] {
-        let html = try await fetchHtml(rosterUrl)
+        try parseRosterHTML(try await fetchHtml(rosterUrl))
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetchRoster() para poder testear el
+    // parsing (incluida la limpieza del código de piloto pegado al nombre, ver
+    // cleanDriverName) contra un fixture HTML sin red — ver
+    // OfficialRosterStandingsSourceTests.
+    func parseRosterHTML(_ html: String) throws -> [RosterRow] {
         let doc = try SwiftSoup.parse(html, rosterUrl)
         let tables = try doc.select("table").array()
         guard let table = try tables.first(where: { table in
@@ -181,7 +190,13 @@ public final class OfficialRosterStandingsSource: StandingsSource, @unchecked Se
     private func fetchDriverDbEnrichment(slug: String) async throws -> [String: Enrichment] {
         let year = Calendar(identifier: .gregorian).component(.year, from: Date())
         let url = "https://www.driverdb.com/championships/\(slug)/\(year)/standings"
-        let html = try await fetchHtml(url)
+        return try parseDriverDbHTML(try await fetchHtml(url), url: url)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetchDriverDbEnrichment() para
+    // poder testear el parsing (incluido el filtro del guion largo "—" como equipo)
+    // contra un fixture HTML sin red — ver OfficialRosterStandingsSourceTests.
+    func parseDriverDbHTML(_ html: String, url: String) throws -> [String: Enrichment] {
         let doc = try SwiftSoup.parse(html, url)
         let tables = try doc.select("table").array()
         guard let table = try tables.first(where: { table in

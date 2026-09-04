@@ -63,8 +63,18 @@ abstract class AppDatabase : RoomDatabase() {
                     Log.e("AppDatabase", "Error cargando librerías nativas", e)
                 }
 
-                val passphrase = SQLiteDatabase.getBytes("pitboard-secure-key-2026".toCharArray())
-                val factory = SupportFactory(passphrase)
+                val passphraseResult = DatabasePassphraseProvider.getOrCreatePassphrase(context.applicationContext)
+                if (passphraseResult.isNewlyGenerated) {
+                    // Cualquier BD que ya exista en disco fue cifrada con la passphrase
+                    // hardcodeada anterior ("pitboard-secure-key-2026") y no se puede abrir
+                    // con la nueva passphrase aleatoria — se borra y se recrea limpia en vez
+                    // de intentar migrar el cifrado. Sin usuarios en producción todavía
+                    // (v0.1.0, ver fallbackToDestructiveMigration más abajo), no hay pérdida
+                    // real de datos: todo aquí es caché de eventos/clasificaciones públicas
+                    // que se vuelve a sincronizar sola.
+                    context.applicationContext.getDatabasePath("pitboard_v2.db").delete()
+                }
+                val factory = SupportFactory(passphraseResult.passphrase)
 
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,

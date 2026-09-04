@@ -37,6 +37,12 @@ class EspnNascarScheduleSource(
             response.body?.string() ?: error("$url: cuerpo vacío")
         }
 
+        return parseHtml(html)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el troceo
+    // de celdas por <br> contra un fixture HTML sin red — ver EspnNascarScheduleSourceTest.
+    internal fun parseHtml(html: String): List<EventEntity> {
         val doc = Jsoup.parse(html)
         val table = doc.select("table.tablehead").firstOrNull() ?: return emptyList()
 

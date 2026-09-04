@@ -1,0 +1,50 @@
+name: iOS — PitBoardKit tests
+
+# Corre en un runner macOS gratuito de GitHub Actions (gratis e ilimitado en repos
+# públicos) — es la comprobación real que este proyecto no puede hacer localmente sin un
+# Mac. Compila el paquete SwiftPM PitBoardKit y ejecuta PitBoardKitTests contra el
+# simulador de iOS, lo mismo que haría Xcode con Cmd+U.
+
+on:
+  push:
+    paths:
+      - "PitBoard(Iphone)/PitBoardKit/**"
+      - ".github/workflows/ios-tests.yml"
+  pull_request:
+    paths:
+      - "PitBoard(Iphone)/PitBoardKit/**"
+      - ".github/workflows/ios-tests.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: PitBoard(Iphone)/PitBoardKit
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mostrar versiones y Xcodes instalados (diagnóstico)
+        run: |
+          xcodebuild -version
+          swift --version
+          ls /Applications | grep -i xcode || true
+
+      - name: Listar simuladores de iPhone ya instalados (diagnóstico)
+        run: xcrun simctl list devices available | grep -i iphone
+
+      - name: Compilar y correr PitBoardKitTests en el simulador de iOS
+        run: >
+          xcodebuild test
+          -scheme PitBoardKit
+          -destination 'platform=iOS Simulator,name=iPhone 16'
+          -skipMacroValidation
+
+      - name: Subir el log si algo falla, para poder diagnosticarlo
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-result-bundle
+          path: PitBoard(Iphone)/PitBoardKit/**/*.xcresult
+          if-no-files-found: ignore

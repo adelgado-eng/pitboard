@@ -85,39 +85,39 @@ struct EventsScreen: View {
                     // internet — puede haber eventos guardados de OTRAS series.
                     EmptyStateView(
                         systemImage: "magnifyingglass",
-                        title: "Ningún evento de estas series",
-                        message: "No hay eventos guardados para las series que has elegido. Prueba a quitar el filtro o a actualizar."
+                        title: settings.t("events_empty_filtered_title"),
+                        message: settings.t("events_empty_filtered_message")
                     ) {
                         HStack(spacing: 8) {
-                            Button("Quitar filtro") { settings.setEventScreenActiveSeries([]) }
+                            Button(settings.t("events_remove_filter")) { settings.setEventScreenActiveSeries([]) }
                                 .buttonStyle(.borderedProminent)
-                            Button("Actualizar") { refreshNow() }
+                            Button(settings.t("events_refresh")) { refreshNow() }
                                 .buttonStyle(.bordered)
                         }
                     }
                 } else if noEventsAtAll && !isOnline {
                     EmptyStateView(
                         systemImage: "wifi.slash",
-                        title: "Necesitas conexión",
-                        message: "Todavía no se ha guardado ningún evento en este dispositivo. Conéctate a wifi o datos móviles al menos una vez."
+                        title: settings.t("events_empty_offline_title"),
+                        message: settings.t("events_empty_offline_message")
                     )
                 } else if noEventsAtAll {
                     EmptyStateView(
                         systemImage: "calendar",
-                        title: "Sin eventos",
-                        message: "Todavía no se ha sincronizado ningún calendario. Prueba a tocar Actualizar."
+                        title: settings.t("events_empty_title"),
+                        message: settings.t("events_empty_message")
                     ) {
-                        Button("Actualizar") { refreshNow() }
+                        Button(settings.t("events_refresh")) { refreshNow() }
                             .buttonStyle(.borderedProminent)
                     }
                 } else if nothingMatchesQuickFilters {
                     EmptyStateView(
                         systemImage: "magnifyingglass",
-                        title: "Ningún evento coincide",
-                        message: "Prueba con otra palabra clave, serie o tipo de sesión."
+                        title: settings.t("events_empty_no_match_title"),
+                        message: settings.t("events_empty_no_match_message")
                     ) {
                         if quickFiltersActive {
-                            Button("Borrar búsqueda y filtros") {
+                            Button(settings.t("events_clear_search_and_filters")) {
                                 searchQuery = ""
                                 settings.setEventScreenActiveSeries([])
                                 settings.setEventScreenActiveSessionTypes([])
@@ -134,14 +134,14 @@ struct EventsScreen: View {
 
                             if !weekendEvents.isEmpty {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text(groups.weekendLabel.uppercased())
+                                    Text(settings.t(groups.weekendLabelKey).uppercased())
                                         .font(.caption.bold())
                                         .foregroundStyle(colors.primary)
                                         .padding(.leading, 4)
 
                                     VStack(spacing: 0) {
                                         ForEach(Array(weekendEvents.enumerated()), id: \.element.uid) { index, event in
-                                            EventRow(event: event, config: seriesConfigByKey[event.series]) {
+                                            EventRow(event: event, config: seriesConfigByKey[event.series], timeDisplayMode: settings.timeDisplayMode) {
                                                 detailsEvent = event
                                             }
                                             if index < weekendEvents.count - 1 {
@@ -156,7 +156,7 @@ struct EventsScreen: View {
                             }
 
                             if !laterEvents.isEmpty {
-                                Text("MÁS ADELANTE")
+                                Text(settings.t("events_later_section"))
                                     .font(.caption.bold())
                                     .foregroundStyle(colors.onSurfaceVariant)
                                     .padding(.leading, 4)
@@ -164,7 +164,7 @@ struct EventsScreen: View {
 
                                 VStack(spacing: 8) {
                                     ForEach(laterEvents, id: \.uid) { event in
-                                        EventCard(event: event, config: seriesConfigByKey[event.series]) {
+                                        EventCard(event: event, config: seriesConfigByKey[event.series], timeDisplayMode: settings.timeDisplayMode) {
                                             detailsEvent = event
                                         }
                                     }
@@ -176,7 +176,7 @@ struct EventsScreen: View {
                 }
             }
         }
-        .navigationTitle("Eventos")
+        .navigationTitle(settings.t("events_title"))
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 if syncing {
@@ -217,7 +217,7 @@ struct EventsScreen: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                TextField("Buscar por palabra clave…", text: $searchQuery)
+                TextField(settings.t("events_search_placeholder"), text: $searchQuery)
                     .accessibilityIdentifier("events.searchField")
                 if !searchQuery.isEmpty {
                     Button { searchQuery = "" } label: { Image(systemName: "xmark.circle.fill") }
@@ -229,7 +229,7 @@ struct EventsScreen: View {
             .clipShape(RoundedRectangle(cornerRadius: PitBoardShapes.small))
 
             FlowLayout(spacing: 8) {
-                FilterChipView(label: "Todas", selected: selectedSeries.isEmpty) {
+                FilterChipView(label: settings.t("events_filter_all_series"), selected: selectedSeries.isEmpty) {
                     settings.setEventScreenActiveSeries([])
                 }
                 ForEach(RaceSeries.allCases) { series in
@@ -243,12 +243,12 @@ struct EventsScreen: View {
             }
 
             FlowLayout(spacing: 8) {
-                FilterChipView(label: "Todas las sesiones", selected: selectedSessionTypes.isEmpty) {
+                FilterChipView(label: settings.t("events_filter_all_sessions"), selected: selectedSessionTypes.isEmpty) {
                     settings.setEventScreenActiveSessionTypes([])
                 }
                 ForEach(sessionTypeFilterOptions, id: \.rawValue) { badge in
                     let active = selectedSessionTypes.contains(badge.rawValue)
-                    FilterChipView(label: badge.label, selected: active) {
+                    FilterChipView(label: settings.t(badge.labelKey), selected: active) {
                         var updated = selectedSessionTypes
                         if active { updated.remove(badge.rawValue) } else { updated.insert(badge.rawValue) }
                         settings.setEventScreenActiveSessionTypes(updated)
@@ -291,6 +291,7 @@ private struct SeriesConfigSheet: View {
     let onSave: (RaceSeries, String, String) -> Void
 
     @State private var editingSeries: RaceSeries?
+    @Environment(AppSettingsRepository.self) private var settings
 
     var body: some View {
         NavigationStack {
@@ -305,11 +306,11 @@ private struct SeriesConfigSheet: View {
                 }
             }
             .listStyle(.plain)
-            .navigationTitle("Editar series")
+            .navigationTitle(settings.t("events_edit_series"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Cerrar", action: onDismiss)
+                    Button(settings.t("events_close"), action: onDismiss)
                 }
             }
         }
@@ -335,6 +336,7 @@ private struct SeriesConfigRow: View {
     let colorHex: String
     let onTap: () -> Void
     @Environment(\.pitBoardColors) private var colors
+    @Environment(AppSettingsRepository.self) private var settings
 
     var body: some View {
         Button(action: onTap) {
@@ -342,10 +344,10 @@ private struct SeriesConfigRow: View {
                 ColorSwatch(hex: colorHex)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(series.displayName).font(.subheadline.weight(.semibold))
-                    Text("Tag: \(tag)").font(.caption).foregroundStyle(.secondary)
+                    Text(String(format: settings.t("events_series_tag_prefix"), tag)).font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Text("Editar").font(.footnote.weight(.semibold)).foregroundStyle(colors.primary)
+                Text(settings.t("events_edit")).font(.footnote.weight(.semibold)).foregroundStyle(colors.primary)
             }
             .padding(.vertical, 6)
         }
@@ -362,6 +364,7 @@ private struct EditSeriesConfigSheet: View {
 
     @State private var tag: String
     @State private var colorHex: String
+    @Environment(AppSettingsRepository.self) private var settings
 
     init(series: RaceSeries, initialTag: String, initialColorHex: String, onSave: @escaping (String, String) -> Void, onCancel: @escaping () -> Void) {
         self.series = series
@@ -377,15 +380,15 @@ private struct EditSeriesConfigSheet: View {
         NavigationStack {
             Form {
                 Section(series.displayName) {
-                    TextField("Tag corto (máx. 5)", text: $tag)
+                    TextField(settings.t("events_tag_label"), text: $tag)
                         .onChange(of: tag) { _, newValue in
                             let upper = newValue.uppercased()
                             tag = String(upper.prefix(5))
                         }
-                    TextField("Color (#RRGGBB)", text: $colorHex)
+                    TextField(settings.t("events_color_label"), text: $colorHex)
                         .autocorrectionDisabled()
                     HStack {
-                        Text("Vista previa").foregroundStyle(.secondary)
+                        Text(settings.t("events_preview_label")).foregroundStyle(.secondary)
                         Spacer()
                         ColorSwatch(hex: colorHex)
                     }
@@ -393,9 +396,9 @@ private struct EditSeriesConfigSheet: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancelar", action: onCancel) }
+                ToolbarItem(placement: .cancellationAction) { Button(settings.t("events_cancel"), action: onCancel) }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Guardar") { onSave(tag.isEmpty ? initialTag : tag, colorHex) }
+                    Button(settings.t("events_save")) { onSave(tag.isEmpty ? initialTag : tag, colorHex) }
                 }
             }
         }
@@ -417,6 +420,7 @@ private struct ColorSwatch: View {
 private struct EventRow: View {
     let event: EventModel
     let config: SeriesConfigModel?
+    let timeDisplayMode: TimeDisplayMode
     let onTap: () -> Void
     @Environment(\.pitBoardColors) private var colors
 
@@ -442,7 +446,7 @@ private struct EventRow: View {
                         .font(.body.weight(.medium))
                         .foregroundStyle(colors.onSurface)
                         .lineLimit(2)
-                    Text(DateTimeFormatters.formatEventDateTime(event.startTimeUtc))
+                    Text(DateTimeFormatters.formatEventDateTime(event.startTimeUtc, mode: timeDisplayMode, eventZoneId: event.timeZoneId))
                         .font(.caption)
                         .foregroundStyle(colors.onSurfaceVariant)
                 }
@@ -463,11 +467,12 @@ private struct EventRow: View {
 private struct EventCard: View {
     let event: EventModel
     let config: SeriesConfigModel?
+    let timeDisplayMode: TimeDisplayMode
     let onTap: () -> Void
     @Environment(\.pitBoardColors) private var colors
 
     var body: some View {
-        EventRow(event: event, config: config, onTap: onTap)
+        EventRow(event: event, config: config, timeDisplayMode: timeDisplayMode, onTap: onTap)
             .background(colors.surfaceVariant.opacity(0.3))
             .clipShape(RoundedRectangle(cornerRadius: PitBoardShapes.medium))
     }
@@ -490,6 +495,11 @@ private struct SessionBadgeChip: View {
 private struct EventDetailsSheet: View {
     let event: EventModel
     @Environment(\.pitBoardColors) private var colors
+    @Environment(AppSettingsRepository.self) private var settings
+
+    // Clima del circuito bajo demanda: solo se pide al abrir ESTE evento (nunca para toda la
+    // lista de golpe), y solo si Open-Meteo puede tener algo que decir — ver WeatherService.
+    @State private var weather: WeatherResult?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -507,17 +517,26 @@ private struct EventDetailsSheet: View {
 
             Divider()
 
-            DetailLine(label: "Tu hora local", value: DateTimeFormatters.formatEventDateTimeLong(event.startTimeUtc))
+            DetailLine(label: settings.t("events_detail_your_time"), value: DateTimeFormatters.formatEventDateTimeLong(event.startTimeUtc))
             if let zoneId = event.timeZoneId, let local = DateTimeFormatters.formatEventDateTime(event.startTimeUtc, inZone: zoneId) {
-                DetailLine(label: "Hora local del circuito (\(zoneId))", value: local)
+                DetailLine(label: String(format: settings.t("events_detail_track_time"), zoneId), value: local)
             }
-            DetailLine(label: "Serie", value: event.series.displayName)
+            DetailLine(label: settings.t("events_detail_series"), value: event.series.displayName)
             if !event.inferredBadge.isEmpty, let badge = SessionBadgeType(rawValue: event.inferredBadge) {
-                DetailLine(label: "Tipo de sesión", value: badge.label)
+                DetailLine(label: settings.t("events_detail_session_type"), value: settings.t(badge.labelKey))
+            }
+            // Sin fila cuando el circuito no se reconoce o está demasiado lejos en el
+            // futuro — no aporta nada un "Clima: —" para el 90% de los eventos de la
+            // temporada que todavía no tienen previsión.
+            if case .available(let tempCelsius, let rainProbabilityPercent) = weather {
+                DetailLine(label: settings.t("events_detail_weather"), value: String(format: settings.t("events_detail_weather_value"), Int(tempCelsius), rainProbabilityPercent))
             }
         }
         .padding(20)
         .presentationDetents([.medium, .large])
+        .task(id: event.uid) {
+            weather = await WeatherService.fetch(eventFullTitle: event.fullTitle, startTimeUtc: event.startTimeUtc)
+        }
     }
 }
 

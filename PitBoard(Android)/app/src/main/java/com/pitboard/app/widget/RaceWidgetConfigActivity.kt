@@ -263,8 +263,9 @@ private fun RaceWidgetConfigScreen(appWidgetId: Int, onSaved: () -> Unit) {
     }
 }
 
+/** internal (no private): reutilizado también por StandingsWidgetConfigActivity. */
 @Composable
-private fun ColorPickerDialog(initialHex: String, onDismiss: () -> Unit, onColorPicked: (String) -> Unit) {
+internal fun ColorPickerDialog(initialHex: String, onDismiss: () -> Unit, onColorPicked: (String) -> Unit) {
     val controller = rememberColorPickerController()
     var pickedHex by remember { mutableStateOf(initialHex) }
     AlertDialog(
@@ -288,7 +289,7 @@ private fun EventCountRow(selected: Int, onSelect: (Int) -> Unit) {
     }
 }
 
-private fun safeParseColor(hex: String): Color = try {
+internal fun safeParseColor(hex: String): Color = try {
     Color(hex.toColorInt())
 } catch (_: Exception) {
     Color(0xFF5F6570)

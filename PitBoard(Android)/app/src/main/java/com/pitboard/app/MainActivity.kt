@@ -23,12 +23,14 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,8 +53,11 @@ import com.pitboard.app.schedule.RaceScheduleRepository
 import com.pitboard.app.standings.ConnectivityHelper
 import com.pitboard.app.standings.StandingsCategory
 import com.pitboard.app.standings.StandingsRepository
+import com.pitboard.app.i18n.AppLanguage
+import com.pitboard.app.i18n.LocalAppLanguage
 import com.pitboard.app.ui.CategoryStandingsScreen
 import com.pitboard.app.ui.EventsScreen
+import com.pitboard.app.ui.LanguagePickerScreen
 import com.pitboard.app.ui.NotificationPermissionOnboarding
 import com.pitboard.app.ui.SettingsScreen
 import com.pitboard.app.ui.StandingsScreen
@@ -96,12 +101,31 @@ private fun bottomDestinations(standingsEnabled: Boolean): List<BottomDestinatio
 @Composable
 fun PitBoardApp() {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val appSettingsRepository = remember { AppSettingsRepository(context) }
     val appTheme by appSettingsRepository.appTheme.collectAsState(initial = AppTheme.SYSTEM)
     // Interruptor de clasificaciones (Ajustes). El valor inicial "false" es el mismo que
     // devuelve AppSettingsRepository por defecto, así que la pestaña no parpadea al
     // arrancar: si está activada, aparece en cuanto DataStore emite el valor guardado.
     val standingsEnabled by appSettingsRepository.standingsEnabled.collectAsState(initial = false)
+    // null = todavía no ha pasado por el selector de idioma de primer arranque (ver más
+    // abajo) — "initial = null" a propósito, NUNCA se asume español por defecto aquí: eso
+    // dejaría ver la app un instante en español antes de que DataStore confirme que
+    // realmente no hay idioma guardado.
+    val appLanguage by appSettingsRepository.appLanguage.collectAsState(initial = null)
+
+    CompositionLocalProvider(LocalAppLanguage provides (appLanguage ?: AppLanguage.SPANISH)) {
+
+    // Primer arranque de verdad: elegir idioma es lo PRIMERO de todo, antes incluso que el
+    // permiso de notificaciones — pedido explícito ("al instalarla te pida cuál quieres").
+    if (appLanguage == null) {
+        PitBoardTheme(appTheme = appTheme) {
+            LanguagePickerScreen(onLanguageChosen = { chosen ->
+                scope.launch { appSettingsRepository.setAppLanguage(chosen) }
+            })
+        }
+        return@CompositionLocalProvider
+    }
 
     // Primer arranque de la app: se pide el permiso de avisos antes de nada. El resultado
     // deja el interruptor de Ajustes activado (aceptado) o desactivado (rechazado).
@@ -217,6 +241,7 @@ fun PitBoardApp() {
                 }
             }
         }
+    }
     }
 }
 

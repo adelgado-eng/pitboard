@@ -32,51 +32,60 @@ public final class FormulaEStandingsSource: StandingsSource, @unchecked Sendable
         let driverRows = (try? await fetchDriverRows(championshipId: championshipId)) ?? []
         let teamRows = (try? await fetchTeamRows(championshipId: championshipId)) ?? []
 
-        let driverEntities = driverRows
-            .sorted { $0.points > $1.points }
-            .enumerated()
-            .map { index, row in
-                StandingDraft(
-                    category: category,
-                    type: .driver,
-                    entrantKey: row.key,
-                    position: index + 1,
-                    name: row.name,
-                    team: row.team,
-                    points: row.points,
-                    photoUrl: row.imageId.map { "\(Self.staticFilesBase)/drivers/\(championshipId)/right/large/\($0).png" },
-                    updatedAtUtc: nowUtc
-                )
-            }
+        return buildDriverEntities(driverRows, championshipId: championshipId, nowUtc: nowUtc)
+            + buildTeamEntities(teamRows, championshipId: championshipId, nowUtc: nowUtc)
+    }
 
-        let teamEntities = teamRows
-            .sorted { $0.points > $1.points }
-            .enumerated()
-            .map { index, row in
-                StandingDraft(
-                    category: category,
-                    type: .team,
-                    entrantKey: row.key,
-                    position: index + 1,
-                    name: row.name,
-                    team: "",
-                    points: row.points,
-                    photoUrl: row.imageId.map { "\(Self.staticFilesBase)/badges/\($0).svg" },
-                    updatedAtUtc: nowUtc
-                )
-            }
+    // 04/09/2026 (Fase 1 del diagnóstico): fetchCurrentChampionshipId/fetchDriverRows/
+    // fetchTeamRows separadas en "red" (sin cambios) + "parsing puro" (las funciones de
+    // abajo, internal) para poder testear contra fixtures JSON reales sin red — ver
+    // FormulaEStandingsSourceTests.
+    func buildDriverEntities(_ rows: [Row], championshipId: String, nowUtc: Date) -> [StandingDraft] {
+        rows.sorted { $0.points > $1.points }.enumerated().map { index, row in
+            StandingDraft(
+                category: category,
+                type: .driver,
+                entrantKey: row.key,
+                position: index + 1,
+                name: row.name,
+                team: row.team,
+                points: row.points,
+                photoUrl: row.imageId.map { "\(Self.staticFilesBase)/drivers/\(championshipId)/right/large/\($0).png" },
+                updatedAtUtc: nowUtc
+            )
+        }
+    }
 
-        return driverEntities + teamEntities
+    func buildTeamEntities(_ rows: [Row], championshipId: String, nowUtc: Date) -> [StandingDraft] {
+        rows.sorted { $0.points > $1.points }.enumerated().map { index, row in
+            StandingDraft(
+                category: category,
+                type: .team,
+                entrantKey: row.key,
+                position: index + 1,
+                name: row.name,
+                team: "",
+                points: row.points,
+                photoUrl: row.imageId.map { "\(Self.staticFilesBase)/badges/\($0).svg" },
+                updatedAtUtc: nowUtc
+            )
+        }
     }
 
     private func fetchCurrentChampionshipId() async throws -> String? {
-        let response = try await HTTPClient.fetchJSON("\(Self.apiBase)/championships", as: FormulaEChampionshipsResponse.self)
+        try parseChampionshipsJSON(try await HTTPClient.fetchHTML("\(Self.apiBase)/championships"))
+    }
+
+    func parseChampionshipsJSON(_ json: String) throws -> String? {
+        let data = Data(json.utf8)
+        let response = try JSONDecoder().decode(FormulaEChampionshipsResponse.self, from: data)
         let championships = response.championships ?? []
         return championships.first { $0.status?.caseInsensitiveCompare("Present") == .orderedSame }?.id
             ?? championships.last?.id
     }
 
-    private struct Row {
+    // internal (no private): expuesta a test — ver parseDriverRowsJSON/parseTeamRowsJSON.
+    struct Row {
         var key: String
         var name: String
         var team: String
@@ -87,10 +96,11 @@ public final class FormulaEStandingsSource: StandingsSource, @unchecked Sendable
     }
 
     private func fetchDriverRows(championshipId: String) async throws -> [Row] {
-        let rows = try await HTTPClient.fetchJSON(
-            "\(Self.apiBase)/standings/drivers?championshipId=\(championshipId)",
-            as: [FormulaEDriverStanding].self
-        )
+        try parseDriverRowsJSON(try await HTTPClient.fetchHTML("\(Self.apiBase)/standings/drivers?championshipId=\(championshipId)"))
+    }
+
+    func parseDriverRowsJSON(_ json: String) throws -> [Row] {
+        let rows = try JSONDecoder().decode([FormulaEDriverStanding].self, from: Data(json.utf8))
         return rows.compactMap { row -> Row? in
             let name = [row.driverFirstName, row.driverLastName]
                 .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -109,10 +119,11 @@ public final class FormulaEStandingsSource: StandingsSource, @unchecked Sendable
     }
 
     private func fetchTeamRows(championshipId: String) async throws -> [Row] {
-        let rows = try await HTTPClient.fetchJSON(
-            "\(Self.apiBase)/standings/teams?championshipId=\(championshipId)",
-            as: [FormulaETeamStanding].self
-        )
+        try parseTeamRowsJSON(try await HTTPClient.fetchHTML("\(Self.apiBase)/standings/teams?championshipId=\(championshipId)"))
+    }
+
+    func parseTeamRowsJSON(_ json: String) throws -> [Row] {
+        let rows = try JSONDecoder().decode([FormulaETeamStanding].self, from: Data(json.utf8))
         return rows.compactMap { row -> Row? in
             let name = row.teamName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             guard !name.isEmpty else { return nil }

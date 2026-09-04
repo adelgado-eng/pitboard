@@ -34,6 +34,13 @@ class IndyCarStandingsSource : StandingsSource {
             response.body?.string() ?: error("$standingsUrl: cuerpo vacío")
         }
 
+        return parseHtml(html, nowUtc)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // parsing (incluido el recorte del "?w=80" y el "Logo" pegado al alt del escudo) contra
+    // un fixture HTML sin red — ver IndyCarStandingsSourceTest.
+    internal fun parseHtml(html: String, nowUtc: Long): List<StandingEntity> {
         val doc = Jsoup.parse(html, standingsUrl)
         val table = doc.select("table").firstOrNull { t ->
             t.select("th").any { it.text().contains("Driver", ignoreCase = true) }

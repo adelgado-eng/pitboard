@@ -1,0 +1,686 @@
+{
+  "PitBoardKit/Package.swift": {
+    "mtime": 1788473932.3325675,
+    "seen": 1788554000.9259205,
+    "ast_hash": "6f48ebb7c5a54c4b55413548ed3db09e",
+    "semantic_hash": "6f48ebb7c5a54c4b55413548ed3db09e"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Data/AppDatabase.swift": {
+    "mtime": 1788474140.695903,
+    "seen": 1788554000.9259205,
+    "ast_hash": "a2c968e742cd294ff2cfafd9c869af34",
+    "semantic_hash": "a2c968e742cd294ff2cfafd9c869af34"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Data/AppSettingsRepository.swift": {
+    "mtime": 1788530455.3336065,
+    "seen": 1788554000.9259205,
+    "ast_hash": "9079810c76c7d85404993fc5fb7c8783",
+    "semantic_hash": "9079810c76c7d85404993fc5fb7c8783"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Data/EventModel.swift": {
+    "mtime": 1788474074.2357492,
+    "seen": 1788554000.9259205,
+    "ast_hash": "cc61dfc6052dc71e126f845fdce32d55",
+    "semantic_hash": "cc61dfc6052dc71e126f845fdce32d55"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Data/RaceSeries.swift": {
+    "mtime": 1788474057.3064804,
+    "seen": 1788554000.9259205,
+    "ast_hash": "b7366e868c0111168293694ef8f9d1c3",
+    "semantic_hash": "b7366e868c0111168293694ef8f9d1c3"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Data/SeriesConfigModel.swift": {
+    "mtime": 1788474076.1718996,
+    "seen": 1788554000.9259205,
+    "ast_hash": "fadea8ebe5d8336d4b4b63a23646365a",
+    "semantic_hash": "fadea8ebe5d8336d4b4b63a23646365a"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Data/SessionBadgeType.swift": {
+    "mtime": 1788530985.357092,
+    "seen": 1788554000.9259205,
+    "ast_hash": "b347fc5e5025b1a6b616b69af17ba31b",
+    "semantic_hash": "b347fc5e5025b1a6b616b69af17ba31b"
+  },
+  "PitBoardKit/Sources/PitBoardKit/I18n/AppLanguage.swift": {
+    "mtime": 1788530394.507547,
+    "seen": 1788554000.9259205,
+    "ast_hash": "7c1b4f807d22c55294eceb1d86f7d4a7",
+    "semantic_hash": "7c1b4f807d22c55294eceb1d86f7d4a7"
+  },
+  "PitBoardKit/Sources/PitBoardKit/I18n/Strings.swift": {
+    "mtime": 1788531835.6302416,
+    "seen": 1788554000.9259205,
+    "ast_hash": "6cf0c24403a46cf050840469819c5134",
+    "semantic_hash": "6cf0c24403a46cf050840469819c5134"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Networking/HTTPClient.swift": {
+    "mtime": 1788514678.0483596,
+    "seen": 1788554000.9259205,
+    "ast_hash": "63cb080822281b852d499ec2bcaa23a7",
+    "semantic_hash": "63cb080822281b852d499ec2bcaa23a7"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Notifications/NotificationPermission.swift": {
+    "mtime": 1788512933.1184578,
+    "seen": 1788554000.9259205,
+    "ast_hash": "6ed638feec36fb5fd84074e971c2e290",
+    "semantic_hash": "6ed638feec36fb5fd84074e971c2e290"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Notifications/NotificationScheduler.swift": {
+    "mtime": 1788512947.049052,
+    "seen": 1788554000.9259205,
+    "ast_hash": "f4918e9d143dff75187f6bfc267c8391",
+    "semantic_hash": "f4918e9d143dff75187f6bfc267c8391"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/RaceScheduleRepository.swift": {
+    "mtime": 1788513667.2380855,
+    "seen": 1788554000.9259205,
+    "ast_hash": "8b35cf964bdea697fa506741c8908db3",
+    "semantic_hash": "8b35cf964bdea697fa506741c8908db3"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/RaceScheduleSource.swift": {
+    "mtime": 1788474208.5063875,
+    "seen": 1788554000.9259205,
+    "ast_hash": "13f11beba814a1f152402bcf3415aaf9",
+    "semantic_hash": "13f11beba814a1f152402bcf3415aaf9"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/SessionBadgeMatcher.swift": {
+    "mtime": 1788474212.600454,
+    "seen": 1788554000.9259205,
+    "ast_hash": "1d73b74d9c8379730aa51ffd13bbc2b7",
+    "semantic_hash": "1d73b74d9c8379730aa51ffd13bbc2b7"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/EspnNascarScheduleSource.swift": {
+    "mtime": 1788515366.8988733,
+    "seen": 1788554000.9259205,
+    "ast_hash": "261c3a46cd9a0499e94a969ab209ce76",
+    "semantic_hash": "261c3a46cd9a0499e94a969ab209ce76"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/F1AcademyScheduleSource.swift": {
+    "mtime": 1788515374.5589526,
+    "seen": 1788554000.9259205,
+    "ast_hash": "29be340827d7422483ef784e05bd8abb",
+    "semantic_hash": "29be340827d7422483ef784e05bd8abb"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/FormulaEScheduleSource.swift": {
+    "mtime": 1788515380.1618836,
+    "seen": 1788554000.9259205,
+    "ast_hash": "714fd0d789d265ddeebc19cdca519c76",
+    "semantic_hash": "714fd0d789d265ddeebc19cdca519c76"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/GtWorldChallengeScheduleSource.swift": {
+    "mtime": 1788515394.3506253,
+    "seen": 1788554000.9259205,
+    "ast_hash": "33973bc28de22de79a90f643a9b52c19",
+    "semantic_hash": "33973bc28de22de79a90f643a9b52c19"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/ImsaScheduleSource.swift": {
+    "mtime": 1788515352.631067,
+    "seen": 1788554000.9259205,
+    "ast_hash": "71f03b920fe9922dba87ffda343b9a18",
+    "semantic_hash": "71f03b920fe9922dba87ffda343b9a18"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/IndyCarScheduleSource.swift": {
+    "mtime": 1788474800.2553608,
+    "seen": 1788554000.9259205,
+    "ast_hash": "638b94c9e7218169288b7fb945b051d0",
+    "semantic_hash": "638b94c9e7218169288b7fb945b051d0"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/JolpicaF1ScheduleSource.swift": {
+    "mtime": 1788474781.7073095,
+    "seen": 1788554000.9259205,
+    "ast_hash": "87c91e3f533c6e477b5bf43d549876db",
+    "semantic_hash": "87c91e3f533c6e477b5bf43d549876db"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/JsonLdSportsEventScheduleSource.swift": {
+    "mtime": 1788515400.8504107,
+    "seen": 1788554000.9259205,
+    "ast_hash": "6d25b7b80eb7165ed6a4bab0f3eb861c",
+    "semantic_hash": "6d25b7b80eb7165ed6a4bab0f3eb861c"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/MotoGpPulseliveScheduleSource.swift": {
+    "mtime": 1788474931.220185,
+    "seen": 1788554000.9259205,
+    "ast_hash": "64a5ca91a6dc427786dd7bf2a5a26940",
+    "semantic_hash": "64a5ca91a6dc427786dd7bf2a5a26940"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/UsScheduleDateParsing.swift": {
+    "mtime": 1788474767.2419698,
+    "seen": 1788554000.9259205,
+    "ast_hash": "fda1ec9fa0548b8887e0c0f1df54ccb6",
+    "semantic_hash": "fda1ec9fa0548b8887e0c0f1df54ccb6"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Schedule/Sources/WikipediaSeasonCalendarSource.swift": {
+    "mtime": 1788474916.5749657,
+    "seen": 1788554000.9259205,
+    "ast_hash": "b058712e5db76c93d0baaf2ab1ee4884",
+    "semantic_hash": "b058712e5db76c93d0baaf2ab1ee4884"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/CarBasedStandingsClasses.swift": {
+    "mtime": 1788534236.5774057,
+    "seen": 1788554000.9259205,
+    "ast_hash": "22159cd24b96144c84312924ba14a7a6",
+    "semantic_hash": "22159cd24b96144c84312924ba14a7a6"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/CarDriverModel.swift": {
+    "mtime": 1788474107.1255383,
+    "seen": 1788554000.9259205,
+    "ast_hash": "7a2e5a44f1c41c00ccab9eec704af761",
+    "semantic_hash": "7a2e5a44f1c41c00ccab9eec704af761"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/AcoCarDriversSource.swift": {
+    "mtime": 1788474438.3764343,
+    "seen": 1788554000.9259205,
+    "ast_hash": "03320862b22534d846bb4e50791aeaec",
+    "semantic_hash": "03320862b22534d846bb4e50791aeaec"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/DriverDbStandingsSource.swift": {
+    "mtime": 1788474423.4233153,
+    "seen": 1788554000.9259205,
+    "ast_hash": "c56a28f1133bcf3b213baf09868a81b0",
+    "semantic_hash": "c56a28f1133bcf3b213baf09868a81b0"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/ElmsDriversSource.swift": {
+    "mtime": 1788515359.451523,
+    "seen": 1788554000.9259205,
+    "ast_hash": "2265bc52a8940b8feef6f270c207c330",
+    "semantic_hash": "2265bc52a8940b8feef6f270c207c330"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/ElmsStandingsSource.swift": {
+    "mtime": 1788515636.4100153,
+    "seen": 1788554000.9259205,
+    "ast_hash": "30587d40b60d7cbd799d0db703e711e4",
+    "semantic_hash": "30587d40b60d7cbd799d0db703e711e4"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/F1AcademyStandingsSource.swift": {
+    "mtime": 1788474782.7300873,
+    "seen": 1788554000.9259205,
+    "ast_hash": "15b7148397ef5745ae3997977ed3b8f3",
+    "semantic_hash": "15b7148397ef5745ae3997977ed3b8f3"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/F1StandingsSource.swift": {
+    "mtime": 1788474752.821152,
+    "seen": 1788554000.9259205,
+    "ast_hash": "0863ef9f1dfee8922d2bbb2e291a09bc",
+    "semantic_hash": "0863ef9f1dfee8922d2bbb2e291a09bc"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/F2StandingsSource.swift": {
+    "mtime": 1788474762.047554,
+    "seen": 1788554000.9259205,
+    "ast_hash": "98897f516d0047372f4d6d3dcc733994",
+    "semantic_hash": "98897f516d0047372f4d6d3dcc733994"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/F3StandingsSource.swift": {
+    "mtime": 1788474768.0967324,
+    "seen": 1788554000.9259205,
+    "ast_hash": "fdbd6c215628186d8bb4694f4ffcaed5",
+    "semantic_hash": "fdbd6c215628186d8bb4694f4ffcaed5"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/FormulaEStandingsSource.swift": {
+    "mtime": 1788475026.2056246,
+    "seen": 1788554000.9259205,
+    "ast_hash": "ef443c3c3d15d191640a14fcc064a3ee",
+    "semantic_hash": "ef443c3c3d15d191640a14fcc064a3ee"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/ImsaStandingsSource.swift": {
+    "mtime": 1788513924.7374418,
+    "seen": 1788554000.9259205,
+    "ast_hash": "d55a661ae26c9bc30c390aa1099c2a85",
+    "semantic_hash": "d55a661ae26c9bc30c390aa1099c2a85"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/IndyCarStandingsSource.swift": {
+    "mtime": 1788518803.115679,
+    "seen": 1788554000.9259205,
+    "ast_hash": "d4dc4abab3d9be76a75efdd788665bde",
+    "semantic_hash": "d4dc4abab3d9be76a75efdd788665bde"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/LeMansCupStandingsSource.swift": {
+    "mtime": 1788515664.361264,
+    "seen": 1788554000.9259205,
+    "ast_hash": "46f91c9d33559ec9a411022ccd02700a",
+    "semantic_hash": "46f91c9d33559ec9a411022ccd02700a"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/Moto2StandingsSource.swift": {
+    "mtime": 1788474848.8433104,
+    "seen": 1788554000.9259205,
+    "ast_hash": "4c3513dbd22b4383eb59bef60079c832",
+    "semantic_hash": "4c3513dbd22b4383eb59bef60079c832"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/Moto3StandingsSource.swift": {
+    "mtime": 1788474852.1029913,
+    "seen": 1788554000.9259205,
+    "ast_hash": "c84d6180de37d6268c4cb86f843dcc74",
+    "semantic_hash": "c84d6180de37d6268c4cb86f843dcc74"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/MotoGpStandingsSource.swift": {
+    "mtime": 1788474844.4372616,
+    "seen": 1788554000.9259205,
+    "ast_hash": "0a48bf1d6dfe823194c3fab16a8e0812",
+    "semantic_hash": "0a48bf1d6dfe823194c3fab16a8e0812"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/MotorsportStandingsHTMLSource.swift": {
+    "mtime": 1788515345.837918,
+    "seen": 1788554000.9259205,
+    "ast_hash": "80a945fe6678c3c268df9a31f8b2e5da",
+    "semantic_hash": "80a945fe6678c3c268df9a31f8b2e5da"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/NascarStandingsSource.swift": {
+    "mtime": 1788519030.7055936,
+    "seen": 1788554000.9259205,
+    "ast_hash": "6af546f9e35f6ea5c2adc0dd1b194b27",
+    "semantic_hash": "6af546f9e35f6ea5c2adc0dd1b194b27"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/OfficialRosterStandingsSource.swift": {
+    "mtime": 1788474394.2017224,
+    "seen": 1788554000.9259205,
+    "ast_hash": "e38c983c8f18647c0860a2c65257310f",
+    "semantic_hash": "e38c983c8f18647c0860a2c65257310f"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/PorscheSupercupStandingsSource.swift": {
+    "mtime": 1788474866.3415825,
+    "seen": 1788554000.9259205,
+    "ast_hash": "4ebbc281d94e753f97290296b05de8ca",
+    "semantic_hash": "4ebbc281d94e753f97290296b05de8ca"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/RosterNameFilter.swift": {
+    "mtime": 1788515307.2271354,
+    "seen": 1788554000.9259205,
+    "ast_hash": "5abe0b13abe106a89fb239da13f8a638",
+    "semantic_hash": "5abe0b13abe106a89fb239da13f8a638"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/Sources/WecStandingsSource.swift": {
+    "mtime": 1788515645.9048538,
+    "seen": 1788554000.9259205,
+    "ast_hash": "df794872c0c4c421d41d2310ac21b574",
+    "semantic_hash": "df794872c0c4c421d41d2310ac21b574"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/StandingModel.swift": {
+    "mtime": 1788474100.954248,
+    "seen": 1788554000.9259205,
+    "ast_hash": "adab99be17e68673853231c9d758a1c2",
+    "semantic_hash": "adab99be17e68673853231c9d758a1c2"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/StandingsCategory.swift": {
+    "mtime": 1788518720.8766904,
+    "seen": 1788554000.9259205,
+    "ast_hash": "3370b77740dd5647f57c7d0ac809f820",
+    "semantic_hash": "3370b77740dd5647f57c7d0ac809f820"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/StandingsRepository.swift": {
+    "mtime": 1788513658.1707866,
+    "seen": 1788554000.9259205,
+    "ast_hash": "91165fac4da20e6f6edc19b8e77b1f64",
+    "semantic_hash": "91165fac4da20e6f6edc19b8e77b1f64"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Standings/StandingsSource.swift": {
+    "mtime": 1788474206.8729181,
+    "seen": 1788554000.9259205,
+    "ast_hash": "ee1f5eaf12abb808eaf560d8df38fdce",
+    "semantic_hash": "ee1f5eaf12abb808eaf560d8df38fdce"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Support/BoundedConcurrency.swift": {
+    "mtime": 1788474343.0002663,
+    "seen": 1788554000.9259205,
+    "ast_hash": "146f060a22fc09a5ebc26595544b4afb",
+    "semantic_hash": "146f060a22fc09a5ebc26595544b4afb"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Support/ColorContrast.swift": {
+    "mtime": 1788516784.3532476,
+    "seen": 1788554000.9259205,
+    "ast_hash": "04c22123a66399e5855069e227825a66",
+    "semantic_hash": "04c22123a66399e5855069e227825a66"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Support/DateTimeFormatters.swift": {
+    "mtime": 1788529661.1580474,
+    "seen": 1788554000.9259205,
+    "ast_hash": "39ea8defa0a728a6da730fa8f2717e1c",
+    "semantic_hash": "39ea8defa0a728a6da730fa8f2717e1c"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Support/EventWeekendGrouper.swift": {
+    "mtime": 1788530979.9626272,
+    "seen": 1788554000.9259205,
+    "ast_hash": "c52c834351253304f05dc403a112c770",
+    "semantic_hash": "c52c834351253304f05dc403a112c770"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Support/SeasonWindow.swift": {
+    "mtime": 1788512892.6222172,
+    "seen": 1788554000.9259205,
+    "ast_hash": "a0b43b054e23bb0730caab3bd62c444f",
+    "semantic_hash": "a0b43b054e23bb0730caab3bd62c444f"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Support/TextNormalizer.swift": {
+    "mtime": 1788474197.6350913,
+    "seen": 1788554000.9259205,
+    "ast_hash": "723e671cdff8e37ee3af53553997d0e6",
+    "semantic_hash": "723e671cdff8e37ee3af53553997d0e6"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Sync/BackgroundSyncManager.swift": {
+    "mtime": 1788512979.721084,
+    "seen": 1788554000.9259205,
+    "ast_hash": "9206f929f39e3fa92e6c847b3ad33f14",
+    "semantic_hash": "9206f929f39e3fa92e6c847b3ad33f14"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Sync/ConnectivityMonitor.swift": {
+    "mtime": 1788512955.5853853,
+    "seen": 1788554000.9259205,
+    "ast_hash": "ead3430968cbf315e96c77a2917f531a",
+    "semantic_hash": "ead3430968cbf315e96c77a2917f531a"
+  },
+  "PitBoardKit/Sources/PitBoardKit/UI/Components/EmptyStateView.swift": {
+    "mtime": 1788513012.8850014,
+    "seen": 1788554000.9259205,
+    "ast_hash": "f54347662148db8021d73d60931e2f4a",
+    "semantic_hash": "f54347662148db8021d73d60931e2f4a"
+  },
+  "PitBoardKit/Sources/PitBoardKit/UI/Components/OfflineBanner.swift": {
+    "mtime": 1788516378.1114173,
+    "seen": 1788554000.9259205,
+    "ast_hash": "e90523d500d6b5db581df3fedfe56e45",
+    "semantic_hash": "e90523d500d6b5db581df3fedfe56e45"
+  },
+  "PitBoardKit/Sources/PitBoardKit/UI/Components/RemoteImage.swift": {
+    "mtime": 1788515158.6067948,
+    "seen": 1788554000.9259205,
+    "ast_hash": "d075e52280f0fdc42f0ba91daeae81f2",
+    "semantic_hash": "d075e52280f0fdc42f0ba91daeae81f2"
+  },
+  "PitBoardKit/Sources/PitBoardKit/UI/Components/RemoteImageCache.swift": {
+    "mtime": 1788514683.7240987,
+    "seen": 1788554000.9259205,
+    "ast_hash": "e706b9d30eca92231cb49742a0396ee5",
+    "semantic_hash": "e706b9d30eca92231cb49742a0396ee5"
+  },
+  "PitBoardKit/Sources/PitBoardKit/UI/Theme/BadgeColors.swift": {
+    "mtime": 1788513002.2482934,
+    "seen": 1788554000.9259205,
+    "ast_hash": "37f7d8a4a89de544d0f252420d855dc7",
+    "semantic_hash": "37f7d8a4a89de544d0f252420d855dc7"
+  },
+  "PitBoardKit/Sources/PitBoardKit/UI/Theme/PitBoardColorScheme.swift": {
+    "mtime": 1788512994.0867426,
+    "seen": 1788554000.9259205,
+    "ast_hash": "13a6a1141df195e82a65be9766f203fd",
+    "semantic_hash": "13a6a1141df195e82a65be9766f203fd"
+  },
+  "PitBoardKit/Sources/PitBoardKit/UI/Theme/PitBoardTheme.swift": {
+    "mtime": 1788512999.002664,
+    "seen": 1788554000.9259205,
+    "ast_hash": "ed2395a215eefbec32f4489d897edcd0",
+    "semantic_hash": "ed2395a215eefbec32f4489d897edcd0"
+  },
+  "PitBoardKit/Sources/PitBoardKit/UI/Theme/PodiumColors.swift": {
+    "mtime": 1788513008.895566,
+    "seen": 1788554000.9259205,
+    "ast_hash": "9022397c885a2701ed5fc3a8a358bf44",
+    "semantic_hash": "9022397c885a2701ed5fc3a8a358bf44"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Weather/CircuitCoordinates.swift": {
+    "mtime": 1788529680.32636,
+    "seen": 1788554000.9259205,
+    "ast_hash": "32c1349b9c7e6ba2507d644ca6b30f67",
+    "semantic_hash": "32c1349b9c7e6ba2507d644ca6b30f67"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Weather/WeatherService.swift": {
+    "mtime": 1788529704.4913087,
+    "seen": 1788554000.9259205,
+    "ast_hash": "ececf160c44ad6fbe54905a8dd2569a8",
+    "semantic_hash": "ececf160c44ad6fbe54905a8dd2569a8"
+  },
+  "PitBoardKit/Sources/PitBoardKit/Widget/WidgetSupport.swift": {
+    "mtime": 1788513483.007944,
+    "seen": 1788554000.9259205,
+    "ast_hash": "146507bc6e83e709936f0399a5a6ba05",
+    "semantic_hash": "146507bc6e83e709936f0399a5a6ba05"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/AppSettingsRepositoryTests.swift": {
+    "mtime": 1788513801.8475418,
+    "seen": 1788554000.9259205,
+    "ast_hash": "53e6900a8afa179b7bd840e464dc3ac4",
+    "semantic_hash": "53e6900a8afa179b7bd840e464dc3ac4"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/ColorContrastTests.swift": {
+    "mtime": 1788513716.8647401,
+    "seen": 1788554000.9259205,
+    "ast_hash": "635089a1476ef4bb5c1d40ba6d1c94a8",
+    "semantic_hash": "635089a1476ef4bb5c1d40ba6d1c94a8"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/EventWeekendGrouperTests.swift": {
+    "mtime": 1788513789.3418686,
+    "seen": 1788554000.9259205,
+    "ast_hash": "16229c24416213ed46505876107f20c3",
+    "semantic_hash": "16229c24416213ed46505876107f20c3"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/RaceScheduleRepositoryTests.swift": {
+    "mtime": 1788513873.0408247,
+    "seen": 1788554000.9259205,
+    "ast_hash": "520d329adec5bcf46f7cb526a94a2ced",
+    "semantic_hash": "520d329adec5bcf46f7cb526a94a2ced"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/RosterNameFilterTests.swift": {
+    "mtime": 1788513814.6729648,
+    "seen": 1788554000.9259205,
+    "ast_hash": "5b06875cc1dd2ac555c3362eac43f46d",
+    "semantic_hash": "5b06875cc1dd2ac555c3362eac43f46d"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/SeasonWindowTests.swift": {
+    "mtime": 1788513710.7932823,
+    "seen": 1788554000.9259205,
+    "ast_hash": "0244f3865d3c8ea60cb33c1a99a9cf93",
+    "semantic_hash": "0244f3865d3c8ea60cb33c1a99a9cf93"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/SessionBadgeMatcherTests.swift": {
+    "mtime": 1788513704.071833,
+    "seen": 1788554000.9259205,
+    "ast_hash": "a41ab7fca5d2ae9f0b0b15e2c7ff54c3",
+    "semantic_hash": "a41ab7fca5d2ae9f0b0b15e2c7ff54c3"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/StandingsRepositoryTests.swift": {
+    "mtime": 1788513889.6142955,
+    "seen": 1788554000.9259205,
+    "ast_hash": "44542586c0a58b24ad384c59192239ab",
+    "semantic_hash": "44542586c0a58b24ad384c59192239ab"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/TestSupport.swift": {
+    "mtime": 1788513675.2460263,
+    "seen": 1788554000.9259205,
+    "ast_hash": "f19531234e4e3c0586703b70dc9332ba",
+    "semantic_hash": "f19531234e4e3c0586703b70dc9332ba"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/TextNormalizerTests.swift": {
+    "mtime": 1788513687.5381465,
+    "seen": 1788554000.9259205,
+    "ast_hash": "6dafa3428666555f86576b055c2f5904",
+    "semantic_hash": "6dafa3428666555f86576b055c2f5904"
+  },
+  "PitBoardKit/Tests/PitBoardKitTests/WidgetSupportTests.swift": {
+    "mtime": 1788513725.0238893,
+    "seen": 1788554000.9259205,
+    "ast_hash": "15fb6db8324cc7c0b79219e0e3377266",
+    "semantic_hash": "15fb6db8324cc7c0b79219e0e3377266"
+  },
+  "PitBoardTests/AsyncTimeoutTests.swift": {
+    "mtime": 1788517396.0900142,
+    "seen": 1788554000.9259205,
+    "ast_hash": "2f2d7d7920674e2a1699fa15b1ee8ce2",
+    "semantic_hash": "2f2d7d7920674e2a1699fa15b1ee8ce2"
+  },
+  "PitBoardTests/DefaultSeriesConfigsTests.swift": {
+    "mtime": 1788517414.912697,
+    "seen": 1788554000.9259205,
+    "ast_hash": "1cfc0817c4ae94107e55f98db936bce8",
+    "semantic_hash": "1cfc0817c4ae94107e55f98db936bce8"
+  },
+  "PitBoardTests/TestSupport.swift": {
+    "mtime": 1788517388.3632417,
+    "seen": 1788554000.9259205,
+    "ast_hash": "86612c1237815ba535d4edeba6840bf5",
+    "semantic_hash": "86612c1237815ba535d4edeba6840bf5"
+  },
+  "PitBoardTests/UITestFixturesTests.swift": {
+    "mtime": 1788517428.9819424,
+    "seen": 1788554000.9259205,
+    "ast_hash": "19f14ad3d7362b95f2279db17166a4a4",
+    "semantic_hash": "19f14ad3d7362b95f2279db17166a4a4"
+  },
+  "PitBoardUITests/AppLaunchUITests.swift": {
+    "mtime": 1788517113.133323,
+    "seen": 1788554000.9259205,
+    "ast_hash": "b3565cfe535bba15fbfdac8718facee0",
+    "semantic_hash": "b3565cfe535bba15fbfdac8718facee0"
+  },
+  "PitBoardUITests/EventsScreenUITests.swift": {
+    "mtime": 1788517123.496622,
+    "seen": 1788554000.9259205,
+    "ast_hash": "936aec6fd8f489dd9012954fc3028f01",
+    "semantic_hash": "936aec6fd8f489dd9012954fc3028f01"
+  },
+  "PitBoardUITests/PitBoardUITestCase.swift": {
+    "mtime": 1788517104.4985702,
+    "seen": 1788554000.9259205,
+    "ast_hash": "d7f339962a1bd9f714967511cd047ece",
+    "semantic_hash": "d7f339962a1bd9f714967511cd047ece"
+  },
+  "PitBoardUITests/SettingsScreenUITests.swift": {
+    "mtime": 1788517134.0784085,
+    "seen": 1788554000.9259205,
+    "ast_hash": "d0c12e3a19cbf3546d81a8bbbfb347d4",
+    "semantic_hash": "d0c12e3a19cbf3546d81a8bbbfb347d4"
+  },
+  "PitBoardUITests/StandingsScreenUITests.swift": {
+    "mtime": 1788517144.2585456,
+    "seen": 1788554000.9259205,
+    "ast_hash": "ee745afb04c56273a8cca9c02ce6c75d",
+    "semantic_hash": "ee745afb04c56273a8cca9c02ce6c75d"
+  },
+  "PitBoardWidget/Assets.xcassets/Contents.json": {
+    "mtime": 1788473973.9800012,
+    "seen": 1788554000.9259205,
+    "ast_hash": "9deb2ada1cc834bbebf8bbad9c8978a1",
+    "semantic_hash": "9deb2ada1cc834bbebf8bbad9c8978a1"
+  },
+  "PitBoardWidget/PitBoardWidgetBundle.swift": {
+    "mtime": 1788534346.5168788,
+    "seen": 1788554000.9259205,
+    "ast_hash": "8af27c569529b3ae29bbdf62c80e0a20",
+    "semantic_hash": "8af27c569529b3ae29bbdf62c80e0a20"
+  },
+  "PitBoardWidget/RaceWidgetConfigurationIntent.swift": {
+    "mtime": 1788515478.387503,
+    "seen": 1788554000.9259205,
+    "ast_hash": "d8dd159cbe1d87247b62c5d103967403",
+    "semantic_hash": "d8dd159cbe1d87247b62c5d103967403"
+  },
+  "PitBoardWidget/RaceWidgetProvider.swift": {
+    "mtime": 1788531980.132181,
+    "seen": 1788554000.9259205,
+    "ast_hash": "7993aebacaf163b89dffb5ad42b3e1e9",
+    "semantic_hash": "7993aebacaf163b89dffb5ad42b3e1e9"
+  },
+  "PitBoardWidget/RaceWidgetView.swift": {
+    "mtime": 1788532020.9888942,
+    "seen": 1788554000.9259205,
+    "ast_hash": "743e195fcf2c206dd3d95445b958e793",
+    "semantic_hash": "743e195fcf2c206dd3d95445b958e793"
+  },
+  "PitBoardWidget/StandingsWidgetConfigurationIntent.swift": {
+    "mtime": 1788534366.9388144,
+    "seen": 1788554000.9259205,
+    "ast_hash": "da478c753ecf88bc2d035a8bf2a47063",
+    "semantic_hash": "da478c753ecf88bc2d035a8bf2a47063"
+  },
+  "PitBoardWidget/StandingsWidgetProvider.swift": {
+    "mtime": 1788534395.4665728,
+    "seen": 1788554000.9259205,
+    "ast_hash": "dcba635833e4706e6504e8a2b9497ead",
+    "semantic_hash": "dcba635833e4706e6504e8a2b9497ead"
+  },
+  "PitBoardWidget/StandingsWidgetView.swift": {
+    "mtime": 1788534427.5441058,
+    "seen": 1788554000.9259205,
+    "ast_hash": "990e567e48bb0ce07cbd4b2e9a94cdbd",
+    "semantic_hash": "990e567e48bb0ce07cbd4b2e9a94cdbd"
+  },
+  "PitBoard/App/AsyncTimeout.swift": {
+    "mtime": 1788517359.24774,
+    "seen": 1788554000.9259205,
+    "ast_hash": "3a2ce1866003e8f591a16dd4cdd0c621",
+    "semantic_hash": "3a2ce1866003e8f591a16dd4cdd0c621"
+  },
+  "PitBoard/App/DefaultSeriesConfigs.swift": {
+    "mtime": 1788517345.8928223,
+    "seen": 1788554000.9259205,
+    "ast_hash": "b490c1e1a3e71bb86d3e803342e32443",
+    "semantic_hash": "b490c1e1a3e71bb86d3e803342e32443"
+  },
+  "PitBoard/App/EnvironmentKeys.swift": {
+    "mtime": 1788513099.0628846,
+    "seen": 1788554000.9259205,
+    "ast_hash": "eca0005476041252414a8c87a526dac9",
+    "semantic_hash": "eca0005476041252414a8c87a526dac9"
+  },
+  "PitBoard/App/PitBoardApp.swift": {
+    "mtime": 1788513027.350425,
+    "seen": 1788554000.9259205,
+    "ast_hash": "76540ca5f8399f15755516f04faa5431",
+    "semantic_hash": "76540ca5f8399f15755516f04faa5431"
+  },
+  "PitBoard/App/RootTabView.swift": {
+    "mtime": 1788530485.3923116,
+    "seen": 1788554000.9259205,
+    "ast_hash": "8b6fbad87337796e49aaa63cbd2f4327",
+    "semantic_hash": "8b6fbad87337796e49aaa63cbd2f4327"
+  },
+  "PitBoard/App/UITestSupport.swift": {
+    "mtime": 1788517349.7794914,
+    "seen": 1788554000.9259205,
+    "ast_hash": "40dda371141ddcb957a09bc16310f179",
+    "semantic_hash": "40dda371141ddcb957a09bc16310f179"
+  },
+  "PitBoard/Resources/Assets.xcassets/AccentColor.colorset/Contents.json": {
+    "mtime": 1788473973.216414,
+    "seen": 1788554000.9259205,
+    "ast_hash": "55019f7265dde0a78318b0807f98e847",
+    "semantic_hash": "55019f7265dde0a78318b0807f98e847"
+  },
+  "PitBoard/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json": {
+    "mtime": 1788473972.1158957,
+    "seen": 1788554000.9259205,
+    "ast_hash": "656e426612a7126f2dc91453413e7c4a",
+    "semantic_hash": "656e426612a7126f2dc91453413e7c4a"
+  },
+  "PitBoard/Resources/Assets.xcassets/Contents.json": {
+    "mtime": 1788473971.0195217,
+    "seen": 1788554000.9259205,
+    "ast_hash": "9deb2ada1cc834bbebf8bbad9c8978a1",
+    "semantic_hash": "9deb2ada1cc834bbebf8bbad9c8978a1"
+  },
+  "PitBoard/UI/Events/EventsScreen.swift": {
+    "mtime": 1788531231.7291398,
+    "seen": 1788554000.9259205,
+    "ast_hash": "cc5d9a83bd1293ecfee82dece2519a8a",
+    "semantic_hash": "cc5d9a83bd1293ecfee82dece2519a8a"
+  },
+  "PitBoard/UI/Settings/LanguagePickerScreen.swift": {
+    "mtime": 1788530467.9091485,
+    "seen": 1788554000.9259205,
+    "ast_hash": "18666d423c9550894d8f893ab78502bc",
+    "semantic_hash": "18666d423c9550894d8f893ab78502bc"
+  },
+  "PitBoard/UI/Settings/SettingsScreen.swift": {
+    "mtime": 1788530555.443716,
+    "seen": 1788554000.9259205,
+    "ast_hash": "fec7be3c7a1c1649e37d57f74d16e072",
+    "semantic_hash": "fec7be3c7a1c1649e37d57f74d16e072"
+  },
+  "PitBoard/UI/Standings/CategoryStandingsScreen.swift": {
+    "mtime": 1788534247.5666366,
+    "seen": 1788554000.9259205,
+    "ast_hash": "cb807b95831c452bfe4dc1f146c62cc7",
+    "semantic_hash": "cb807b95831c452bfe4dc1f146c62cc7"
+  },
+  "PitBoard/UI/Standings/StandingsScreen.swift": {
+    "mtime": 1788531688.8813853,
+    "seen": 1788554000.9259205,
+    "ast_hash": "874a729a7804d59ff705966b66d7dc40",
+    "semantic_hash": "874a729a7804d59ff705966b66d7dc40"
+  }
+}

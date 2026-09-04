@@ -23,7 +23,13 @@ struct RootTabView: View {
 
     var body: some View {
         Group {
-            if !startupSyncDone {
+            // Primer arranque de verdad: elegir idioma es lo PRIMERO de todo, antes incluso
+            // que el permiso de notificaciones — pedido explícito ("al instalarla te pida
+            // cuál quieres"). Se salta en modo test de UI (ver UITestSupport) para que
+            // XCUITest siempre llegue a las 3 pestañas desde el primer frame.
+            if settings.appLanguage == nil && !UITestSupport.isUITesting() {
+                LanguagePickerScreen(onLanguageChosen: { settings.setAppLanguage($0) })
+            } else if !startupSyncDone {
                 StartupLoadingScreen()
             } else {
                 TabView {

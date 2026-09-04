@@ -29,6 +29,13 @@ public final class ElmsStandingsSource: StandingsSource, @unchecked Sendable {
 
     public func fetch(nowUtc: Date) async throws -> [StandingDraft] {
         let html = try await HTTPClient.fetchHTML(pageUrl)
+        return try parseHTML(html, nowUtc: nowUtc)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // emparejado título-tabla y el plan B por número de coche contra un fixture HTML sin
+    // red — ver ElmsStandingsSourceTests.
+    func parseHTML(_ html: String, nowUtc: Date) throws -> [StandingDraft] {
         let doc = try SwiftSoup.parse(html, pageUrl)
 
         // Títulos "<Clase> Teams Classification": solo los elementos "hoja" que cumplen

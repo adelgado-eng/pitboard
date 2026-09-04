@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 import PitBoardKit
 
 /// Equivalente exacto de `SettingsScreen.kt` (`SettingsViewModel` + `SettingsScreen` +
@@ -34,8 +35,10 @@ struct SettingsScreen: View {
                 notificationsCard
                 standingsCard
                 appearanceCard
+                timeZoneCard
+                backgroundRefreshHelpCard
 
-                Text("PitBoard v0.1.0\n🏁 Hecho para fans del motor")
+                Text(settings.t("settings_footer"))
                     .font(.caption2)
                     .foregroundStyle(colors.onSurfaceVariant.opacity(0.6))
                     .multilineTextAlignment(.center)
@@ -45,19 +48,15 @@ struct SettingsScreen: View {
             .padding(20)
         }
         .background(colors.background)
-        .navigationTitle("Ajustes")
-        .alert("Permiso de notificaciones", isPresented: $showPermissionBlockedDialog) {
-            Button("Abrir ajustes") {
+        .navigationTitle(settings.t("settings_title"))
+        .alert(settings.t("settings_notifications_permission_title"), isPresented: $showPermissionBlockedDialog) {
+            Button(settings.t("settings_open_settings")) {
                 waitingForSystemSettings = true
                 NotificationPermission.openSystemSettings()
             }
-            Button("Ahora no", role: .cancel) {}
+            Button(settings.t("settings_not_now"), role: .cancel) {}
         } message: {
-            Text(
-                "iOS tiene bloqueados los avisos de PitBoard, así que la app ya no puede " +
-                "volver a pedirte el permiso desde aquí. Abre los ajustes del sistema y " +
-                "activa las notificaciones para PitBoard."
-            )
+            Text(settings.t("settings_notifications_permission_body"))
         }
         .sheet(isPresented: $showCategoryPicker) {
             NotificationSeriesPicker(
@@ -88,11 +87,11 @@ struct SettingsScreen: View {
 
     @ViewBuilder
     private var notificationsCard: some View {
-        SettingsCard(title: "Notificaciones", systemImage: "bell.fill") {
+        SettingsCard(title: settings.t("settings_notifications_title"), systemImage: "bell.fill") {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Activar avisos").font(.body)
-                    Text("Avisar antes de las sesiones")
+                    Text(settings.t("settings_notifications_enable")).font(.body)
+                    Text(settings.t("settings_notifications_subtitle"))
                         .font(.caption)
                         .foregroundStyle(colors.onSurfaceVariant)
                 }
@@ -108,7 +107,7 @@ struct SettingsScreen: View {
             if settings.notificationsEnabled {
                 Divider().padding(.vertical, 8)
 
-                Text("¿Cuándo avisar?").font(.caption.weight(.semibold))
+                Text(settings.t("settings_notifications_when")).font(.caption.weight(.semibold))
                 HStack(spacing: 8) {
                     minutesChip(minutes: 15, label: "15m")
                     minutesChip(minutes: 30, label: "30m")
@@ -116,12 +115,12 @@ struct SettingsScreen: View {
                 }
                 .padding(.top, 4)
 
-                Text("¿Qué sesiones?")
+                Text(settings.t("settings_notifications_which_sessions"))
                     .font(.caption.weight(.semibold))
                     .padding(.top, 12)
                 VStack(spacing: 4) {
                     SessionTypeToggle(
-                        label: "Competición (Carrera, Clasif., Sprint)",
+                        label: settings.t("settings_notifications_competitive"),
                         checked: settings.competitiveNotificationsEnabled,
                         onToggle: { enabled in
                             settings.setCompetitiveNotificationsEnabled(enabled)
@@ -129,7 +128,7 @@ struct SettingsScreen: View {
                         }
                     )
                     SessionTypeToggle(
-                        label: "Entrenamientos (Libres)",
+                        label: settings.t("settings_notifications_practice"),
                         checked: settings.practiceNotificationsEnabled,
                         onToggle: { enabled in
                             settings.setPracticeNotificationsEnabled(enabled)
@@ -145,9 +144,9 @@ struct SettingsScreen: View {
                 } label: {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Series activas").font(.subheadline)
+                            Text(settings.t("settings_notifications_active_series")).font(.subheadline)
                             let count = activeSeries.count
-                            Text(count == RaceSeries.allCases.count ? "Todas las series" : "\(count) series seleccionadas")
+                            Text(count == RaceSeries.allCases.count ? settings.t("settings_notifications_all_series") : String(format: settings.t("settings_notifications_series_count"), count))
                                 .font(.caption)
                                 .foregroundStyle(colors.primary)
                         }
@@ -224,14 +223,11 @@ struct SettingsScreen: View {
 
     @ViewBuilder
     private var standingsCard: some View {
-        SettingsCard(title: "Clasificaciones", systemImage: "trophy.fill") {
+        SettingsCard(title: settings.t("settings_standings_title"), systemImage: "trophy.fill") {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Activar clasificaciones").font(.body)
-                    Text(
-                        "F1, MotoGP, NASCAR y más. Al activarlas aparece su pestaña en la barra de abajo; " +
-                        "se actualizan cada lunes a las 12:00 y necesitan wifi o datos móviles."
-                    )
+                    Text(settings.t("settings_standings_enable")).font(.body)
+                    Text(settings.t("settings_standings_subtitle"))
                     .font(.caption)
                     .foregroundStyle(colors.onSurfaceVariant)
                 }
@@ -263,15 +259,15 @@ struct SettingsScreen: View {
 
     @ViewBuilder
     private var appearanceCard: some View {
-        SettingsCard(title: "Apariencia", systemImage: "paintpalette.fill") {
-            Text("Elige el tema de la aplicación")
+        SettingsCard(title: settings.t("settings_appearance_title"), systemImage: "paintpalette.fill") {
+            Text(settings.t("settings_appearance_subtitle"))
                 .font(.caption)
                 .foregroundStyle(colors.onSurfaceVariant)
 
             HStack(spacing: 8) {
-                themeChip(theme: .light, label: "☀️ Claro")
-                themeChip(theme: .dark, label: "🌙 Oscuro")
-                themeChip(theme: .system, label: "📱 Auto")
+                themeChip(theme: .light, label: settings.t("settings_theme_light"))
+                themeChip(theme: .dark, label: settings.t("settings_theme_dark"))
+                themeChip(theme: .system, label: settings.t("settings_theme_auto"))
             }
         }
     }
@@ -283,6 +279,54 @@ struct SettingsScreen: View {
             .tint(selected ? colors.primary : colors.onSurfaceVariant)
             .background(selected ? colors.primaryContainer : .clear, in: Capsule())
             .accessibilityIdentifier("settings.theme.\(theme.rawValue)")
+    }
+
+    // MARK: - Tarjeta: Zona horaria
+
+    @ViewBuilder
+    private var timeZoneCard: some View {
+        SettingsCard(title: settings.t("settings_timezone_title"), systemImage: "globe") {
+            Text(settings.t("settings_timezone_subtitle"))
+                .font(.caption)
+                .foregroundStyle(colors.onSurfaceVariant)
+
+            HStack(spacing: 8) {
+                timeModeChip(mode: .device, label: settings.t("settings_timezone_device"))
+                timeModeChip(mode: .track, label: settings.t("settings_timezone_track"))
+            }
+        }
+    }
+
+    private func timeModeChip(mode: TimeDisplayMode, label: String) -> some View {
+        let selected = settings.timeDisplayMode == mode
+        return Button(label) { settings.setTimeDisplayMode(mode) }
+            .buttonStyle(.bordered)
+            .tint(selected ? colors.primary : colors.onSurfaceVariant)
+            .background(selected ? colors.primaryContainer : .clear, in: Capsule())
+            .accessibilityIdentifier("settings.timeDisplayMode.\(mode.rawValue)")
+    }
+
+    // MARK: - Tarjeta: Ayuda (avisos/widget que llegan tarde)
+
+    /// Equivalente iOS del enlace a dontkillmyapp.com de Android — ese sitio es específico
+    /// de fabricantes Android (Samsung/Xiaomi/Huawei matando procesos en segundo plano), así
+    /// que aquí no aplica tal cual. El problema equivalente en iOS es "Actualización en
+    /// segundo plano" desactivada (a mano o por Modo de bajo consumo) para PitBoard — este
+    /// botón lleva directo a esa pantalla de Ajustes del sistema.
+    @ViewBuilder
+    private var backgroundRefreshHelpCard: some View {
+        SettingsCard(title: settings.t("settings_battery_help_title"), systemImage: "battery.25") {
+            Text(settings.t("settings_battery_help_subtitle"))
+                .font(.caption)
+                .foregroundStyle(colors.onSurfaceVariant)
+                .padding(.bottom, 4)
+
+            Button(settings.t("settings_battery_help_button")) {
+                guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+                UIApplication.shared.open(url)
+            }
+            .buttonStyle(.borderedProminent)
+        }
     }
 }
 
@@ -350,6 +394,7 @@ private struct NotificationSeriesPicker: View {
     let onToggle: (RaceSeries, Bool) -> Void
     let onDismiss: () -> Void
 
+    @Environment(AppSettingsRepository.self) private var settings
     @Environment(\.pitBoardColors) private var colors
 
     private var configByKey: [RaceSeries: SeriesConfigModel] {
@@ -360,7 +405,7 @@ private struct NotificationSeriesPicker: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 8) {
-                    Text("Desactiva aquellas series de las que no quieras recibir notificaciones.")
+                    Text(settings.t("settings_series_with_alerts_subtitle"))
                         .font(.subheadline)
                         .foregroundStyle(colors.onSurfaceVariant)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -400,11 +445,11 @@ private struct NotificationSeriesPicker: View {
                 }
                 .padding(20)
             }
-            .navigationTitle("Series con avisos")
+            .navigationTitle(settings.t("settings_series_with_alerts_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Listo", action: onDismiss)
+                    Button(settings.t("settings_done"), action: onDismiss)
                 }
             }
         }

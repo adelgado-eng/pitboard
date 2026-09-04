@@ -26,6 +26,13 @@ public final class ElmsDriversSource: @unchecked Sendable {
 
     public func fetch(nowUtc: Date) async throws -> [CarDriverDraft] {
         let html = try await HTTPClient.fetchHTML(pageUrl)
+        return try parseHTML(html, nowUtc: nowUtc)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // agrupado por clase (recordando el último <h2> visto) contra un fixture HTML sin red
+    // — ver ElmsDriversSourceTests.
+    func parseHTML(_ html: String, nowUtc: Date) throws -> [CarDriverDraft] {
         let doc = try SwiftSoup.parse(html, pageUrl)
 
         var currentClass: StandingsClass?

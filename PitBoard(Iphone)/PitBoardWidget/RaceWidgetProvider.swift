@@ -9,12 +9,17 @@ import PitBoardKit
 /// `TimelineEntry` puede sobrevivir más allá del `ModelContext` que la construyó.
 struct RaceWidgetEntry: TimelineEntry {
     let date: Date
-    let weekendLabel: String
+    /// Clave de `Strings` (ej. "events_weekend_today"), no texto fijo en español — se
+    /// traduce en `RaceWidgetView` con `entry.appLanguage`.
+    let weekendLabelKey: String
     let weekendEvents: [EventDraft]
     let laterEvents: [EventDraft]
     let seriesTagColors: [RaceSeries: SeriesTagColor]
     let configuration: RaceWidgetConfigurationIntent
     let useDark: Bool
+    /// Mismo idioma que el resto de la app (elegido en el selector de primer arranque) —
+    /// `.spanish` si todavía no se ha elegido ninguno.
+    let appLanguage: AppLanguage
 
     var allEvents: [EventDraft] { weekendEvents + laterEvents }
 }
@@ -24,14 +29,15 @@ struct RaceWidgetProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> RaceWidgetEntry {
         RaceWidgetEntry(
             date: Date(),
-            weekendLabel: "ESTE FIN DE SEMANA",
+            weekendLabelKey: "events_weekend_this",
             weekendEvents: [
                 EventDraft(series: .f1, uid: "placeholder", fullTitle: "Formula 1 - GP de Ejemplo - Carrera", startTimeUtc: Date().addingTimeInterval(3600), inferredBadge: SessionBadgeType.race.rawValue)
             ],
             laterEvents: [],
             seriesTagColors: [.f1: SeriesTagColor(tag: "F1", colorHex: RaceSeries.f1.defaultColorHex)],
             configuration: RaceWidgetConfigurationIntent(),
-            useDark: true
+            useDark: true,
+            appLanguage: .spanish
         )
     }
 
@@ -94,14 +100,20 @@ struct RaceWidgetProvider: AppIntentTimelineProvider {
         case .system: useDark = UITraitCollection.current.userInterfaceStyle == .dark
         }
 
+        // Mismo idioma que el resto de la app — AppSettingsRepository() usa por defecto el
+        // App Group compartido, así que lee la misma preferencia guardada desde el proceso
+        // de la app principal.
+        let appLanguage = AppSettingsRepository().appLanguage ?? .spanish
+
         return RaceWidgetEntry(
             date: now,
-            weekendLabel: groups.weekendLabel,
+            weekendLabelKey: groups.weekendLabelKey,
             weekendEvents: groups.weekendEvents,
             laterEvents: groups.laterEvents,
             seriesTagColors: seriesTagColors,
             configuration: configuration,
-            useDark: useDark
+            useDark: useDark,
+            appLanguage: appLanguage
         )
     }
 
@@ -110,7 +122,7 @@ struct RaceWidgetProvider: AppIntentTimelineProvider {
     /// evita tener que emparejar de vuelta por `uid`, que solo es estable DENTRO de una
     /// serie (dos series distintas podrían compartir el mismo uid por coincidencia; ver
     /// `EventEntity.kt`), así que no sirve como clave global de unión aquí.
-    private static func splitByWeekend(_ events: [EventDraft], zone: TimeZone = .current) -> (weekendLabel: String, weekendEvents: [EventDraft], laterEvents: [EventDraft]) {
+    private static func splitByWeekend(_ events: [EventDraft], zone: TimeZone = .current) -> (weekendLabelKey: String, weekendEvents: [EventDraft], laterEvents: [EventDraft]) {
         guard let first = events.first else { return ("", [], []) }
 
         var calendar = Calendar(identifier: .gregorian)
@@ -130,21 +142,23 @@ struct RaceWidgetProvider: AppIntentTimelineProvider {
         }
 
         let today = calendar.startOfDay(for: Date())
-        let label: String
+        // Mismas claves de Strings que EventWeekendGrouper.split (ver EventsScreen.swift) —
+        // este widget reimplementa el algoritmo sobre EventDraft, pero comparte catálogo.
+        let labelKey: String
         if firstDate == today {
-            label = "Hoy"
+            labelKey = "events_weekend_today"
         } else if today >= friday && today <= sunday {
-            label = "Este fin de semana"
+            labelKey = "events_weekend_this"
         } else {
             let weekday = calendar.component(.weekday, from: today)
             let daysForward = (6 - weekday + 7) % 7
             let offset = daysForward == 0 ? 7 : daysForward
             let strictNextFriday = calendar.date(byAdding: .day, value: offset, to: today) ?? today
-            label = friday == strictNextFriday ? "Próximo fin de semana" : "Próxima cita"
+            labelKey = friday == strictNextFriday ? "events_weekend_next" : "events_weekend_upcoming"
         }
 
         let weekend = events.filter { $0.startTimeUtc >= friday && $0.startTimeUtc <= sundayEnd }
         let later = events.filter { $0.startTimeUtc > sundayEnd }
-        return (label, weekend, later)
+        return (labelKey, weekend, later)
     }
 }

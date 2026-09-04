@@ -44,8 +44,22 @@ public final class JsonLdSportsEventScheduleSource: RaceScheduleSource, @uncheck
         let roundHrefPrefix = roundHrefPrefixTemplate.replacingOccurrences(of: "{year}", with: String(year))
 
         let listingHtml = try await HTTPClient.fetchHTML(listingUrl)
-        let listingDoc = try SwiftSoup.parse(listingHtml, baseUrl)
+        let roundUrls = try extractRoundUrls(listingHtml, roundHrefPrefix: roundHrefPrefix)
 
+        var events: [EventDraft] = []
+        for roundUrl in roundUrls {
+            if let sessions = try? await sessionsForRound(roundUrl) {
+                events.append(contentsOf: sessions)
+            }
+        }
+        return events
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear el
+    // filtro de enlaces de ronda (prefijo + exclusión de slugs de test) contra un fixture
+    // HTML sin red — ver JsonLdSportsEventScheduleSourceTests.
+    func extractRoundUrls(_ listingHtml: String, roundHrefPrefix: String) throws -> [String] {
+        let listingDoc = try SwiftSoup.parse(listingHtml, baseUrl)
         let anchors = try listingDoc.select("a[href]").array()
         var seen = Set<String>()
         var roundUrls: [String] = []
@@ -58,18 +72,17 @@ public final class JsonLdSportsEventScheduleSource: RaceScheduleSource, @uncheck
             if excludeSlugContaining.contains(where: { lowered.contains($0.lowercased()) }) { continue }
             roundUrls.append(absolute)
         }
-
-        var events: [EventDraft] = []
-        for roundUrl in roundUrls {
-            if let sessions = try? await sessionsForRound(roundUrl) {
-                events.append(contentsOf: sessions)
-            }
-        }
-        return events
+        return roundUrls
     }
 
     private func sessionsForRound(_ roundUrl: String) async throws -> [EventDraft] {
         let html = try await HTTPClient.fetchHTML(roundUrl)
+        return try parseRoundHTML(html, roundUrl: roundUrl)
+    }
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de sessionsForRound() para poder
+    // testear el parsing del JSON-LD de una ronda contra un fixture HTML sin red.
+    func parseRoundHTML(_ html: String, roundUrl: String) throws -> [EventDraft] {
         let doc = try SwiftSoup.parse(html, roundUrl)
 
         let scripts = try doc.select("script[type=application/ld+json]").array()

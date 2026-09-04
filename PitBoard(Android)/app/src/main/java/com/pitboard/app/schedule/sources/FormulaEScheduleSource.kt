@@ -32,8 +32,11 @@ class FormulaEScheduleSource(
 ) : RaceScheduleSource {
     override val series: RaceSeries = RaceSeries.FORMULA_E
 
-    override suspend fun fetch(): List<EventEntity> {
-        val html = fetchHtml(calendarUrl)
+    override suspend fun fetch(): List<EventEntity> = parseHtml(fetchHtml(calendarUrl))
+
+    // 04/09/2026 (Fase 1 del diagnóstico): separado de fetch() para poder testear la lectura
+    // del JSON-LD embebido contra un fixture HTML sin red — ver FormulaEScheduleSourceTest.
+    internal fun parseHtml(html: String): List<EventEntity> {
         val doc = Jsoup.parse(html, calendarUrl)
         val adapter = StandingsMoshi.instance.adapter(FormulaEItemList::class.java)
 
