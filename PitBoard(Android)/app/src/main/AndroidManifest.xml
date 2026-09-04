@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permite que WorkManager reprograme el refresco periódico tras reiniciar el móvil -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Obligatorio pedirlo en tiempo de ejecución desde Android 13 (API 33) — se pide
+         al abrir la app por primera vez (NotificationPermissionOnboarding.kt) y, si
+         entonces se rechazó, otra vez al activar el interruptor en SettingsScreen.kt -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Clasificaciones (Fase 0): la app pasa a necesitar red por primera vez, solo para
+         esta sección — el resto sigue siendo 100% offline. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:name=".PitBoardApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PitBoard">
+
+        <!-- Pantalla principal: eventos (calendario automático por serie), clasificaciones, ajustes -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.PitBoard">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Se abre al arrastrar CUALQUIERA de los 3 widgets al home.
+             CORREGIDO: exported="true" — el lanzador de Samsung (una app distinta a la
+             nuestra) es quien la invoca desde fuera de nuestro proceso, así que necesita
+             exported="true" para poder abrirla. Con "false" el sistema denegaba el intent,
+             la config nunca se guardaba, y por eso el widget se veía "sin eventos" aunque
+             tuvieras calendarios importados: activeCategories se quedaba vacío. -->
+        <activity
+            android:name=".widget.RaceWidgetConfigActivity"
+            android:exported="true"
+            android:theme="@style/Theme.PitBoard">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <!-- Las 3 opciones que ahora aparecen como entradas separadas en el selector de
+             widgets: 2×1, 2×2 y 4×2. Las tres apuntan a la MISMA clase RaceWidget (mismo
+             contenido, misma base de datos) — solo cambia el AppWidgetProviderInfo
+             (race_widget_info_*.xml) que cada una referencia. exported="false" aquí SÍ es
+             correcto: el sistema entrega estos broadcasts a los proveedores de widgets sin
+             necesitar exported="true" (a diferencia de la activity de arriba). -->
+
+        <receiver
+            android:name=".widget.RaceWidgetReceiverSmall"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/race_widget_info_small" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.RaceWidgetReceiverMedium"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/race_widget_info_medium" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.RaceWidgetReceiverLarge"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/race_widget_info_large" />
+        </receiver>
+
+    </application>
+
+</manifest>

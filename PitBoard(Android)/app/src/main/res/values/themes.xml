@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Tema base de la app: oscuro, coherente con el mockup del widget (fondo asfalto,
+         texto "tiza"). Se aplica tanto a MainActivity como a RaceWidgetConfigActivity. -->
+    <style name="Theme.PitBoard" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/asphalt_950</item>
+        <item name="android:windowBackground">@color/asphalt_950</item>
+        <item name="colorPrimary">@color/accent_blue</item>
+        <item name="colorOnPrimary">@color/chalk</item>
+        <item name="android:textColorPrimary">@color/chalk</item>
+        <item name="android:textColorSecondary">@color/chalk_dim</item>
+    </style>
+
+</resources>

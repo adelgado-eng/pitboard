@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icono pequeño para la barra de estado: Android SIEMPRE lo repinta en blanco/gris
+     silueteado, así que da igual que aquí solo use un color — los detalles de color
+     jamás se verían en la notificación real. Forma: un mástil + una banderola. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M5,2L6,2L6,22L5,22Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M6,3L18,3L18,4.5L15,6L18,7.5L18,10L6,10Z" />
+</vector>

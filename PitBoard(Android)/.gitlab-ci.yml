@@ -1,0 +1,45 @@
+# Pipeline de GitLab CI para PitBoard. Usa una imagen con el Android SDK ya instalado
+# (mingc/android-build-box) — evita tener que montar el SDK a mano en cada ejecución,
+# que es lento y frágil de mantener.
+image: mingc/android-build-box:latest
+
+# Cachea las dependencias de Gradle entre ejecuciones — sin esto, cada pipeline
+# volvería a descargar Room, Compose, Glance, ical4j, etc. desde cero (varios minutos)
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+before_script:
+  - chmod +x ./gradlew
+
+stages:
+  - build
+  - test
+
+# Compila un APK de debug en cada push — es la forma más rápida de detectar un
+# error de compilación (ej: un import mal puesto) sin tener que abrir Android Studio
+build_debug:
+  stage: build
+  script:
+    - ./gradlew assembleDebug --build-cache
+  artifacts:
+    paths:
+      - app/build/outputs/apk/debug/*.apk
+    expire_in: 1 week
+
+# Tests unitarios (JUnit) — de momento el proyecto no tiene ninguno propio más allá
+# de la plantilla, pero deja el pipeline listo para cuando empieces a añadirlos
+unit_tests:
+  stage: test
+  script:
+    - ./gradlew testDebugUnitTest --build-cache
+  artifacts:
+    when: always
+    paths:
+      - app/build/reports/tests/
+    expire_in: 1 week

@@ -1,0 +1,390 @@
+import SwiftUI
+import SwiftData
+import UIKit
+import PitBoardKit
+
+/// Clasificación de UNA categoría, con pestañas Pilotos/Equipos (o de clase de coche para
+/// las categorías de resistencia) — equivalente exacto de `CategoryStandingsScreen.kt`.
+/// Pantalla de solo lectura: sin ViewModel, `@Query` filtrado por `category` directamente
+/// en el predicado (capturado en `init`, ver más abajo) hace de sustituto de los `Flow`
+/// de `StandingsRepository.observe`.
+struct CategoryStandingsScreen: View {
+    let category: StandingsCategory
+
+    @Query private var categoryStandings: [StandingModel]
+    @Query private var categoryCarDrivers: [CarDriverModel]
+
+    @State private var mode: StandingType = .driver
+    @State private var carClass: StandingsClass
+    @State private var selectedCar: StandingModel?
+    @State private var previewImage: ImagePreview?
+
+    init(category: StandingsCategory) {
+        self.category = category
+        _categoryStandings = Query(
+            filter: #Predicate<StandingModel> { $0.category == category },
+            sort: [SortDescriptor(\.position)]
+        )
+        _categoryCarDrivers = Query(filter: #Predicate<CarDriverModel> { $0.category == category })
+        _carClass = State(initialValue: Self.carBasedClasses[category]?.first?.0 ?? .overall)
+    }
+
+    private var carClasses: [(StandingsClass, String)]? { Self.carBasedClasses[category] }
+    private var isCarBased: Bool { carClasses != nil }
+    private var effectiveStandingsClass: StandingsClass { isCarBased ? carClass : .overall }
+
+    private var carRows: [StandingModel] {
+        categoryStandings.filter { $0.standingsClass == effectiveStandingsClass && $0.type == .team }
+    }
+    private var driverRows: [StandingModel] {
+        categoryStandings.filter { $0.standingsClass == .overall && $0.type == .driver }
+    }
+    private var teamRows: [StandingModel] {
+        categoryStandings.filter { $0.standingsClass == .overall && $0.type == .team }
+    }
+
+    private var lastUpdated: Date? {
+        categoryStandings.map(\.updatedAtUtc).max()
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if let lastUpdated {
+                Text("Actualizado: \(DateTimeFormatters.formatLastUpdated(lastUpdated))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    if let carClasses {
+                        ForEach(carClasses, id: \.0) { cls, label in
+                            FilterChipView(title: label, selected: carClass == cls) { carClass = cls }
+                        }
+                    } else {
+                        FilterChipView(title: "Pilotos", selected: mode == .driver) { mode = .driver }
+                        if category.hasTeamStandings {
+                            FilterChipView(title: "Equipos", selected: mode == .team) { mode = .team }
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 4)
+            }
+
+            if isCarBased {
+                StandingsListView(
+                    rows: carRows,
+                    isCarBased: true,
+                    onCarClick: { selectedCar = $0 },
+                    onImageClick: { url, name in previewImage = ImagePreview(url: url, label: name, isLogo: true) }
+                )
+            } else {
+                // Equivalente de HorizontalPager: dos páginas deslizables (Pilotos/Equipos)
+                // con el mismo gesto que en Android; los FilterChip de arriba mueven la
+                // página igual que en Compose.
+                TabView(selection: $mode) {
+                    StandingsListView(
+                        rows: driverRows,
+                        isCarBased: false,
+                        onCarClick: { _ in },
+                        onImageClick: { url, name in previewImage = ImagePreview(url: url, label: name, isLogo: false) }
+                    )
+                    .tag(StandingType.driver)
+
+                    if category.hasTeamStandings {
+                        StandingsListView(
+                            rows: teamRows,
+                            isCarBased: false,
+                            onCarClick: { _ in },
+                            onImageClick: { url, name in previewImage = ImagePreview(url: url, label: name, isLogo: true) }
+                        )
+                        .tag(StandingType.team)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                HStack(spacing: 8) {
+                    RemoteImage(urlString: category.logoUrl) { phase in
+                        switch phase {
+                        case .success(let image): image.resizable().aspectRatio(contentMode: .fit).padding(4)
+                        default: Image(systemName: "trophy.fill")
+                        }
+                    }
+                    .frame(width: 32, height: 32)
+                    .background(Color.white, in: RoundedRectangle(cornerRadius: 8))
+                    Text(category.displayName).font(.headline)
+                }
+            }
+        }
+        .sheet(item: $selectedCar) { car in
+            let carNumber = car.name.hasPrefix("#") ? String(car.name.dropFirst()) : car.name
+            let drivers = categoryCarDrivers.filter { $0.standingsClass == car.standingsClass && $0.carNumber == carNumber }
+            CarDriversSheetView(car: car, drivers: drivers) { url, name in
+                previewImage = ImagePreview(url: url, label: name, isLogo: false)
+            }
+        }
+        .fullScreenCover(item: $previewImage) { preview in
+            ImagePreviewView(preview: preview)
+        }
+    }
+
+    // Órdenes pedidos explícitamente, coinciden con el orden real de las pestañas de cada
+    // web de origen (ver comentarios en CategoryStandingsScreen.kt).
+    private static let elmsClasses: [(StandingsClass, String)] = [
+        (.lmp2, "LMP2"), (.lmp2ProAm, "LMP2 Pro/Am"), (.lmp3, "LMP3"), (.lmgt3, "GT3")
+    ]
+    private static let imsaClasses: [(StandingsClass, String)] = [
+        (.gtp, "GTP"), (.lmp2, "LMP2"), (.gtdPro, "GTD Pro"), (.gtd, "GTD")
+    ]
+    private static let wecClasses: [(StandingsClass, String)] = [
+        (.hypercar, "Hypercar"), (.lmgt3, "LMGT3")
+    ]
+    private static let lemansCupClasses: [(StandingsClass, String)] = [
+        (.lmp3, "LMP3"), (.lmp3ProAm, "LMP3 Pro/Am"), (.gt3, "GT3")
+    ]
+    /// Categorías "por coche": sus filas de equipo representan un coche concreto, clicable
+    /// para ver sus pilotos (ver `CarDriversSheetView`).
+    private static let carBasedClasses: [StandingsCategory: [(StandingsClass, String)]] = [
+        .elms: elmsClasses, .imsa: imsaClasses, .wec: wecClasses, .lemansCup: lemansCupClasses
+    ]
+}
+
+/// Vista previa tocada — URL, nombre a mostrar y si es un LOGO de equipo (true) o una
+/// FOTO de piloto (false); decide cómo encaja la imagen en `ImagePreviewView`.
+private struct ImagePreview: Identifiable {
+    let url: String
+    let label: String
+    let isLogo: Bool
+    var id: String { url + "|" + label }
+}
+
+/// Lista de una página (Pilotos/Equipos) o del listado único de las categorías por coche
+/// — equivalente de `StandingsList` en Kotlin.
+private struct StandingsListView: View {
+    let rows: [StandingModel]
+    /// Solo los coches de ELMS/IMSA/WEC/Le Mans Cup abren el desplegable de pilotos — el
+    /// resto de categorías no tiene ese dato (mismo parámetro `isCarBased` que en Kotlin).
+    let isCarBased: Bool
+    let onCarClick: (StandingModel) -> Void
+    let onImageClick: (String, String) -> Void
+
+    @Environment(\.pitBoardColors) private var colors
+
+    var body: some View {
+        if rows.isEmpty {
+            VStack {
+                Spacer()
+                Text("Sin datos todavía para esta categoría")
+                    .font(.body)
+                    .foregroundStyle(colors.onSurfaceVariant)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity)
+        } else {
+            List {
+                ForEach(rows, id: \.entrantKey) { row in
+                    StandingRowView(
+                        row: row,
+                        onClick: (isCarBased && row.type == .team) ? { onCarClick(row) } : nil,
+                        onImageClick: row.photoUrl != nil ? { onImageClick(row.photoUrl!, row.name) } : nil
+                    )
+                }
+                .listRowSeparator(.visible)
+            }
+            .listStyle(.plain)
+        }
+    }
+}
+
+private struct StandingRowView: View {
+    let row: StandingModel
+    let onClick: (() -> Void)?
+    let onImageClick: (() -> Void)?
+
+    @Environment(\.pitBoardColors) private var colors
+
+    var body: some View {
+        HStack(spacing: 0) {
+            let podiumColor = PodiumColors.forPosition(row.position, surface: colors.surface)
+            Text("\(row.position)")
+                .font(.title3.weight(podiumColor != nil ? .heavy : .bold))
+                .foregroundStyle(podiumColor ?? colors.onSurfaceVariant)
+                .frame(width: 32, alignment: .leading)
+
+            avatar
+                .padding(.leading, 4)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(row.name).font(.body.weight(.semibold))
+                if !row.team.isEmpty {
+                    Text(row.team).font(.caption).foregroundStyle(colors.primary)
+                }
+            }
+            .padding(.leading, 12)
+
+            Spacer()
+
+            Text("\(formatPoints(row.points)) pts")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(colors.primary)
+        }
+        .padding(.vertical, 6)
+        .contentShape(Rectangle())
+        .onTapGesture { onClick?() }
+    }
+
+    @ViewBuilder
+    private var avatar: some View {
+        Group {
+            if row.type == .team {
+                RemoteImage(urlString: row.photoUrl) { phase in
+                    if case .success(let image) = phase {
+                        image.resizable().aspectRatio(contentMode: .fit).padding(4)
+                    } else {
+                        Image(systemName: "person.fill").foregroundStyle(colors.onSurfaceVariant)
+                    }
+                }
+                .background(Color.white, in: Circle())
+            } else {
+                RemoteImage(urlString: row.photoUrl) { phase in
+                    if case .success(let image) = phase {
+                        // Crop + recorte desde arriba: las fotos panorámicas de pilotos
+                        // nunca pierden la cara, aunque sean de cuerpo entero.
+                        image.resizable().aspectRatio(contentMode: .fill)
+                    } else {
+                        Image(systemName: "person.fill").foregroundStyle(colors.onSurfaceVariant)
+                    }
+                }
+                .background(colors.surfaceVariant)
+            }
+        }
+        .frame(width: 40, height: 40)
+        .clipShape(Circle())
+        .contentShape(Circle())
+        .onTapGesture { onImageClick?() }
+    }
+}
+
+private struct CarDriversSheetView: View {
+    let car: StandingModel
+    let drivers: [CarDriverModel]
+    let onDriverImageClick: (String, String) -> Void
+
+    @Environment(\.pitBoardColors) private var colors
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(car.name.isEmpty ? car.team : car.name)
+                    .font(.title2.bold())
+                if !car.team.isEmpty {
+                    Text(car.team).font(.body).foregroundStyle(colors.primary)
+                }
+
+                if drivers.isEmpty {
+                    Text("Sin datos de pilotos todavía para este coche")
+                        .font(.body)
+                        .foregroundStyle(colors.onSurfaceVariant)
+                        .padding(.vertical, 24)
+                } else {
+                    ForEach(drivers, id: \.entryKey) { driver in
+                        HStack(spacing: 12) {
+                            RemoteImage(urlString: driver.photoUrl) { phase in
+                                if case .success(let image) = phase {
+                                    image.resizable().aspectRatio(contentMode: .fill)
+                                } else {
+                                    Image(systemName: "person.fill").foregroundStyle(colors.onSurfaceVariant)
+                                }
+                            }
+                            .frame(width: 44, height: 44)
+                            .background(colors.surfaceVariant)
+                            .clipShape(Circle())
+                            .contentShape(Circle())
+                            .onTapGesture {
+                                if let url = driver.photoUrl { onDriverImageClick(url, driver.name) }
+                            }
+
+                            Text(driver.name).font(.body.weight(.semibold))
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+            .padding(20)
+        }
+    }
+}
+
+/// Vista previa a pantalla completa de una foto/logo — equivalente de
+/// `ImagePreviewDialog`. Los logos usan `.fit` (nunca se recorta nada); las fotos de
+/// piloto usan `.fill` + recorte desde arriba (la cara nunca se pierde).
+private struct ImagePreviewView: View {
+    let preview: ImagePreview
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.92).ignoresSafeArea()
+                .onTapGesture { dismiss() }
+
+            VStack(spacing: 16) {
+                RemoteImage(urlString: preview.url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image.resizable().aspectRatio(contentMode: preview.isLogo ? .fit : .fill)
+                    case .failure:
+                        Image(systemName: "person.fill").font(.system(size: 64)).foregroundStyle(.white)
+                    default:
+                        ProgressView().tint(.white)
+                    }
+                }
+                .frame(width: UIScreen.main.bounds.width * 0.9, height: UIScreen.main.bounds.width * 0.9)
+                .clipped()
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: PitBoardShapes.large))
+
+                Text(preview.label)
+                    .font(.title3.bold())
+                    .foregroundStyle(.white)
+            }
+
+            VStack {
+                HStack {
+                    Spacer()
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark").foregroundStyle(.white).padding()
+                    }
+                }
+                Spacer()
+            }
+        }
+    }
+}
+
+private struct FilterChipView: View {
+    let title: String
+    let selected: Bool
+    let action: () -> Void
+
+    @Environment(\.pitBoardColors) private var colors
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(selected ? colors.primaryContainer : colors.surfaceVariant.opacity(0.5))
+                .foregroundStyle(selected ? colors.onPrimaryContainer : colors.onSurfaceVariant)
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+}

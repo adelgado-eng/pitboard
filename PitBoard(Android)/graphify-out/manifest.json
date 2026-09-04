@@ -1,0 +1,974 @@
+{
+  "app/build.gradle.kts": {
+    "mtime": 1788457887.9336967,
+    "seen": 1788473064.9658332,
+    "ast_hash": "57d1d6a40e09aea8d9c671fe55866440",
+    "semantic_hash": "57d1d6a40e09aea8d9c671fe55866440"
+  },
+  "app/release/output-metadata.json": {
+    "mtime": 1786742150.0,
+    "seen": 1787863371.5360267,
+    "ast_hash": "6e74015b2a2279ddb9c206cecd30ad70",
+    "semantic_hash": "6e74015b2a2279ddb9c206cecd30ad70"
+  },
+  "app/schemas/com.pitboard.app.data.AppDatabase/1.json": {
+    "mtime": 1786527546.0,
+    "seen": 1787863371.5360267,
+    "ast_hash": "16baf11c792264db3406cd8705ba0fb5",
+    "semantic_hash": "16baf11c792264db3406cd8705ba0fb5"
+  },
+  "app/schemas/com.pitboard.app.data.AppDatabase/2.json": {
+    "mtime": 1786810136.0,
+    "seen": 1787863371.5360267,
+    "ast_hash": "b57f6d132a5e1d3dd1349554d9c2e21c",
+    "semantic_hash": "b57f6d132a5e1d3dd1349554d9c2e21c"
+  },
+  "app/schemas/com.pitboard.app.data.AppDatabase/3.json": {
+    "mtime": 1787141575.7607186,
+    "seen": 1787863371.5360267,
+    "ast_hash": "a47bdd1654f27273381d47612f86d3fa",
+    "semantic_hash": "a47bdd1654f27273381d47612f86d3fa"
+  },
+  "app/schemas/com.pitboard.app.data.AppDatabase/4.json": {
+    "mtime": 1787142685.1211655,
+    "seen": 1787863371.5360267,
+    "ast_hash": "4005f6a454d0201ebfe86b82650d189d",
+    "semantic_hash": "4005f6a454d0201ebfe86b82650d189d"
+  },
+  "app/schemas/com.pitboard.app.data.AppDatabase/5.json": {
+    "mtime": 1787828083.7318525,
+    "seen": 1787863371.5360267,
+    "ast_hash": "dc638ef51cc75a4173b5c8b31497da1a",
+    "semantic_hash": "dc638ef51cc75a4173b5c8b31497da1a"
+  },
+  "app/src/main/java/com/pitboard/app/MainActivity.kt": {
+    "mtime": 1788455787.5730684,
+    "seen": 1788473064.9693372,
+    "ast_hash": "7eb00e69cf60f55fa1f59220222ae8e3",
+    "semantic_hash": "7eb00e69cf60f55fa1f59220222ae8e3"
+  },
+  "app/src/main/java/com/pitboard/app/PitBoardApplication.kt": {
+    "mtime": 1788457970.9498787,
+    "seen": 1788473064.9693372,
+    "ast_hash": "337d54d39070a40da0beba230e95ce20",
+    "semantic_hash": "337d54d39070a40da0beba230e95ce20"
+  },
+  "app/src/main/java/com/pitboard/app/data/AppDatabase.kt": {
+    "mtime": 1788377679.1670961,
+    "seen": 1788473064.9693372,
+    "ast_hash": "8ca41f0ccab0551282b2b4e6b3e34868",
+    "semantic_hash": "8ca41f0ccab0551282b2b4e6b3e34868"
+  },
+  "app/src/main/java/com/pitboard/app/data/AppSettingsRepository.kt": {
+    "mtime": 1788455755.6118753,
+    "seen": 1788473064.9693372,
+    "ast_hash": "037321b160e9d76328125d7d123ebc46",
+    "semantic_hash": "037321b160e9d76328125d7d123ebc46"
+  },
+  "app/src/main/java/com/pitboard/app/data/DatabaseMigrations.kt": {
+    "mtime": 1787878584.840585,
+    "seen": 1788035168.7777326,
+    "ast_hash": "0d60f7c25ccbfaeb0e8a169c013bd207",
+    "semantic_hash": "0d60f7c25ccbfaeb0e8a169c013bd207"
+  },
+  "app/src/main/java/com/pitboard/app/data/EventDao.kt": {
+    "mtime": 1788352502.2236824,
+    "seen": 1788473064.9703448,
+    "ast_hash": "a1d5d1c239d86b383dfb04905232fa7c",
+    "semantic_hash": "a1d5d1c239d86b383dfb04905232fa7c"
+  },
+  "app/src/main/java/com/pitboard/app/data/EventEntity.kt": {
+    "mtime": 1788299147.3115344,
+    "seen": 1788473064.9703448,
+    "ast_hash": "2fd475ccfdc38e969abb2e8823ec4d4a",
+    "semantic_hash": "2fd475ccfdc38e969abb2e8823ec4d4a"
+  },
+  "app/src/main/java/com/pitboard/app/data/SessionBadgeType.kt": {
+    "mtime": 1787156783.5858867,
+    "seen": 1787863371.5360267,
+    "ast_hash": "9d71bd3a772add8f47fdf94a01362ba6",
+    "semantic_hash": "9d71bd3a772add8f47fdf94a01362ba6"
+  },
+  "app/src/main/java/com/pitboard/app/notifications/EventReminderWorker.kt": {
+    "mtime": 1787444151.0882235,
+    "seen": 1787863371.5360267,
+    "ast_hash": "5834133f9f58368e6d5e8c75c0798537",
+    "semantic_hash": "5834133f9f58368e6d5e8c75c0798537"
+  },
+  "app/src/main/java/com/pitboard/app/notifications/NotificationScheduler.kt": {
+    "mtime": 1788352524.4058266,
+    "seen": 1788473064.9713528,
+    "ast_hash": "86be38db2599189d02f8eb02138f3062",
+    "semantic_hash": "86be38db2599189d02f8eb02138f3062"
+  },
+  "app/src/main/java/com/pitboard/app/standings/ConnectivityHelper.kt": {
+    "mtime": 1788095399.9626126,
+    "seen": 1788473064.9713528,
+    "ast_hash": "8a2963b4abce42c8441f5f039524f9da",
+    "semantic_hash": "8a2963b4abce42c8441f5f039524f9da"
+  },
+  "app/src/main/java/com/pitboard/app/standings/StandingDao.kt": {
+    "mtime": 1787608766.2429295,
+    "seen": 1787863371.5360267,
+    "ast_hash": "d84381fabeaff4cefff39a801c36c0d5",
+    "semantic_hash": "d84381fabeaff4cefff39a801c36c0d5"
+  },
+  "app/src/main/java/com/pitboard/app/standings/StandingEntity.kt": {
+    "mtime": 1788457226.5649748,
+    "seen": 1788473064.972353,
+    "ast_hash": "4ff5b7020302782b8d2afee7f6503086",
+    "semantic_hash": "4ff5b7020302782b8d2afee7f6503086"
+  },
+  "app/src/main/java/com/pitboard/app/standings/StandingsConverters.kt": {
+    "mtime": 1787608786.8969038,
+    "seen": 1787863371.5360267,
+    "ast_hash": "d66ca94128b56ffe9ad96772042aba2a",
+    "semantic_hash": "d66ca94128b56ffe9ad96772042aba2a"
+  },
+  "app/src/main/java/com/pitboard/app/standings/StandingsHttpClient.kt": {
+    "mtime": 1788102239.5158854,
+    "seen": 1788473064.972353,
+    "ast_hash": "f5f988eae61dd208c6d7dff1f81fefa3",
+    "semantic_hash": "f5f988eae61dd208c6d7dff1f81fefa3"
+  },
+  "app/src/main/java/com/pitboard/app/standings/StandingsRepository.kt": {
+    "mtime": 1788457219.39893,
+    "seen": 1788473064.972353,
+    "ast_hash": "be0f52291544bed60d76c0defe135d66",
+    "semantic_hash": "be0f52291544bed60d76c0defe135d66"
+  },
+  "app/src/main/java/com/pitboard/app/standings/StandingsScheduler.kt": {
+    "mtime": 1788096458.010678,
+    "seen": 1788473064.972353,
+    "ast_hash": "3314d1293af1402f2d50e0b224fde412",
+    "semantic_hash": "3314d1293af1402f2d50e0b224fde412"
+  },
+  "app/src/main/java/com/pitboard/app/standings/StandingsSource.kt": {
+    "mtime": 1788457232.0974956,
+    "seen": 1788473064.972353,
+    "ast_hash": "8341bdd455c7e8c4310b4facdd933152",
+    "semantic_hash": "8341bdd455c7e8c4310b4facdd933152"
+  },
+  "app/src/main/java/com/pitboard/app/standings/StandingsSyncWorker.kt": {
+    "mtime": 1788378141.4972062,
+    "seen": 1788473064.972353,
+    "ast_hash": "7139f086d44cb894ccffc8e41cc61b47",
+    "semantic_hash": "7139f086d44cb894ccffc8e41cc61b47"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/ElmsStandingsSource.kt": {
+    "mtime": 1788113348.5225482,
+    "seen": 1788473064.972353,
+    "ast_hash": "9a751556a374a8bc73cf63ca6d4ee369",
+    "semantic_hash": "9a751556a374a8bc73cf63ca6d4ee369"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/F1AcademyStandingsSource.kt": {
+    "mtime": 1788360642.2658777,
+    "seen": 1788473064.972353,
+    "ast_hash": "e262f9b19ad8eb7accec3c8ab0dff847",
+    "semantic_hash": "e262f9b19ad8eb7accec3c8ab0dff847"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/F1StandingsSource.kt": {
+    "mtime": 1787930697.290848,
+    "seen": 1788035168.7918177,
+    "ast_hash": "7f64278b75835e7e5e3d25d9438bdfd0",
+    "semantic_hash": "7f64278b75835e7e5e3d25d9438bdfd0"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/IndyCarStandingsSource.kt": {
+    "mtime": 1788056140.4432304,
+    "seen": 1788473064.9733527,
+    "ast_hash": "c3a41bd5c7bcfd39838048b1478e8e98",
+    "semantic_hash": "c3a41bd5c7bcfd39838048b1478e8e98"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/MotoGpStandingsSource.kt": {
+    "mtime": 1788354809.8814785,
+    "seen": 1788473064.9733527,
+    "ast_hash": "6088461b1116073754dd375baaf67652",
+    "semantic_hash": "6088461b1116073754dd375baaf67652"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/NascarStandingsSource.kt": {
+    "mtime": 1788359353.4204192,
+    "seen": 1788473064.9733527,
+    "ast_hash": "c4101ee28a55bc5fde26b57b871332b6",
+    "semantic_hash": "c4101ee28a55bc5fde26b57b871332b6"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/PorscheSupercupStandingsSource.kt": {
+    "mtime": 1788365094.7209425,
+    "seen": 1788473064.9733527,
+    "ast_hash": "effda2a49db6f3bc6434796aff52129f",
+    "semantic_hash": "effda2a49db6f3bc6434796aff52129f"
+  },
+  "app/src/main/java/com/pitboard/app/sync/SyncWorker.kt": {
+    "mtime": 1788113200.3384686,
+    "seen": 1788473064.9733527,
+    "ast_hash": "e5a56486656687de930abb17c704cec9",
+    "semantic_hash": "e5a56486656687de930abb17c704cec9"
+  },
+  "app/src/main/java/com/pitboard/app/ui/CategoryStandingsScreen.kt": {
+    "mtime": 1788470849.8834498,
+    "seen": 1788473064.9733527,
+    "ast_hash": "3322c06cb08de9a45c69100a525fa7c7",
+    "semantic_hash": "3322c06cb08de9a45c69100a525fa7c7"
+  },
+  "app/src/main/java/com/pitboard/app/ui/EventsScreen.kt": {
+    "mtime": 1788472326.1623738,
+    "seen": 1788473064.9733527,
+    "ast_hash": "659bbe9d3b40ad27e8617d9943dd6735",
+    "semantic_hash": "659bbe9d3b40ad27e8617d9943dd6735"
+  },
+  "app/src/main/java/com/pitboard/app/ui/SettingsScreen.kt": {
+    "mtime": 1788299878.2732954,
+    "seen": 1788473064.9733527,
+    "ast_hash": "f3acdc2675658dfc201c48e3252487d4",
+    "semantic_hash": "f3acdc2675658dfc201c48e3252487d4"
+  },
+  "app/src/main/java/com/pitboard/app/ui/StandingsScreen.kt": {
+    "mtime": 1788382851.3620348,
+    "seen": 1788473064.9733527,
+    "ast_hash": "a3dc63accc7d1bb878a91379a654a6f1",
+    "semantic_hash": "a3dc63accc7d1bb878a91379a654a6f1"
+  },
+  "app/src/main/java/com/pitboard/app/util/DateTimeFormatters.kt": {
+    "mtime": 1788468447.6330614,
+    "seen": 1788473064.977369,
+    "ast_hash": "37c59047547caff74c9b6159cf26a30f",
+    "semantic_hash": "37c59047547caff74c9b6159cf26a30f"
+  },
+  "app/src/main/java/com/pitboard/app/util/EventWeekendGrouper.kt": {
+    "mtime": 1787182806.4324205,
+    "seen": 1787863371.5360267,
+    "ast_hash": "92487b7faa3d0726b800ac9463aa05f3",
+    "semantic_hash": "92487b7faa3d0726b800ac9463aa05f3"
+  },
+  "app/src/main/java/com/pitboard/app/widget/RaceWidget.kt": {
+    "mtime": 1788352536.5061517,
+    "seen": 1788473064.977369,
+    "ast_hash": "ca0b982083cf86044d38dc267c5b47bd",
+    "semantic_hash": "ca0b982083cf86044d38dc267c5b47bd"
+  },
+  "app/src/main/java/com/pitboard/app/widget/RaceWidgetConfigActivity.kt": {
+    "mtime": 1788299976.4919858,
+    "seen": 1788473064.977369,
+    "ast_hash": "0ef1369286bb0a53ba92fae6910b1d77",
+    "semantic_hash": "0ef1369286bb0a53ba92fae6910b1d77"
+  },
+  "app/src/main/java/com/pitboard/app/widget/RaceWidgetReceiver.kt": {
+    "mtime": 1787326714.3742344,
+    "seen": 1787863371.5360267,
+    "ast_hash": "bfe5a5bc21223ad2862c8863ec97bbc1",
+    "semantic_hash": "bfe5a5bc21223ad2862c8863ec97bbc1"
+  },
+  "app/src/main/java/com/pitboard/app/widget/WidgetPrefsRepository.kt": {
+    "mtime": 1788299936.1082718,
+    "seen": 1788473064.9783676,
+    "ast_hash": "61c3e4b048d023b166daec4de9476962",
+    "semantic_hash": "61c3e4b048d023b166daec4de9476962"
+  },
+  "build.gradle.kts": {
+    "mtime": 1786527362.0,
+    "seen": 1787863371.5360267,
+    "ast_hash": "cc73359bdaa72b672261d1c31f275266",
+    "semantic_hash": "cc73359bdaa72b672261d1c31f275266"
+  },
+  "settings.gradle.kts": {
+    "mtime": 1786527362.0,
+    "seen": 1787863371.5360267,
+    "ast_hash": "c88fc3a1b8d8a013245a3555cf93331c",
+    "semantic_hash": "c88fc3a1b8d8a013245a3555cf93331c"
+  },
+  ".claude/skills/gradle-run/scripts/gradle_run.py": {
+    "mtime": 1787868775.814307,
+    "seen": 1788035168.7707074,
+    "ast_hash": "677a71f2af280068d460552910580fa3",
+    "semantic_hash": "677a71f2af280068d460552910580fa3"
+  },
+  ".claude/skills/gradle-run/scripts/test_gradle_run.py": {
+    "mtime": 1787868775.822417,
+    "seen": 1788035168.7707074,
+    "ast_hash": "73942020b63896221ec09e1b33eee9f4",
+    "semantic_hash": "73942020b63896221ec09e1b33eee9f4"
+  },
+  ".claude/skills/material-3/.claude-plugin/plugin.json": {
+    "mtime": 1787868783.3987088,
+    "seen": 1788035168.7707074,
+    "ast_hash": "a827df301630b4453c459aaa4e0ae3ea",
+    "semantic_hash": "a827df301630b4453c459aaa4e0ae3ea"
+  },
+  "app/schemas/com.pitboard.app.data.AppDatabase/6.json": {
+    "mtime": 1787879187.2326894,
+    "seen": 1788035168.7747238,
+    "ast_hash": "3defb1770e0f953fe5f1d2ba7cf5f460",
+    "semantic_hash": "3defb1770e0f953fe5f1d2ba7cf5f460"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/DriverDbStandingsSource.kt": {
+    "mtime": 1788447986.3240118,
+    "seen": 1788473064.972353,
+    "ast_hash": "bac6d0ce519395046eef208661c22f60",
+    "semantic_hash": "bac6d0ce519395046eef208661c22f60"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/MotorsportStandingsHtmlSource.kt": {
+    "mtime": 1788448331.7070365,
+    "seen": 1788473064.9733527,
+    "ast_hash": "ef7e4ca68b2929b8b2738266477c545e",
+    "semantic_hash": "ef7e4ca68b2929b8b2738266477c545e"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/OfficialRosterStandingsSource.kt": {
+    "mtime": 1788359326.9696066,
+    "seen": 1788473064.9733527,
+    "ast_hash": "f4ab55215785df4855f9241fdf519e9f",
+    "semantic_hash": "f4ab55215785df4855f9241fdf519e9f"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/RosterNameFilter.kt": {
+    "mtime": 1788056918.6827064,
+    "seen": 1788473064.9733527,
+    "ast_hash": "0d313d183f27f09d1663ea660619dd2c",
+    "semantic_hash": "0d313d183f27f09d1663ea660619dd2c"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/SpeedSportStandingsSource.kt": {
+    "mtime": 1787878616.8687282,
+    "seen": 1788035168.7918177,
+    "ast_hash": "8070b5ab435f5630130539adcfb4c1c7",
+    "semantic_hash": "8070b5ab435f5630130539adcfb4c1c7"
+  },
+  "app/src/main/java/com/pitboard/app/ui/components/EmptyState.kt": {
+    "mtime": 1787870494.153308,
+    "seen": 1788035168.7935753,
+    "ast_hash": "82ca8876dadc77ca6cb8f456f0b92a67",
+    "semantic_hash": "82ca8876dadc77ca6cb8f456f0b92a67"
+  },
+  "app/src/main/java/com/pitboard/app/ui/theme/BadgeColors.kt": {
+    "mtime": 1787870301.35382,
+    "seen": 1788035168.7935753,
+    "ast_hash": "8a5255ebe9d653ba225df74827c2a036",
+    "semantic_hash": "8a5255ebe9d653ba225df74827c2a036"
+  },
+  "app/src/main/java/com/pitboard/app/ui/theme/Color.kt": {
+    "mtime": 1787870278.5988595,
+    "seen": 1788035168.7935753,
+    "ast_hash": "c39c5ec6b5e253aee9fd50ad6c8008b3",
+    "semantic_hash": "c39c5ec6b5e253aee9fd50ad6c8008b3"
+  },
+  "app/src/main/java/com/pitboard/app/ui/theme/Shape.kt": {
+    "mtime": 1787870301.2890382,
+    "seen": 1788035168.7935753,
+    "ast_hash": "a86d776a8ccacb5f5ae365cccb4187ea",
+    "semantic_hash": "a86d776a8ccacb5f5ae365cccb4187ea"
+  },
+  "app/src/main/java/com/pitboard/app/ui/theme/Theme.kt": {
+    "mtime": 1787870301.3206906,
+    "seen": 1788035168.7935753,
+    "ast_hash": "1e78762954b5abb0e6395ba6dfd6535b",
+    "semantic_hash": "1e78762954b5abb0e6395ba6dfd6535b"
+  },
+  "app/src/main/java/com/pitboard/app/util/ColorContrast.kt": {
+    "mtime": 1787870301.4140158,
+    "seen": 1788035168.7935753,
+    "ast_hash": "5838033c704f566263a29535f0637658",
+    "semantic_hash": "5838033c704f566263a29535f0637658"
+  },
+  "skills-lock.json": {
+    "mtime": 1787868792.4639323,
+    "seen": 1788035168.7975972,
+    "ast_hash": "43c60c3a5fe127bddb8291ec19dd02c8",
+    "semantic_hash": "43c60c3a5fe127bddb8291ec19dd02c8"
+  },
+  "_to_delete/ResyncResult.kt": {
+    "mtime": 1786886790.0,
+    "seen": 1788473064.9658332,
+    "ast_hash": "b5b6405b8c147f8a8bd9198813f79608",
+    "semantic_hash": "b5b6405b8c147f8a8bd9198813f79608"
+  },
+  "app/schemas/com.pitboard.app.data.AppDatabase/7.json": {
+    "mtime": 1788345236.8978915,
+    "seen": 1788473064.9693372,
+    "ast_hash": "1fd61b311cd54104fb1d17fe92f14366",
+    "semantic_hash": "1fd61b311cd54104fb1d17fe92f14366"
+  },
+  "app/schemas/com.pitboard.app.data.AppDatabase/8.json": {
+    "mtime": 1788370871.4352093,
+    "seen": 1788473064.9693372,
+    "ast_hash": "e801fa312449586f5f81c78736102564",
+    "semantic_hash": "e801fa312449586f5f81c78736102564"
+  },
+  "app/schemas/com.pitboard.app.data.AppDatabase/9.json": {
+    "mtime": 1788378441.4218278,
+    "seen": 1788473064.9693372,
+    "ast_hash": "d2f168c19c3211204c291bca198b5fe2",
+    "semantic_hash": "d2f168c19c3211204c291bca198b5fe2"
+  },
+  "app/src/main/java/com/pitboard/app/data/RaceSeries.kt": {
+    "mtime": 1788424722.9589374,
+    "seen": 1788473064.9703448,
+    "ast_hash": "e9c9e597bb6c4479396c463bcf01d4a6",
+    "semantic_hash": "e9c9e597bb6c4479396c463bcf01d4a6"
+  },
+  "app/src/main/java/com/pitboard/app/data/RaceSeriesConverters.kt": {
+    "mtime": 1788299136.8131971,
+    "seen": 1788473064.9703448,
+    "ast_hash": "4e2abfdb58b14fe51ed3d8eb4bea5364",
+    "semantic_hash": "4e2abfdb58b14fe51ed3d8eb4bea5364"
+  },
+  "app/src/main/java/com/pitboard/app/data/SeriesConfigDao.kt": {
+    "mtime": 1788299155.975753,
+    "seen": 1788473064.9703448,
+    "ast_hash": "7ff8f813ef6cf6a34ac8daf30cdbabc4",
+    "semantic_hash": "7ff8f813ef6cf6a34ac8daf30cdbabc4"
+  },
+  "app/src/main/java/com/pitboard/app/data/SeriesConfigEntity.kt": {
+    "mtime": 1788299152.0317304,
+    "seen": 1788473064.9703448,
+    "ast_hash": "25ac2ffeeb1dceeccc0432b0d4376c0a",
+    "semantic_hash": "25ac2ffeeb1dceeccc0432b0d4376c0a"
+  },
+  "app/src/main/java/com/pitboard/app/notifications/NotificationPermission.kt": {
+    "mtime": 1788090716.6819732,
+    "seen": 1788473064.9713528,
+    "ast_hash": "b7c38d5822b4a6915cc306316c1ff3d7",
+    "semantic_hash": "b7c38d5822b4a6915cc306316c1ff3d7"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/RaceScheduleRepository.kt": {
+    "mtime": 1788467730.9700842,
+    "seen": 1788473064.9713528,
+    "ast_hash": "ded8c77ccc1ca25f995477e87e89114b",
+    "semantic_hash": "ded8c77ccc1ca25f995477e87e89114b"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/RaceScheduleScheduler.kt": {
+    "mtime": 1788299601.9201577,
+    "seen": 1788473064.9713528,
+    "ast_hash": "7862693323bf89e93329924e72e339a8",
+    "semantic_hash": "7862693323bf89e93329924e72e339a8"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/RaceScheduleSource.kt": {
+    "mtime": 1788299208.1145377,
+    "seen": 1788473064.9713528,
+    "ast_hash": "fffade3e5ed4eb0f4ecd6b9b9ed47758",
+    "semantic_hash": "fffade3e5ed4eb0f4ecd6b9b9ed47758"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/RaceScheduleSyncWorker.kt": {
+    "mtime": 1788299614.685457,
+    "seen": 1788473064.9713528,
+    "ast_hash": "e6db987679526238e0b53f154822aee5",
+    "semantic_hash": "e6db987679526238e0b53f154822aee5"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/SessionBadgeMatcher.kt": {
+    "mtime": 1788341659.2240298,
+    "seen": 1788473064.9713528,
+    "ast_hash": "b7f0307dabc6cfb55422aba57f812745",
+    "semantic_hash": "b7f0307dabc6cfb55422aba57f812745"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/EspnNascarScheduleSource.kt": {
+    "mtime": 1788299437.2546582,
+    "seen": 1788473064.9713528,
+    "ast_hash": "81387a122cb2dd6806a59c74ba1c5b9d",
+    "semantic_hash": "81387a122cb2dd6806a59c74ba1c5b9d"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/F1AcademyScheduleSource.kt": {
+    "mtime": 1788341889.6779277,
+    "seen": 1788473064.9713528,
+    "ast_hash": "18331425fde4ff8b6a8baa9cdaae258b",
+    "semantic_hash": "18331425fde4ff8b6a8baa9cdaae258b"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/FormulaEScheduleSource.kt": {
+    "mtime": 1788456252.5000546,
+    "seen": 1788473064.9713528,
+    "ast_hash": "490067046ac56687d2726bc3e547f531",
+    "semantic_hash": "490067046ac56687d2726bc3e547f531"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/GtWorldChallengeScheduleSource.kt": {
+    "mtime": 1788378437.4027867,
+    "seen": 1788473064.9713528,
+    "ast_hash": "f8fddc6e58ab412baf1fc6385b1743e0",
+    "semantic_hash": "f8fddc6e58ab412baf1fc6385b1743e0"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/ImsaScheduleSource.kt": {
+    "mtime": 1788341995.7973468,
+    "seen": 1788473064.9713528,
+    "ast_hash": "4392f8afefe1f05091b8d6c7ba0acd3a",
+    "semantic_hash": "4392f8afefe1f05091b8d6c7ba0acd3a"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/IndyCarScheduleSource.kt": {
+    "mtime": 1788299339.696537,
+    "seen": 1788473064.9713528,
+    "ast_hash": "f6242953d0ddea02452d30f6f3f2efbc",
+    "semantic_hash": "f6242953d0ddea02452d30f6f3f2efbc"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/JolpicaF1ScheduleSource.kt": {
+    "mtime": 1788299300.142341,
+    "seen": 1788473064.9713528,
+    "ast_hash": "c442c554c23dd9de0cbdcfae500a0a94",
+    "semantic_hash": "c442c554c23dd9de0cbdcfae500a0a94"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/JsonLdSportsEventScheduleSource.kt": {
+    "mtime": 1788341956.4540527,
+    "seen": 1788473064.9713528,
+    "ast_hash": "732fe0f0d21d0b4c9ac00d39d28b99ce",
+    "semantic_hash": "732fe0f0d21d0b4c9ac00d39d28b99ce"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/MotoGpPulseliveScheduleSource.kt": {
+    "mtime": 1788382649.710172,
+    "seen": 1788473064.9713528,
+    "ast_hash": "a23d4eef88b06c0bca660df73adae356",
+    "semantic_hash": "a23d4eef88b06c0bca660df73adae356"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/UsScheduleDateParsing.kt": {
+    "mtime": 1788300441.5725715,
+    "seen": 1788473064.9713528,
+    "ast_hash": "3ac6a4a8313cc07af852987d5a497f79",
+    "semantic_hash": "3ac6a4a8313cc07af852987d5a497f79"
+  },
+  "app/src/main/java/com/pitboard/app/schedule/sources/WikipediaSeasonCalendarSource.kt": {
+    "mtime": 1788447074.028656,
+    "seen": 1788473064.9713528,
+    "ast_hash": "8d465c9d2997ee199ce7d929b27f5a9c",
+    "semantic_hash": "8d465c9d2997ee199ce7d929b27f5a9c"
+  },
+  "app/src/main/java/com/pitboard/app/standings/CarDriverDao.kt": {
+    "mtime": 1788377667.105468,
+    "seen": 1788473064.9713528,
+    "ast_hash": "019e689ebea326d106cbb643c923793b",
+    "semantic_hash": "019e689ebea326d106cbb643c923793b"
+  },
+  "app/src/main/java/com/pitboard/app/standings/CarDriverEntity.kt": {
+    "mtime": 1788377663.0492454,
+    "seen": 1788473064.9713528,
+    "ast_hash": "7674c0d76d9dcbdfd7d31e70546bdc45",
+    "semantic_hash": "7674c0d76d9dcbdfd7d31e70546bdc45"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/AcoCarDriversSource.kt": {
+    "mtime": 1788387986.7404656,
+    "seen": 1788473064.972353,
+    "ast_hash": "8bf434a6aa571e04db6f42f0a2705229",
+    "semantic_hash": "8bf434a6aa571e04db6f42f0a2705229"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/ElmsDriversSource.kt": {
+    "mtime": 1788377704.8996584,
+    "seen": 1788473064.972353,
+    "ast_hash": "42f362556b2a7eb4409fc6d43274641e",
+    "semantic_hash": "42f362556b2a7eb4409fc6d43274641e"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/F2StandingsSource.kt": {
+    "mtime": 1788447937.1873007,
+    "seen": 1788473064.9733527,
+    "ast_hash": "92ae35e934816f6969b041a44f6c0305",
+    "semantic_hash": "92ae35e934816f6969b041a44f6c0305"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/F3StandingsSource.kt": {
+    "mtime": 1788448011.4482174,
+    "seen": 1788473064.9733527,
+    "ast_hash": "ac882483da0bc221d62d50a63e204c2d",
+    "semantic_hash": "ac882483da0bc221d62d50a63e204c2d"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/FormulaEStandingsSource.kt": {
+    "mtime": 1788457875.5134234,
+    "seen": 1788473064.9733527,
+    "ast_hash": "61246a46884f3feee14b1a605c8d40e9",
+    "semantic_hash": "61246a46884f3feee14b1a605c8d40e9"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/ImsaStandingsSource.kt": {
+    "mtime": 1788378810.3695674,
+    "seen": 1788473064.9733527,
+    "ast_hash": "4042311ec35343ef4ee0408dd97b22da",
+    "semantic_hash": "4042311ec35343ef4ee0408dd97b22da"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/LeMansCupStandingsSource.kt": {
+    "mtime": 1788447416.010357,
+    "seen": 1788473064.9733527,
+    "ast_hash": "10c1301746d67206e60abe40f90793fc",
+    "semantic_hash": "10c1301746d67206e60abe40f90793fc"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/Moto2StandingsSource.kt": {
+    "mtime": 1788448347.8253827,
+    "seen": 1788473064.9733527,
+    "ast_hash": "1ad9b09ec715a6846e53c127f21b3b8e",
+    "semantic_hash": "1ad9b09ec715a6846e53c127f21b3b8e"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/Moto3StandingsSource.kt": {
+    "mtime": 1788448357.5492866,
+    "seen": 1788473064.9733527,
+    "ast_hash": "2375ae74437722c06ada5f499959e56e",
+    "semantic_hash": "2375ae74437722c06ada5f499959e56e"
+  },
+  "app/src/main/java/com/pitboard/app/standings/sources/WecStandingsSource.kt": {
+    "mtime": 1788447317.2032864,
+    "seen": 1788473064.9733527,
+    "ast_hash": "591ce06de2adadd03e36f9274bec2e09",
+    "semantic_hash": "591ce06de2adadd03e36f9274bec2e09"
+  },
+  "app/src/main/java/com/pitboard/app/ui/NotificationPermissionOnboarding.kt": {
+    "mtime": 1788090746.9493015,
+    "seen": 1788473064.9733527,
+    "ast_hash": "1543d147a26a2471e678379b684331e6",
+    "semantic_hash": "1543d147a26a2471e678379b684331e6"
+  },
+  "app/src/main/java/com/pitboard/app/ui/components/OfflineBanner.kt": {
+    "mtime": 1788352241.1120124,
+    "seen": 1788473064.9743605,
+    "ast_hash": "9136e7f4e85e0cf9e1dd602f85305f54",
+    "semantic_hash": "9136e7f4e85e0cf9e1dd602f85305f54"
+  },
+  "app/src/main/java/com/pitboard/app/ui/theme/PodiumColors.kt": {
+    "mtime": 1788113273.7630215,
+    "seen": 1788473064.9753668,
+    "ast_hash": "309708f962c2acdbca9878fb1b449906",
+    "semantic_hash": "309708f962c2acdbca9878fb1b449906"
+  },
+  "app/src/main/java/com/pitboard/app/util/SeasonWindow.kt": {
+    "mtime": 1788352492.4154398,
+    "seen": 1788473064.977369,
+    "ast_hash": "66103eb2a3c8b1c48812acdffb867b84",
+    "semantic_hash": "66103eb2a3c8b1c48812acdffb867b84"
+  },
+  "gradlew": {
+    "mtime": 1788445679.836398,
+    "seen": 1788473064.9783676,
+    "ast_hash": "f092910dfa8e47c5a37a452c3f6baf8a",
+    "semantic_hash": "f092910dfa8e47c5a37a452c3f6baf8a"
+  },
+  ".claude/skills/compose-animations/SKILL.md": {
+    "mtime": 1787868775.0948582,
+    "seen": 1788473120.2694104,
+    "ast_hash": "b29a7ef71c393bf6297548a6016ce79e",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-animations/references/animated-content.md": {
+    "mtime": 1787868775.0989656,
+    "seen": 1788473120.2694104,
+    "ast_hash": "49694bd74b1914c91776501187992e8d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-component-design/SKILL.md": {
+    "mtime": 1787868775.2324297,
+    "seen": 1788473120.2694104,
+    "ast_hash": "6b6ab26dda48de03519f48bfff3bb98e",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-component-design/references/modifier-layout.md": {
+    "mtime": 1787868775.2406738,
+    "seen": 1788473120.2694104,
+    "ast_hash": "fac6a04c9d7140b6db695e3a978fde5d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-component-design/references/slot-apis.md": {
+    "mtime": 1787868775.2489283,
+    "seen": 1788473120.2694104,
+    "ast_hash": "5d9fecea1d021c916346b3a0b520aee8",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-performance/SKILL.md": {
+    "mtime": 1787868775.3688705,
+    "seen": 1788473120.2694104,
+    "ast_hash": "63bcb7bbdeab67611615b7dea3b82828",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-performance/references/composition-contracts.md": {
+    "mtime": 1787868775.3849723,
+    "seen": 1788473120.2694104,
+    "ast_hash": "a51b487f7c3a3af27f6c918ded210d0f",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-performance/references/deferred-reads.md": {
+    "mtime": 1787868775.400569,
+    "seen": 1788473120.2694104,
+    "ast_hash": "f4a0042836d945621781b84b60df4f8a",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-performance/references/diagnosis.md": {
+    "mtime": 1787868775.421419,
+    "seen": 1788473120.2694104,
+    "ast_hash": "78239f0695948ccb3e9abf9c40b98263",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-performance/references/stability.md": {
+    "mtime": 1787868775.4129221,
+    "seen": 1788473120.2694104,
+    "ast_hash": "62d900cee24076cd24a712928b6727bb",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-state-and-effects/SKILL.md": {
+    "mtime": 1787868775.5412157,
+    "seen": 1788473120.2694104,
+    "ast_hash": "497a76b6f80f604ce0f1ab4b8661dac4",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-state-and-effects/references/local-state.md": {
+    "mtime": 1787868775.5581317,
+    "seen": 1788473120.2694104,
+    "ast_hash": "40ba2d18654a6a50ead1661736a3a455",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-state-and-effects/references/side-effects.md": {
+    "mtime": 1787868775.5664022,
+    "seen": 1788473120.2694104,
+    "ast_hash": "cbed503ff801b4345ba6fc36854b36b5",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-state-and-effects/references/state-hoisting.md": {
+    "mtime": 1787868775.574563,
+    "seen": 1788473120.2694104,
+    "ast_hash": "823f9f84554b4bf6eadfe9b99990870c",
+    "semantic_hash": ""
+  },
+  ".claude/skills/compose-ui-testing-patterns/SKILL.md": {
+    "mtime": 1787868775.643659,
+    "seen": 1788473120.2694104,
+    "ast_hash": "abba14444e6cc02f0a413b3cf79e6689",
+    "semantic_hash": ""
+  },
+  ".claude/skills/frontend-design/LICENSE.txt": {
+    "mtime": 1787868792.4174044,
+    "seen": 1788473120.2694104,
+    "ast_hash": "2ee41112a44fe7014dce33e26468ba93",
+    "semantic_hash": ""
+  },
+  ".claude/skills/frontend-design/SKILL.md": {
+    "mtime": 1787868792.4257686,
+    "seen": 1788473120.2694104,
+    "ast_hash": "31c633612585bf2dd4e6d1103afc9f33",
+    "semantic_hash": ""
+  },
+  ".claude/skills/gradle-run/SKILL.md": {
+    "mtime": 1787868775.793141,
+    "seen": 1788473120.2694104,
+    "ast_hash": "075dd588516e633332a4a4f2d537b47a",
+    "semantic_hash": ""
+  },
+  ".claude/skills/gradle-run/agents/openai.yaml": {
+    "mtime": 1787868775.7846797,
+    "seen": 1788473120.2694104,
+    "ast_hash": "8a4703f84e7f7ebd4eddd411a858a0fd",
+    "semantic_hash": ""
+  },
+  ".claude/skills/kotlin-api-design/SKILL.md": {
+    "mtime": 1787868775.9442706,
+    "seen": 1788473120.2694104,
+    "ast_hash": "3c4dc5fef2a97777d290ac8d7ac8c155",
+    "semantic_hash": ""
+  },
+  ".claude/skills/kotlin-api-design/references/functions.md": {
+    "mtime": 1787868775.9608567,
+    "seen": 1788473120.2694104,
+    "ast_hash": "ccd2f52f1a9f7cd24a8e76d582a8421b",
+    "semantic_hash": ""
+  },
+  ".claude/skills/kotlin-api-design/references/multiplatform-boundaries.md": {
+    "mtime": 1787868775.9745696,
+    "seen": 1788473120.2694104,
+    "ast_hash": "670c936b31d5673726c028c3d2161cc9",
+    "semantic_hash": ""
+  },
+  ".claude/skills/kotlin-api-design/references/value-classes.md": {
+    "mtime": 1787868775.9786012,
+    "seen": 1788473120.2694104,
+    "ast_hash": "d2ede36371e384ac341a6a291f594dab",
+    "semantic_hash": ""
+  },
+  ".claude/skills/kotlin-concurrency-and-flow/SKILL.md": {
+    "mtime": 1787868776.094057,
+    "seen": 1788473120.2694104,
+    "ast_hash": "b97784a91b4b6eac0a6c4726cdcfa708",
+    "semantic_hash": ""
+  },
+  ".claude/skills/kotlin-concurrency-and-flow/references/flow-state-events.md": {
+    "mtime": 1787868776.1023636,
+    "seen": 1788473120.2694104,
+    "ast_hash": "0ab91828f70e5505f74565deccec123a",
+    "semantic_hash": ""
+  },
+  ".claude/skills/kotlin-concurrency-and-flow/references/structured-concurrency.md": {
+    "mtime": 1787868776.1150029,
+    "seen": 1788473120.2694104,
+    "ast_hash": "8265529c924127da0298d9e2a5644e86",
+    "semantic_hash": ""
+  },
+  ".claude/skills/kotlin-control-flow/SKILL.md": {
+    "mtime": 1787868776.1776006,
+    "seen": 1788473120.2694104,
+    "ast_hash": "cf97f9f7b1891bdd21cf1e2065d77244",
+    "semantic_hash": ""
+  },
+  ".claude/skills/material-3/SKILL.md": {
+    "mtime": 1787868783.4281101,
+    "seen": 1788473120.2694104,
+    "ast_hash": "ce1e4e695a7ed3f5dfc100d091a704f8",
+    "semantic_hash": ""
+  },
+  ".claude/skills/material-3/references/color-system.md": {
+    "mtime": 1787868783.4439368,
+    "seen": 1788473120.2694104,
+    "ast_hash": "2ff5b84a0a9232b71698373a51915852",
+    "semantic_hash": ""
+  },
+  ".claude/skills/material-3/references/component-catalog.md": {
+    "mtime": 1787868783.4439368,
+    "seen": 1788473120.2694104,
+    "ast_hash": "af1d2baac0732ebcc958ab2157022e75",
+    "semantic_hash": ""
+  },
+  ".claude/skills/material-3/references/layout-and-responsive.md": {
+    "mtime": 1787868783.4725533,
+    "seen": 1788473120.2694104,
+    "ast_hash": "81bac9e7d55fa11adc318bd290696e07",
+    "semantic_hash": ""
+  },
+  ".claude/skills/material-3/references/navigation-patterns.md": {
+    "mtime": 1787868783.5047805,
+    "seen": 1788473120.2694104,
+    "ast_hash": "55fcce02ffee64016978b1eaabe00876",
+    "semantic_hash": ""
+  },
+  ".claude/skills/material-3/references/theming-and-dynamic-color.md": {
+    "mtime": 1787868783.5192864,
+    "seen": 1788473120.2694104,
+    "ast_hash": "d8c2878b7bbc7f1c919375b350e9090e",
+    "semantic_hash": ""
+  },
+  ".claude/skills/material-3/references/typography-and-shape.md": {
+    "mtime": 1787868783.5296767,
+    "seen": 1788473120.2694104,
+    "ast_hash": "8cda9cca9aea5a37cefef44bf13b0968",
+    "semantic_hash": ""
+  },
+  ".claude/skills/refactoring-ui/SKILL.md": {
+    "mtime": 1787868788.2845035,
+    "seen": 1788473120.2694104,
+    "ast_hash": "06b36506b5203fb47456df145a531044",
+    "semantic_hash": ""
+  },
+  ".claude/skills/refactoring-ui/references/accessibility-depth.md": {
+    "mtime": 1787868788.3165028,
+    "seen": 1788473120.2694104,
+    "ast_hash": "328373004a3628fd9b30436cf4f1e55a",
+    "semantic_hash": ""
+  },
+  ".claude/skills/refactoring-ui/references/advanced-patterns.md": {
+    "mtime": 1787868788.3009999,
+    "seen": 1788473120.2694104,
+    "ast_hash": "4f37b04b3460370e321a2a99e5261ce2",
+    "semantic_hash": ""
+  },
+  ".claude/skills/refactoring-ui/references/animation-microinteractions.md": {
+    "mtime": 1787868788.349907,
+    "seen": 1788473120.2694104,
+    "ast_hash": "c13c30972066f3fa42a434c454476189",
+    "semantic_hash": ""
+  },
+  ".claude/skills/refactoring-ui/references/data-visualization.md": {
+    "mtime": 1787868788.3336437,
+    "seen": 1788473120.2694104,
+    "ast_hash": "8f523a3583eec192864b839746152208",
+    "semantic_hash": ""
+  },
+  ".claude/skills/refactoring-ui/references/theming-dark-mode.md": {
+    "mtime": 1787868788.3582973,
+    "seen": 1788473120.2694104,
+    "ast_hash": "ca6219bb52ac1b48fbc03b4cf0b466cb",
+    "semantic_hash": ""
+  },
+  ".claude/skills/using-chrisbanes-skills/SKILL.md": {
+    "mtime": 1787868776.2446718,
+    "seen": 1788473120.2694104,
+    "ast_hash": "48e9198d234bfcb51a7488e8d7f64204",
+    "semantic_hash": ""
+  },
+  ".gitlab-ci.yml": {
+    "mtime": 1786527362.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "0fdcd4b115ba5446f7eacc61eb7210d2",
+    "semantic_hash": ""
+  },
+  "app/src/main/ic_launcher-playstore.png": {
+    "mtime": 1786573496.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "f5b2816cc19a9f13b16cbf50f9067e88",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-hdpi/ic_launcher.png": {
+    "mtime": 1786641450.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "1acf7709e53119c564d3660a47536460",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-hdpi/ic_launcher_foreground.webp": {
+    "mtime": 1786573498.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "dc0ced62af9eafb19012fef0de422b67",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp": {
+    "mtime": 1786573498.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "5bf50ebff8f70a09e353f24c328b1750",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-mdpi/ic_launcher.png": {
+    "mtime": 1786641450.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "9ce63967b385484be847ada982fc5669",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-mdpi/ic_launcher_foreground.webp": {
+    "mtime": 1786573496.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "d8b79a3ed2b2b5857bb76cb5810bb6ba",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-mdpi/ic_launcher_round.webp": {
+    "mtime": 1786573496.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "cd4d613515489dbb78eb52571786c647",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xhdpi/ic_launcher.png": {
+    "mtime": 1786641450.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "d9c13e953c935f8586ed51b118a81acb",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.webp": {
+    "mtime": 1786573496.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "a211d7f2b67ca9c5d04090de43587f0a",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp": {
+    "mtime": 1786573498.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "99f65b71dc8a45d8ebd9f9839198306c",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
+    "mtime": 1786641450.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "7cc471e838f07a7bb01809abfe9a3b23",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.webp": {
+    "mtime": 1786573498.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "24ddb66eebe9dceb57884c230cd665f0",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp": {
+    "mtime": 1786573496.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "5b47621edab69acd2cee28d23243f14f",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
+    "mtime": 1786641450.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "dcc72fac8c2dbe04fb81af5054b173da",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.webp": {
+    "mtime": 1786573496.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "0c7975c0426ff335292bbbf69a5681d7",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp": {
+    "mtime": 1786573498.0,
+    "seen": 1788473120.2694104,
+    "ast_hash": "01c74c55ad85cc4a5f2e12e9727a8cb2",
+    "semantic_hash": ""
+  }
+}

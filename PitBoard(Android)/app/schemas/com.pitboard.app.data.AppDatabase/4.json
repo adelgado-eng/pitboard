@@ -1,0 +1,257 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "fed94f846971f4d13e56a5ff5583fc7a",
+    "entities": [
+      {
+        "tableName": "calendar_sources",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `displayName` TEXT NOT NULL, `sourceUri` TEXT NOT NULL, `originalFileName` TEXT NOT NULL, `importedAt` INTEGER NOT NULL, `lastSyncedAt` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "displayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceUri",
+            "columnName": "sourceUri",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "originalFileName",
+            "columnName": "originalFileName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "importedAt",
+            "columnName": "importedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastSyncedAt",
+            "columnName": "lastSyncedAt",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "categories",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`calendarSourceId` INTEGER NOT NULL, `seriesName` TEXT NOT NULL, `tag` TEXT NOT NULL, `colorHex` TEXT NOT NULL, `enabledByDefault` INTEGER NOT NULL, PRIMARY KEY(`calendarSourceId`, `seriesName`), FOREIGN KEY(`calendarSourceId`) REFERENCES `calendar_sources`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "calendarSourceId",
+            "columnName": "calendarSourceId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seriesName",
+            "columnName": "seriesName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tag",
+            "columnName": "tag",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "colorHex",
+            "columnName": "colorHex",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enabledByDefault",
+            "columnName": "enabledByDefault",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "calendarSourceId",
+            "seriesName"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_categories_seriesName",
+            "unique": false,
+            "columnNames": [
+              "seriesName"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_categories_seriesName` ON `${TABLE_NAME}` (`seriesName`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "calendar_sources",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "calendarSourceId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "events",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `calendarSourceId` INTEGER NOT NULL, `uid` TEXT NOT NULL, `seriesName` TEXT NOT NULL, `fullTitle` TEXT NOT NULL, `startTimeUtc` INTEGER NOT NULL, `timeZoneId` TEXT, `inferredBadge` TEXT NOT NULL, FOREIGN KEY(`calendarSourceId`) REFERENCES `calendar_sources`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`calendarSourceId`, `seriesName`) REFERENCES `categories`(`calendarSourceId`, `seriesName`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calendarSourceId",
+            "columnName": "calendarSourceId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seriesName",
+            "columnName": "seriesName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fullTitle",
+            "columnName": "fullTitle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startTimeUtc",
+            "columnName": "startTimeUtc",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timeZoneId",
+            "columnName": "timeZoneId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "inferredBadge",
+            "columnName": "inferredBadge",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_events_startTimeUtc",
+            "unique": false,
+            "columnNames": [
+              "startTimeUtc"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_startTimeUtc` ON `${TABLE_NAME}` (`startTimeUtc`)"
+          },
+          {
+            "name": "index_events_seriesName",
+            "unique": false,
+            "columnNames": [
+              "seriesName"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_seriesName` ON `${TABLE_NAME}` (`seriesName`)"
+          },
+          {
+            "name": "index_events_calendarSourceId_seriesName",
+            "unique": false,
+            "columnNames": [
+              "calendarSourceId",
+              "seriesName"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_calendarSourceId_seriesName` ON `${TABLE_NAME}` (`calendarSourceId`, `seriesName`)"
+          },
+          {
+            "name": "index_events_calendarSourceId_uid",
+            "unique": true,
+            "columnNames": [
+              "calendarSourceId",
+              "uid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_events_calendarSourceId_uid` ON `${TABLE_NAME}` (`calendarSourceId`, `uid`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "calendar_sources",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "calendarSourceId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "categories",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "calendarSourceId",
+              "seriesName"
+            ],
+            "referencedColumns": [
+              "calendarSourceId",
+              "seriesName"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fed94f846971f4d13e56a5ff5583fc7a')"
+    ]
+  }
+}

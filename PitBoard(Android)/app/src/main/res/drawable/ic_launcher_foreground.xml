@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bandera a cuadros simplificada, dentro de la zona segura (círculo central) que exige
+     un icono adaptativo — el mástil y la tela se mantienen lejos de los bordes para que
+     no se recorten en formas de icono redondas/cuadradas/squircle según el launcher. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Mástil -->
+    <path
+        android:fillColor="#EEF0F2"
+        android:pathData="M40,26 L44,26 L44,86 L40,86 Z" />
+
+    <!-- Tela de la bandera: 4x3 cuadros alternos -->
+    <path android:fillColor="#EEF0F2" android:pathData="M44,26 L53,26 L53,35 L44,35 Z" />
+    <path android:fillColor="#2E6DE8" android:pathData="M53,26 L62,26 L62,35 L53,35 Z" />
+    <path android:fillColor="#EEF0F2" android:pathData="M62,26 L71,26 L71,35 L62,35 Z" />
+    <path android:fillColor="#2E6DE8" android:pathData="M71,26 L80,26 L80,35 L71,35 Z" />
+
+    <path android:fillColor="#2E6DE8" android:pathData="M44,35 L53,35 L53,44 L44,44 Z" />
+    <path android:fillColor="#EEF0F2" android:pathData="M53,35 L62,35 L62,44 L53,44 Z" />
+    <path android:fillColor="#2E6DE8" android:pathData="M62,35 L71,35 L71,44 L62,44 Z" />
+    <path android:fillColor="#EEF0F2" android:pathData="M71,35 L80,35 L80,44 L71,44 Z" />
+
+    <path android:fillColor="#EEF0F2" android:pathData="M44,44 L53,44 L53,53 L44,53 Z" />
+    <path android:fillColor="#2E6DE8" android:pathData="M53,44 L62,44 L62,53 L53,53 Z" />
+    <path android:fillColor="#EEF0F2" android:pathData="M62,44 L71,44 L71,53 L62,53 Z" />
+    <path android:fillColor="#2E6DE8" android:pathData="M71,44 L80,44 L80,53 L71,53 Z" />
+
+</vector>

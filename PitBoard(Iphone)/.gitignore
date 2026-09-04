@@ -1,0 +1,16 @@
+# Xcode / generado por XcodeGen — nunca se versiona, se regenera con `xcodegen generate`
+*.xcodeproj/
+*.xcworkspace/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Xcode user state
+xcuserdata/
+DerivedData/
+*.xcuserstate
+
+# macOS
+.DS_Store

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base -->
+    <color name="asphalt_950">#0B0C0F</color>
+    <color name="asphalt_900">#131519</color>
+    <color name="asphalt_800">#1C1F26</color>
+    <color name="chalk">#EEF0F2</color>
+    <color name="chalk_dim">#9AA0AB</color>
+
+    <!-- Acentos -->
+    <color name="accent_blue">#2E6DE8</color>
+    <color name="badge_pink">#E23E7A</color>
+
+    <!-- Colores por categoría (mismos que en el mockup HTML, para que la app y el widget
+         se vean idénticos; CategoryEntity.kt guardará estos valores por defecto al detectar
+         cada serie por primera vez, y podrán editarse desde CategoryManagerScreen.kt) -->
+    <color name="cat_f1">#E10600</color>
+    <color name="cat_motogp">#E4372F</color>
+    <color name="cat_moto2">#FF8A3D</color>
+    <color name="cat_moto3">#FFD23D</color>
+    <color name="cat_nascar">#F2A93B</color>
+    <color name="cat_indycar">#2E6DE8</color>
+    <color name="cat_imsa">#00B2A9</color>
+    <color name="cat_gtwc_europe">#7C4DFF</color>
+    <color name="cat_gtwc_america">#9C6DFF</color>
+    <color name="cat_gtwc_asia">#B98DFF</color>
+    <color name="cat_gtwc_australia">#6B3FD4</color>
+    <color name="cat_elms">#2EC4B6</color>
+    <color name="cat_24h">#06A77D</color>
+    <color name="cat_porsche_supercup">#FF5DA2</color>
+    <color name="cat_macau">#C9A227</color>
+</resources>
