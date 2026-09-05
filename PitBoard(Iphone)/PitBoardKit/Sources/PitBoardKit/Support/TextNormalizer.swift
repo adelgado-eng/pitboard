@@ -14,10 +14,13 @@ public enum TextNormalizer {
     public static func normalize(_ s: String) -> String {
         let folded = s.folding(options: .diacriticInsensitive, locale: nil)
         let lowered = folded.lowercased()
-        let filtered = lowered.unicodeScalars.map { scalar -> Character in
-            (CharacterSet.alphanumerics.contains(scalar) || scalar == " ") ? Character(scalar) : " "
+        // 05/09/2026: el original de Android (.replace(Regex("[^a-z0-9\\s]"), "")) ELIMINA
+        // el caracter no válido, no lo sustituye por un espacio — "A.J." debe quedar "aj",
+        // no "a j" (lo detectó un test real al ejecutarse por primera vez en el CI).
+        let filtered = lowered.unicodeScalars.filter {
+            CharacterSet.alphanumerics.contains($0) || $0 == " "
         }
-        let collapsed = String(filtered)
+        let collapsed = String(String.UnicodeScalarView(filtered))
             .components(separatedBy: .whitespacesAndNewlines)
             .filter { !$0.isEmpty }
             .joined(separator: " ")
