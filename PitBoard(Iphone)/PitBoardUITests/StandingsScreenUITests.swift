@@ -35,10 +35,20 @@ final class StandingsScreenUITests: PitBoardUITestCase {
         let driverRow = app.descendants(matching: .any)
             .matching(identifier: "standings.entrantRow.uitest-driver-1")
             .firstMatch
-        XCTAssertTrue(
-            driverRow.waitForExistence(timeout: 5),
-            "El piloto sembrado en posición 1 (StandingModel de UITestFixtures) debería verse en la lista."
-        )
+        let driverRowFound = driverRow.waitForExistence(timeout: 5)
+        if !driverRowFound {
+            // 05/09/2026: ni por texto, ni por label, ni por identificador se encuentra esta
+            // fila — antes de rendirnos, volcamos el árbol de accesibilidad completo a
+            // stdout (NO al adjunto del .xcresult, que no es recuperable desde el log de
+            // texto de CI) para ver de una vez qué hay realmente en pantalla.
+            print("=== DEBUG árbol de accesibilidad completo de CategoryStandingsScreen ===")
+            print(app.debugDescription)
+            print("=== FIN DEBUG ===")
+        }
+        guard driverRowFound else {
+            XCTFail("El piloto sembrado en posición 1 (StandingModel de UITestFixtures) debería verse en la lista.")
+            return
+        }
         XCTAssertTrue(
             driverRow.label.contains("Piloto de Prueba"),
             "La fila debería mostrar el nombre del piloto sembrado; label real: \(driverRow.label)"
