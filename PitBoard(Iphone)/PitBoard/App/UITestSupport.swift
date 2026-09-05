@@ -57,6 +57,7 @@ enum UITestFixtures {
 
         context.insert(StandingModel(
             category: .f1,
+            standingsClass: .overall,
             type: .driver,
             entrantKey: "uitest-driver-1",
             position: 1,
@@ -67,6 +68,7 @@ enum UITestFixtures {
         ))
         context.insert(StandingModel(
             category: .f1,
+            standingsClass: .overall,
             type: .driver,
             entrantKey: "uitest-driver-2",
             position: 2,
