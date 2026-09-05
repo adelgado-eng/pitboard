@@ -160,18 +160,24 @@ public final class StandingsRepository: @unchecked Sendable {
         return SyncResult(outcomes: outcomes)
     }
 
+    // 05/09/2026: un #Predicate comparando una propiedad de tipo enum propio
+    // (StandingsCategory) contra un valor capturado devolvía SIEMPRE una lista vacía en
+    // esta versión de SwiftData (Xcode 16.4) — el fetch "existing" nunca encontraba nada
+    // que borrar, así que la fila "stale" de la misma categoría se quedaba junto a la
+    // nueva en vez de ser sustituida. Lo detectaron los tests reales de
+    // StandingsRepositoryTests al ejecutarse por primera vez en el CI. Se evita el
+    // #Predicate del todo: se trae todo y se filtra en Swift (la caché local es de, como
+    // mucho, unos cientos de filas — el coste es irrelevante).
     private func replaceStandings(category: StandingsCategory, rows: [StandingDraft], in context: ModelContext) {
-        let predicate = #Predicate<StandingModel> { $0.category == category }
-        if let existing = try? context.fetch(FetchDescriptor(predicate: predicate)) {
-            for model in existing { context.delete(model) }
+        if let existing = try? context.fetch(FetchDescriptor<StandingModel>()) {
+            for model in existing where model.category == category { context.delete(model) }
         }
         for draft in rows { context.insert(StandingModel(draft: draft)) }
     }
 
     private func replaceCarDrivers(category: StandingsCategory, rows: [CarDriverDraft], in context: ModelContext) {
-        let predicate = #Predicate<CarDriverModel> { $0.category == category }
-        if let existing = try? context.fetch(FetchDescriptor(predicate: predicate)) {
-            for model in existing { context.delete(model) }
+        if let existing = try? context.fetch(FetchDescriptor<CarDriverModel>()) {
+            for model in existing where model.category == category { context.delete(model) }
         }
         for draft in rows { context.insert(CarDriverModel(draft: draft)) }
     }

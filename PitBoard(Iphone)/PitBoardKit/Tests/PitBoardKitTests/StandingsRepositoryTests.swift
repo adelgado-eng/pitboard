@@ -87,6 +87,11 @@ final class StandingsRepositoryTests: XCTestCase {
         _ = await repository.syncAll()
 
         let stored = try! ModelContext(container).fetch(FetchDescriptor<StandingModel>())
-        XCTAssertEqual(stored.map(\.entrantKey), ["cached"])
+        // Filtrado por categoría (igual que en testSuccessfulSourcePersistsRowsAndReplacesStaleOnes):
+        // imsaStandingsSource/wecDriversSource/leMansCupDriversSource hacen una petición de
+        // red REAL en este test (ver comentario de la clase) — en un entorno con internet
+        // (como el runner de CI) esa petición puede tener éxito y guardar filas de IMSA
+        // reales, que no son el objeto de este test y no deben hacerlo fallar.
+        XCTAssertEqual(stored.filter { $0.category == .motoGp }.map(\.entrantKey), ["cached"])
     }
 }

@@ -101,10 +101,14 @@ public final class RaceScheduleRepository: @unchecked Sendable {
         return SyncResult(outcomes: outcomes)
     }
 
+    // 05/09/2026: mismo bug que en StandingsRepository.replaceStandings — un #Predicate
+    // comparando una propiedad de tipo enum propio (RaceSeries) contra un valor capturado
+    // devolvía siempre una lista vacía en esta versión de SwiftData, así que la sesión
+    // "stale" de la misma serie nunca se borraba. Se evita el #Predicate: se trae todo y
+    // se filtra en Swift.
     private func replaceSeries(_ series: RaceSeries, events: [EventDraft], in context: ModelContext) {
-        let predicate = #Predicate<EventModel> { $0.series == series }
-        if let existing = try? context.fetch(FetchDescriptor(predicate: predicate)) {
-            for model in existing { context.delete(model) }
+        if let existing = try? context.fetch(FetchDescriptor<EventModel>()) {
+            for model in existing where model.series == series { context.delete(model) }
         }
         for draft in events { context.insert(EventModel(draft: draft)) }
     }
