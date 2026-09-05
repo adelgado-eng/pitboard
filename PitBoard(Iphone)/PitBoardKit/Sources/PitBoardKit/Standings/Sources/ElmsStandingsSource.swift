@@ -44,7 +44,10 @@ public final class ElmsStandingsSource: StandingsSource, @unchecked Sendable {
         let allElements = try doc.select("*").array()
         let candidateHeadings = try allElements.filter { el in
             let text = try el.text().uppercased()
-            return text.contains("TEAM") && text.contains("CLASSIFICATION") && (try el.select("table").isEmpty())
+            // 04/09/2026: "try" tiene que cubrir toda la expresión "&&", no solo el lado
+            // derecho entre paréntesis — mismo fix que en DriverDbStandingsSource.swift,
+            // aquí con "&&" en vez de "??" (lo detectó el CI de GitHub Actions).
+            return try text.contains("TEAM") && text.contains("CLASSIFICATION") && el.select("table").isEmpty()
         }
         let headings = try candidateHeadings.filter { el in
             let children = el.children().array()
