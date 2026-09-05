@@ -120,6 +120,8 @@ struct CategoryStandingsScreen: View {
                     }
                     .frame(width: 32, height: 32)
                     .background(Color.white, in: RoundedRectangle(cornerRadius: 8))
+                    // Decorativo: el título de la pantalla, justo al lado, ya dice lo mismo.
+                    .accessibilityHidden(true)
                     Text(category.displayName).font(.headline)
                 }
             }
@@ -222,6 +224,13 @@ private struct StandingRowView: View {
         .padding(.vertical, 6)
         .contentShape(Rectangle())
         .onTapGesture { onClick?() }
+        // 05/09/2026 (Fase 2, accesibilidad): la fila se construye con .onTapGesture, no
+        // Button — sin esto VoiceOver leía posición/nombre/equipo/puntos como 4 elementos
+        // sueltos sin ninguna acción anunciada. El avatar, que tiene su PROPIO gesto (ver
+        // más abajo), no se absorbe en esta fusión porque ya lleva su propio
+        // accessibilityElement() — sigue siendo un elemento independiente y tocable aparte.
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(onClick != nil ? .isButton : [])
     }
 
     @ViewBuilder
@@ -253,6 +262,14 @@ private struct StandingRowView: View {
         .clipShape(Circle())
         .contentShape(Circle())
         .onTapGesture { onImageClick?() }
+        // Boundary explícito para que la fila de arriba NO lo absorba en su .combine — y
+        // etiqueta propia, ya que sin foto/logo real es solo un icono de silueta genérico.
+        // Sin foto que ver (onImageClick nil), se oculta del todo en vez de dejar un
+        // elemento tocable que no hace nada.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(settings.t("cd_view_photo"))
+        .accessibilityAddTraits(onImageClick != nil ? .isButton : [])
+        .accessibilityHidden(onImageClick == nil)
     }
 }
 
@@ -295,6 +312,9 @@ private struct CarDriversSheetView: View {
                             .onTapGesture {
                                 if let url = driver.photoUrl { onDriverImageClick(url, driver.name) }
                             }
+                            .accessibilityLabel(settings.t("cd_view_photo"))
+                            .accessibilityAddTraits(driver.photoUrl != nil ? .isButton : [])
+                            .accessibilityHidden(driver.photoUrl == nil)
 
                             Text(driver.name).font(.body.weight(.semibold))
                         }
@@ -313,6 +333,7 @@ private struct CarDriversSheetView: View {
 private struct ImagePreviewView: View {
     let preview: ImagePreview
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppSettingsRepository.self) private var settings
 
     var body: some View {
         ZStack {
@@ -346,6 +367,7 @@ private struct ImagePreviewView: View {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark").foregroundStyle(.white).padding()
                     }
+                    .accessibilityLabel(settings.t("cd_close_preview"))
                 }
                 Spacer()
             }
@@ -371,5 +393,6 @@ private struct FilterChipView: View {
                 .clipShape(Capsule())
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

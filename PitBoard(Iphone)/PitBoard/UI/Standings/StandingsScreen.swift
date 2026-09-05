@@ -92,6 +92,11 @@ struct StandingsScreen: View {
                             CategoryRow(category: category, leader: leaderByCategory[category])
                                 .contentShape(Rectangle())
                                 .onTapGesture { onCategorySelected(category) }
+                                // 05/09/2026 (Fase 2, accesibilidad): la fila se construye con
+                                // .onTapGesture, no Button — sin esto VoiceOver la leía como
+                                // varios textos sueltos sin ninguna acción anunciada.
+                                .accessibilityElement(children: .combine)
+                                .accessibilityAddTraits(.isButton)
                                 .accessibilityIdentifier("standings.row.\(category.rawValue)")
                         }
                         .listRowSeparator(.hidden)
@@ -118,6 +123,7 @@ struct StandingsScreen: View {
                         Image(systemName: "arrow.clockwise")
                     }
                     .accessibilityIdentifier("standings.refresh")
+                    .accessibilityLabel(settings.t("cd_refresh"))
                 }
             }
         }
@@ -165,6 +171,8 @@ private struct CategoryRow: View {
             }
             .frame(width: 52, height: 52)
             .background(Color.white, in: RoundedRectangle(cornerRadius: PitBoardShapes.small))
+            // Decorativo: el nombre de la categoría, justo al lado, ya dice lo mismo.
+            .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(category.displayName).font(.body)
@@ -182,6 +190,7 @@ private struct CategoryRow: View {
             Spacer()
             Image(systemName: "chevron.right")
                 .foregroundStyle(colors.onSurfaceVariant)
+                .accessibilityHidden(true)
         }
         .padding(12)
         .background(colors.surfaceVariant.opacity(0.4), in: RoundedRectangle(cornerRadius: PitBoardShapes.medium))

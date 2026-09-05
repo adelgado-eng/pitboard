@@ -146,6 +146,8 @@ private struct StartupLoadingScreen: View {
                     Image(systemName: "trophy.fill")
                         .font(.system(size: 40))
                         .foregroundStyle(colors.onPrimary)
+                        // Decorativo: pantalla de carga, el texto "PitBoard" de abajo basta.
+                        .accessibilityHidden(true)
                 }
                 Text("PitBoard")
                     .font(.title.bold())

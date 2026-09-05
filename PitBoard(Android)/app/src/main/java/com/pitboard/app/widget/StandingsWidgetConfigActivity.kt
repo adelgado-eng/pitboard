@@ -43,6 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
@@ -208,7 +210,14 @@ private fun StandingsWidgetConfigScreen(appWidgetId: Int, onSaved: () -> Unit) {
                 modifier = Modifier.weight(1f)
             )
             Box(Modifier.padding(start = 12.dp)) {
-                Box(Modifier.size(40.dp).clip(CircleShape).background(safeParseColor(backgroundColorHex)).clickable { showColorPicker = true })
+                Box(
+                    Modifier.size(40.dp).clip(CircleShape).background(safeParseColor(backgroundColorHex))
+                        // 05/09/2026 (Fase 2, accesibilidad): mismo fix que en
+                        // RaceWidgetConfigActivity — el círculo de color no tenía nombre
+                        // accesible.
+                        .semantics { contentDescription = "Elegir color de fondo del widget" }
+                        .clickable { showColorPicker = true }
+                )
             }
         }
 

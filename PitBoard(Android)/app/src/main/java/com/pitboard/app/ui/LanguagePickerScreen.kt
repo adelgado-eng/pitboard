@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pitboard.app.i18n.AppLanguage
@@ -112,8 +114,13 @@ fun LanguagePickerScreen(onLanguageChosen: (AppLanguage) -> Unit) {
 @Composable
 private fun LanguageRow(language: AppLanguage, selected: Boolean, onClick: () -> Unit) {
     Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+        // 05/09/2026 (Fase 2, accesibilidad): .selectable() con Role.RadioButton en vez del
+        // onClick propio de Card — así TalkBack anuncia "seleccionado"/"no seleccionado" al
+        // enfocar cada idioma, algo que un Card(onClick=...) normal (semántica de botón) no
+        // hace nunca por sí solo.
+        modifier = Modifier
+            .fillMaxWidth()
+            .selectable(selected = selected, onClick = onClick, role = Role.RadioButton),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = if (selected) {

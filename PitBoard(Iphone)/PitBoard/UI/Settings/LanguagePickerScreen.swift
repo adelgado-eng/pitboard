@@ -26,6 +26,8 @@ struct LanguagePickerScreen: View {
                         .foregroundStyle(colors.onPrimary)
                         .font(.title2)
                 )
+                // Decorativo: el título justo debajo ya dice "Elige tu idioma".
+                .accessibilityHidden(true)
 
             VStack(spacing: 6) {
                 Text(Strings.get("language_picker_title", language: selected))
@@ -78,6 +80,8 @@ private struct LanguageRow: View {
                 if selected {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(colors.primary)
+                        // Decorativo: el estado ya lo anuncia el .isSelected de abajo.
+                        .accessibilityHidden(true)
                 }
             }
             .padding(16)
@@ -87,5 +91,8 @@ private struct LanguageRow: View {
             )
         }
         .buttonStyle(.plain)
+        // 05/09/2026 (Fase 2, accesibilidad): sin esto VoiceOver nunca anunciaba qué idioma
+        // estaba seleccionado.
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

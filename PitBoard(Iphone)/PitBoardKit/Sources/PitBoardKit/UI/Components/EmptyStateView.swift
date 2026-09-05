@@ -26,6 +26,8 @@ public struct EmptyStateView<Action: View>: View {
                 .font(.system(size: 40))
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 4)
+                // Decorativo: el título y el mensaje de abajo ya explican el estado.
+                .accessibilityHidden(true)
             Text(title)
                 .font(.headline)
             Text(message)

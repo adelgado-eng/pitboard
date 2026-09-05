@@ -102,6 +102,10 @@ struct SettingsScreen: View {
                 ))
                 .labelsHidden()
                 .accessibilityIdentifier("settings.notificationsToggle")
+                // 05/09/2026 (Fase 2, accesibilidad): Toggle("", ...) con label VACÍO — sin
+                // esto VoiceOver no anunciaba nada al enfocarlo. .labelsHidden() solo oculta
+                // lo visual, no sustituye la etiqueta de accesibilidad por sí solo.
+                .accessibilityLabel(settings.t("settings_notifications_enable"))
             }
 
             if settings.notificationsEnabled {
@@ -151,11 +155,16 @@ struct SettingsScreen: View {
                                 .foregroundStyle(colors.primary)
                         }
                         Spacer()
-                        Image(systemName: "chevron.right").foregroundStyle(colors.onSurfaceVariant)
+                        Image(systemName: "chevron.right").foregroundStyle(colors.onSurfaceVariant).accessibilityHidden(true)
                     }
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                // .accessibilityHint (no .accessibilityLabel): el botón ya tiene texto propio
+                // ("Series activas", "Todas"/"N series") que VoiceOver fusiona solo — un
+                // accessibilityLabel aquí lo REEMPLAZARÍA en vez de añadirse, perdiendo esa
+                // información. El hint solo aclara qué hace el toque.
+                .accessibilityHint(settings.t("cd_edit_active_series"))
             }
         }
     }
@@ -169,6 +178,7 @@ struct SettingsScreen: View {
         .buttonStyle(.bordered)
         .tint(selected ? colors.primary : colors.onSurfaceVariant)
         .background(selected ? colors.primaryContainer : .clear, in: Capsule())
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     /// Misma máquina de decisión que el `onCheckedChange` de Android: apagar nunca pide
@@ -238,6 +248,7 @@ struct SettingsScreen: View {
                 ))
                 .labelsHidden()
                 .accessibilityIdentifier("settings.standingsToggle")
+                .accessibilityLabel(settings.t("settings_standings_enable"))
             }
         }
     }
@@ -279,6 +290,7 @@ struct SettingsScreen: View {
             .tint(selected ? colors.primary : colors.onSurfaceVariant)
             .background(selected ? colors.primaryContainer : .clear, in: Capsule())
             .accessibilityIdentifier("settings.theme.\(theme.rawValue)")
+            .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     // MARK: - Tarjeta: Zona horaria
@@ -304,6 +316,7 @@ struct SettingsScreen: View {
             .tint(selected ? colors.primary : colors.onSurfaceVariant)
             .background(selected ? colors.primaryContainer : .clear, in: Capsule())
             .accessibilityIdentifier("settings.timeDisplayMode.\(mode.rawValue)")
+            .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     // MARK: - Tarjeta: Ayuda (avisos/widget que llegan tarde)
@@ -349,6 +362,7 @@ private struct SettingsCard<Content: View>: View {
             HStack(spacing: 12) {
                 Image(systemName: systemImage)
                     .foregroundStyle(colors.primary)
+                    .accessibilityHidden(true)
                 Text(title)
                     .font(.title3.weight(.bold))
             }
@@ -378,11 +392,17 @@ private struct SessionTypeToggle: View {
                 Spacer()
                 Image(systemName: checked ? "checkmark.square.fill" : "square")
                     .foregroundStyle(checked ? .primary : .secondary)
+                    // Decorativo: el estado real se anuncia con .isSelected más abajo, no
+                    // hace falta que VoiceOver además nombre el símbolo del icono.
+                    .accessibilityHidden(true)
             }
             .contentShape(Rectangle())
             .padding(.vertical, 8)
         }
         .buttonStyle(.plain)
+        // 05/09/2026 (Fase 2, accesibilidad): sin esto VoiceOver nunca anunciaba si este
+        // checkbox propio estaba marcado o no.
+        .accessibilityAddTraits(checked ? .isSelected : [])
     }
 }
 
@@ -431,7 +451,12 @@ private struct NotificationSeriesPicker: View {
                                     .font(.subheadline)
                                     .foregroundStyle(colors.onSurface)
                                 Spacer()
+                                // Puramente decorativo: el estado ya lo anuncia el
+                                // .isSelected del Button de abajo — sin ocultarlo, VoiceOver
+                                // leería un segundo interruptor "desactivado" contradictorio
+                                // (allowsHitTesting no afecta a accesibilidad).
                                 Toggle("", isOn: .constant(isSelected)).labelsHidden().allowsHitTesting(false)
+                                    .accessibilityHidden(true)
                             }
                             .padding(12)
                             .background(
@@ -441,6 +466,7 @@ private struct NotificationSeriesPicker: View {
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
                     }
                 }
                 .padding(20)

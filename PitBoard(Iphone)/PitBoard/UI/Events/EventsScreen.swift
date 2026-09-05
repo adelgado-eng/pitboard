@@ -189,6 +189,7 @@ struct EventsScreen: View {
                         Image(systemName: "arrow.clockwise")
                     }
                     .accessibilityIdentifier("events.refresh")
+                    .accessibilityLabel(settings.t("cd_refresh"))
                 }
                 Button {
                     withAnimation { showFilterPanel.toggle() }
@@ -197,12 +198,15 @@ struct EventsScreen: View {
                         .foregroundStyle(quickFiltersActive ? colors.primary : .primary)
                 }
                 .accessibilityIdentifier("events.filter")
+                .accessibilityLabel(settings.t("cd_filter_events"))
+                .accessibilityAddTraits(quickFiltersActive ? .isSelected : [])
                 Button {
                     showSeriesEditor = true
                 } label: {
                     Image(systemName: "pencil")
                 }
                 .accessibilityIdentifier("events.editSeries")
+                .accessibilityLabel(settings.t("cd_edit_series"))
             }
         }
         .sheet(isPresented: $showSeriesEditor) {
@@ -216,12 +220,13 @@ struct EventsScreen: View {
     private var filterPanel: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                Image(systemName: "magnifyingglass").foregroundStyle(.secondary).accessibilityHidden(true)
                 TextField(settings.t("events_search_placeholder"), text: $searchQuery)
                     .accessibilityIdentifier("events.searchField")
                 if !searchQuery.isEmpty {
                     Button { searchQuery = "" } label: { Image(systemName: "xmark.circle.fill") }
                         .foregroundStyle(.secondary)
+                        .accessibilityLabel(settings.t("cd_clear_search"))
                 }
             }
             .padding(10)
@@ -570,6 +575,9 @@ private struct FilterChipView: View {
                 .clipShape(Capsule())
         }
         .buttonStyle(.plain)
+        // 05/09/2026 (Fase 2, accesibilidad): sin esto VoiceOver nunca anunciaba si un chip
+        // de filtro estaba activo o no.
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
 

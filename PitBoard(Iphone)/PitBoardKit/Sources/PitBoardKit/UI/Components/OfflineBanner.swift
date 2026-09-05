@@ -9,6 +9,8 @@ public struct OfflineBanner: View {
         HStack(spacing: 8) {
             Image(systemName: "wifi.slash")
                 .font(.footnote)
+                // Decorativo: el texto de al lado ya dice "Sin conexión".
+                .accessibilityHidden(true)
             Text("Sin conexión — mostrando la última actualización guardada")
                 .font(.footnote)
         }

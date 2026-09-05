@@ -279,6 +279,7 @@ private fun CarDriversSheet(
     onDriverImageClick: (String, String) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val viewPhotoLabel = tr("cd_view_photo")
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
@@ -316,7 +317,7 @@ private fun CarDriversSheet(
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .let { m ->
                                         driver.photoUrl?.let { url ->
-                                            m.clickable { onDriverImageClick(url, driver.name) }
+                                            m.clickable(onClickLabel = viewPhotoLabel) { onDriverImageClick(url, driver.name) }
                                         } ?: m
                                     },
                                 contentAlignment = Alignment.Center
@@ -396,6 +397,7 @@ private fun StandingsList(
 
 @Composable
 private fun StandingRow(row: StandingEntity, onClick: (() -> Unit)? = null, onImageClick: (() -> Unit)? = null) {
+    val viewPhotoLabel = tr("cd_view_photo")
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -426,7 +428,7 @@ private fun StandingRow(row: StandingEntity, onClick: (() -> Unit)? = null, onIm
                     .size(40.dp)
                     .clip(CircleShape)
                     .background(Color.White)
-                    .let { if (onImageClick != null) it.clickable(onClick = onImageClick) else it },
+                    .let { if (onImageClick != null) it.clickable(onClickLabel = viewPhotoLabel, onClick = onImageClick) else it },
                 contentAlignment = Alignment.Center
             ) {
                 if (row.photoUrl != null) {
@@ -450,7 +452,7 @@ private fun StandingRow(row: StandingEntity, onClick: (() -> Unit)? = null, onIm
                     .size(40.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .let { if (onImageClick != null) it.clickable(onClick = onImageClick) else it },
+                    .let { if (onImageClick != null) it.clickable(onClickLabel = viewPhotoLabel, onClick = onImageClick) else it },
                 contentAlignment = Alignment.Center
             ) {
                 if (row.photoUrl != null) {

@@ -738,6 +738,58 @@ public enum Strings {
             .catalan: "Circuit: %@",
             .french: "Circuit : %@",
             .german: "Strecke: %@"
+        ],
+
+        // --- Accesibilidad (Fase 2, 05/09/2026): accessibilityLabel de botones solo-icono
+        // — mismas claves y traducciones que "cd_view_photo" en Strings.kt (Android). ---
+        "cd_refresh": [
+            .spanish: "Actualizar",
+            .english: "Refresh",
+            .catalan: "Actualitza",
+            .french: "Actualiser",
+            .german: "Aktualisieren"
+        ],
+        "cd_filter_events": [
+            .spanish: "Filtrar eventos",
+            .english: "Filter events",
+            .catalan: "Filtra esdeveniments",
+            .french: "Filtrer les événements",
+            .german: "Ereignisse filtern"
+        ],
+        "cd_edit_series": [
+            .spanish: "Editar series",
+            .english: "Edit series",
+            .catalan: "Edita les sèries",
+            .french: "Modifier les séries",
+            .german: "Serien bearbeiten"
+        ],
+        "cd_clear_search": [
+            .spanish: "Borrar búsqueda",
+            .english: "Clear search",
+            .catalan: "Esborra la cerca",
+            .french: "Effacer la recherche",
+            .german: "Suche löschen"
+        ],
+        "cd_view_photo": [
+            .spanish: "Ver foto grande",
+            .english: "View larger photo",
+            .catalan: "Veure foto gran",
+            .french: "Voir la photo en grand",
+            .german: "Foto vergrößern ansehen"
+        ],
+        "cd_close_preview": [
+            .spanish: "Cerrar vista previa",
+            .english: "Close preview",
+            .catalan: "Tanca la previsualització",
+            .french: "Fermer l'aperçu",
+            .german: "Vorschau schließen"
+        ],
+        "cd_edit_active_series": [
+            .spanish: "Editar series activas",
+            .english: "Edit active series",
+            .catalan: "Edita les sèries actives",
+            .french: "Modifier les séries actives",
+            .german: "Aktive Serien bearbeiten"
         ]
     ]
 

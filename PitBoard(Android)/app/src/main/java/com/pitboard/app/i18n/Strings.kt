@@ -751,6 +751,24 @@ object Strings {
             AppLanguage.CATALAN to "Circuit: %s",
             AppLanguage.FRENCH to "Circuit : %s",
             AppLanguage.GERMAN to "Strecke: %s"
+        ),
+
+        // --- Accesibilidad (Fase 2, 05/09/2026): onClickLabel/contentDescription de
+        // elementos que ya usan tr() en su pantalla — los widgets (RaceWidgetConfigActivity,
+        // StandingsWidgetConfigActivity) no migran a tr() todavía, eso es Fase 3 (i18n). ---
+        "cd_view_photo" to mapOf(
+            AppLanguage.SPANISH to "Ver foto grande",
+            AppLanguage.ENGLISH to "View larger photo",
+            AppLanguage.CATALAN to "Veure foto gran",
+            AppLanguage.FRENCH to "Voir la photo en grand",
+            AppLanguage.GERMAN to "Foto vergrößern ansehen"
+        ),
+        "cd_edit_active_series" to mapOf(
+            AppLanguage.SPANISH to "Editar series activas",
+            AppLanguage.ENGLISH to "Edit active series",
+            AppLanguage.CATALAN to "Edita les sèries actives",
+            AppLanguage.FRENCH to "Modifier les séries actives",
+            AppLanguage.GERMAN to "Aktive Serien bearbeiten"
         )
     )
 

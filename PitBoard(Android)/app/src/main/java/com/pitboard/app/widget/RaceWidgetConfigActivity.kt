@@ -46,6 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.glance.GlanceId
@@ -217,7 +219,13 @@ private fun RaceWidgetConfigScreen(appWidgetId: Int, onSaved: () -> Unit) {
                 modifier = Modifier.weight(1f)
             )
             Box(Modifier.padding(start = 12.dp)) {
-                Box(Modifier.size(40.dp).clip(CircleShape).background(safeParseColor(backgroundColorHex)).clickable { showColorPicker = true })
+                Box(
+                    Modifier.size(40.dp).clip(CircleShape).background(safeParseColor(backgroundColorHex))
+                        // 05/09/2026 (Fase 2, accesibilidad): el círculo de color no tenía
+                        // ningún nombre accesible — TalkBack lo anunciaba como "Botón" a secas.
+                        .semantics { contentDescription = "Elegir color de fondo del widget" }
+                        .clickable { showColorPicker = true }
+                )
             }
         }
 

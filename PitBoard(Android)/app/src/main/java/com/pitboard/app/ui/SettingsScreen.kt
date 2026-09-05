@@ -334,7 +334,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { showCategoryPicker = true }
+                            .clickable(onClickLabel = tr("cd_edit_active_series")) { showCategoryPicker = true }
                             .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
