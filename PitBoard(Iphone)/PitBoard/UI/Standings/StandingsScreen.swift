@@ -15,16 +15,29 @@ struct StandingsScreen: View {
     @Environment(\.syncManager) private var syncManager
     @Environment(\.pitBoardColors) private var colors
 
+    // 05/09/2026: el macro #Predicate no admite comparar contra el nombre completo del
+    // enum ("key path cannot refer to enum case") NI contra el miembro implícito
+    // ("Member access without an explicit base is not supported in this predicate") —
+    // ambos detectados por el CI al compilar este target por primera vez. Solo acepta
+    // comparar contra una variable capturada desde fuera del predicado (mismo patrón que
+    // ya usa CategoryStandingsScreen.swift con `$0.category == category`), de ahí estas
+    // constantes.
+    // `static` porque estas constantes se usan dentro del valor por defecto de una
+    // propiedad (`@Query(filter:)` en la propia declaración) — ahí `self` todavía no
+    // existe, así que no se puede capturar una propiedad de instancia.
+    private static let overallClass = StandingsClass.overall
+    private static let driverType = StandingType.driver
+    private static let teamType = StandingType.team
+    private static let wecCategory = StandingsCategory.wec
+    private static let elmsCategory = StandingsCategory.elms
+    private static let imsaCategory = StandingsCategory.imsa
+    private static let lemansCupCategory = StandingsCategory.lemansCup
+
     // Filtrado a OVERALL/DRIVER en el propio predicado — el líder de cada categoría es la
     // fila de posición más baja dentro de ese subconjunto (ver `leaderByCategory`).
-    // 05/09/2026: el nombre completo del enum (`StandingsClass.overall`) hacía que el
-    // macro `#Predicate` lo confundiera con una referencia a key path ("key path cannot
-    // refer to enum case") — lo detectó el CI al compilar este target por primera vez.
-    // El miembro implícito (`.overall`) sí infiere el tipo desde el operando izquierdo
-    // de `==` sin ese problema.
     @Query(
         filter: #Predicate<StandingModel> { model in
-            model.standingsClass == .overall && model.type == .driver
+            model.standingsClass == overallClass && model.type == driverType
         }
     )
     private var driverLeaders: [StandingModel]
@@ -36,11 +49,11 @@ struct StandingsScreen: View {
     // a la clase principal de cada una (`StandingsCategory.primaryCarClass`).
     @Query(
         filter: #Predicate<StandingModel> { model in
-            model.type == .team &&
-            (model.category == .wec ||
-             model.category == .elms ||
-             model.category == .imsa ||
-             model.category == .lemansCup)
+            model.type == teamType &&
+            (model.category == wecCategory ||
+             model.category == elmsCategory ||
+             model.category == imsaCategory ||
+             model.category == lemansCupCategory)
         }
     )
     private var carBasedTeamRows: [StandingModel]
