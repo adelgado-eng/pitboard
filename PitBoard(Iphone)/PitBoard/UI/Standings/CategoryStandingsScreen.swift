@@ -19,7 +19,7 @@ struct CategoryStandingsScreen: View {
     // aunque sí hubiera filas guardadas — confirmado con el volcado del árbol de
     // accesibilidad en CI al fallar StandingsScreenUITests. Se trae todo y se filtra en
     // Swift (como en los dos sitios de arriba).
-    @Query(sort: [SortDescriptor(\.position)]) private var allStandings: [StandingModel]
+    @Query(sort: [SortDescriptor<StandingModel>(\.position)]) private var allStandings: [StandingModel]
     @Query private var allCarDrivers: [CarDriverModel]
 
     @State private var mode: StandingType = .driver
