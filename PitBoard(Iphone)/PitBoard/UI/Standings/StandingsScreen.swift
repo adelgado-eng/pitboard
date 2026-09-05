@@ -17,9 +17,14 @@ struct StandingsScreen: View {
 
     // Filtrado a OVERALL/DRIVER en el propio predicado — el líder de cada categoría es la
     // fila de posición más baja dentro de ese subconjunto (ver `leaderByCategory`).
+    // 05/09/2026: el nombre completo del enum (`StandingsClass.overall`) hacía que el
+    // macro `#Predicate` lo confundiera con una referencia a key path ("key path cannot
+    // refer to enum case") — lo detectó el CI al compilar este target por primera vez.
+    // El miembro implícito (`.overall`) sí infiere el tipo desde el operando izquierdo
+    // de `==` sin ese problema.
     @Query(
         filter: #Predicate<StandingModel> { model in
-            model.standingsClass == StandingsClass.overall && model.type == StandingType.driver
+            model.standingsClass == .overall && model.type == .driver
         }
     )
     private var driverLeaders: [StandingModel]
@@ -31,11 +36,11 @@ struct StandingsScreen: View {
     // a la clase principal de cada una (`StandingsCategory.primaryCarClass`).
     @Query(
         filter: #Predicate<StandingModel> { model in
-            model.type == StandingType.team &&
-            (model.category == StandingsCategory.wec ||
-             model.category == StandingsCategory.elms ||
-             model.category == StandingsCategory.imsa ||
-             model.category == StandingsCategory.lemansCup)
+            model.type == .team &&
+            (model.category == .wec ||
+             model.category == .elms ||
+             model.category == .imsa ||
+             model.category == .lemansCup)
         }
     )
     private var carBasedTeamRows: [StandingModel]
