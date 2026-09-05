@@ -5,14 +5,22 @@ import PitBoardKit
 
 /// Clasificación de UNA categoría, con pestañas Pilotos/Equipos (o de clase de coche para
 /// las categorías de resistencia) — equivalente exacto de `CategoryStandingsScreen.kt`.
-/// Pantalla de solo lectura: sin ViewModel, `@Query` filtrado por `category` directamente
-/// en el predicado (capturado en `init`, ver más abajo) hace de sustituto de los `Flow`
-/// de `StandingsRepository.observe`.
+/// Pantalla de solo lectura: sin ViewModel, `@Query` (sin filtrar por `category` — ver el
+/// comentario sobre `allStandings` más abajo) + filtrado en Swift hace de sustituto de los
+/// `Flow` de `StandingsRepository.observe`.
 struct CategoryStandingsScreen: View {
     let category: StandingsCategory
 
-    @Query private var categoryStandings: [StandingModel]
-    @Query private var categoryCarDrivers: [CarDriverModel]
+    // 05/09/2026: mismo bug que StandingsRepository.replaceStandings y
+    // RaceScheduleRepository.replaceSeries — un #Predicate comparando la propiedad
+    // `category` (un enum propio, StandingsCategory) contra un valor capturado devuelve
+    // SIEMPRE una lista vacía en esta versión de SwiftData (Xcode 16.4). Aquí hacía que
+    // esta pantalla mostrase "Sin datos todavía" para TODAS las categorías sin excepción,
+    // aunque sí hubiera filas guardadas — confirmado con el volcado del árbol de
+    // accesibilidad en CI al fallar StandingsScreenUITests. Se trae todo y se filtra en
+    // Swift (como en los dos sitios de arriba).
+    @Query(sort: [SortDescriptor(\.position)]) private var allStandings: [StandingModel]
+    @Query private var allCarDrivers: [CarDriverModel]
 
     @State private var mode: StandingType = .driver
     @State private var carClass: StandingsClass
@@ -22,12 +30,14 @@ struct CategoryStandingsScreen: View {
 
     init(category: StandingsCategory) {
         self.category = category
-        _categoryStandings = Query(
-            filter: #Predicate<StandingModel> { $0.category == category },
-            sort: [SortDescriptor(\.position)]
-        )
-        _categoryCarDrivers = Query(filter: #Predicate<CarDriverModel> { $0.category == category })
         _carClass = State(initialValue: CarBasedStandingsClasses.carBasedClasses[category]?.first?.0 ?? .overall)
+    }
+
+    private var categoryStandings: [StandingModel] {
+        allStandings.filter { $0.category == category }
+    }
+    private var categoryCarDrivers: [CarDriverModel] {
+        allCarDrivers.filter { $0.category == category }
     }
 
     private var carClasses: [(StandingsClass, String)]? { CarBasedStandingsClasses.carBasedClasses[category] }
