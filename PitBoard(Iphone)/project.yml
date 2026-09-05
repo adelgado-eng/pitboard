@@ -104,6 +104,10 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.pitboard.app.tests
+        # 05/09/2026: sin esto, xcodebuild falla al firmar el bundle de test con "Cannot
+        # code sign because the target does not have an Info.plist file" — lo detectó el
+        # CI al compilar este target por primera vez.
+        GENERATE_INFOPLIST_FILE: YES
 
   PitBoardUITests:
     type: bundle.ui-testing
@@ -118,6 +122,7 @@ targets:
         # Le dice al runner de XCUITest qué app lanzar/controlar — sin esto XcodeGen a
         # veces no infiere el "target application" solo a partir de `dependencies`.
         TEST_TARGET_NAME: PitBoard
+        GENERATE_INFOPLIST_FILE: YES
 
 schemes:
   PitBoard:
