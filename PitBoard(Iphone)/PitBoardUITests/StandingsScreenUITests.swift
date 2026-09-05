@@ -29,16 +29,19 @@ final class StandingsScreenUITests: PitBoardUITestCase {
             "CategoryStandingsScreen debería mostrar el nombre de la categoría en la barra superior."
         )
         // `StandingRowView` aplica `.accessibilityElement(children: .combine)` (para que
-        // VoiceOver lea posición/nombre/equipo/puntos como un solo elemento) — eso funde el
-        // `Text` del nombre dentro de un elemento combinado, así que ya no existe como
-        // `staticTexts` independiente. Mismo problema que la fila de la lista de categorías
-        // (comentario más arriba): hay que buscar por `label` en vez de por tipo exacto.
+        // VoiceOver lea posición/nombre/equipo/puntos como un solo elemento), lo que hace
+        // que ni `staticTexts` ni una búsqueda por `label` sean fiables (ambas fallaron en
+        // CI). `entrantKey` viene fijo de `UITestFixtures.seedIfNeeded()`.
         let driverRow = app.descendants(matching: .any)
-            .matching(NSPredicate(format: "label CONTAINS[c] %@", "Piloto de Prueba"))
+            .matching(identifier: "standings.entrantRow.uitest-driver-1")
             .firstMatch
         XCTAssertTrue(
             driverRow.waitForExistence(timeout: 5),
             "El piloto sembrado en posición 1 (StandingModel de UITestFixtures) debería verse en la lista."
+        )
+        XCTAssertTrue(
+            driverRow.label.contains("Piloto de Prueba"),
+            "La fila debería mostrar el nombre del piloto sembrado; label real: \(driverRow.label)"
         )
 
         // El botón atrás nativo de NavigationStack se etiqueta con el título de la

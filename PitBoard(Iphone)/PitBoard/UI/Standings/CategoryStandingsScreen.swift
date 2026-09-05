@@ -231,6 +231,10 @@ private struct StandingRowView: View {
         // accessibilityElement() — sigue siendo un elemento independiente y tocable aparte.
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(onClick != nil ? .isButton : [])
+        // Identificador estable para que los UI tests localicen una fila concreta — el
+        // label combinado de .accessibilityElement(children: .combine) no es fiable de
+        // buscar por texto exacto (ver StandingsScreenUITests).
+        .accessibilityIdentifier("standings.entrantRow.\(row.entrantKey)")
     }
 
     @ViewBuilder
