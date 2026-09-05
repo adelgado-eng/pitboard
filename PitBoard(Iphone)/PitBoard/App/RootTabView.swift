@@ -36,7 +36,7 @@ struct RootTabView: View {
                     NavigationStack {
                         EventsScreen()
                     }
-                    .tabItem { Label("Eventos", systemImage: "flag.checkered") }
+                    .tabItem { Label(settings.t("events_title"), systemImage: "flag.checkered") }
 
                     if settings.standingsEnabled {
                         NavigationStack(path: $standingsPath) {
@@ -47,13 +47,13 @@ struct RootTabView: View {
                                 CategoryStandingsScreen(category: category)
                             }
                         }
-                        .tabItem { Label("Clasificaciones", systemImage: "trophy") }
+                        .tabItem { Label(settings.t("standings_title"), systemImage: "trophy") }
                     }
 
                     NavigationStack {
                         SettingsScreen()
                     }
-                    .tabItem { Label("Ajustes", systemImage: "gearshape") }
+                    .tabItem { Label(settings.t("settings_title"), systemImage: "gearshape") }
                 }
             }
         }
@@ -134,6 +134,7 @@ struct RootTabView: View {
 
 private struct StartupLoadingScreen: View {
     @Environment(\.pitBoardColors) private var colors
+    @Environment(AppSettingsRepository.self) private var settings
 
     var body: some View {
         ZStack {
@@ -154,7 +155,7 @@ private struct StartupLoadingScreen: View {
                     .foregroundStyle(colors.onBackground)
                 ProgressView()
                     .tint(colors.primary)
-                Text("Actualizando calendario y clasificaciones…")
+                Text(settings.t("startup_loading_message"))
                     .font(.subheadline)
                     .foregroundStyle(colors.onSurfaceVariant)
             }

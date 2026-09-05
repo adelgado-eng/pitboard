@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Row
+import com.pitboard.app.i18n.tr
 
 /**
  * Aviso de "sin conexión, viendo la última actualización guardada" — vivía duplicado dentro de
@@ -38,7 +39,7 @@ fun OfflineBanner() {
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
-            "Sin conexión — mostrando la última actualización guardada",
+            tr("offline_banner_message"),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

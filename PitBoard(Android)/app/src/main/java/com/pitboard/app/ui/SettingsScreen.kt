@@ -544,7 +544,7 @@ private fun NotificationSeriesPicker(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(tr("settings_series_with_alerts_title"), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                    IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, contentDescription = "Cerrar") }
+                    IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, contentDescription = tr("events_close")) }
                 }
 
                 Text(

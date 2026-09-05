@@ -129,7 +129,7 @@ struct EventsScreen: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 16) {
                             if !isOnline {
-                                OfflineBanner()
+                                OfflineBanner(message: settings.t("offline_banner_message"))
                             }
 
                             if !weekendEvents.isEmpty {

@@ -85,7 +85,7 @@ struct StandingsScreen: View {
             } else {
                 VStack(spacing: 0) {
                     if !isOnline {
-                        OfflineBanner()
+                        OfflineBanner(message: settings.t("offline_banner_message"))
                     }
                     List {
                         ForEach(StandingsCategory.allCases) { category in

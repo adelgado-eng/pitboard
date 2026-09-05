@@ -769,6 +769,23 @@ object Strings {
             AppLanguage.CATALAN to "Edita les sèries actives",
             AppLanguage.FRENCH to "Modifier les séries actives",
             AppLanguage.GERMAN to "Aktive Serien bearbeiten"
+        ),
+
+        // --- i18n (Fase 3, 05/09/2026): últimos textos fijos en español que quedaban fuera
+        // de Eventos/Standings/CategoryStandings/Ajustes (ya cubiertos desde Fase 1). ---
+        "startup_loading_message" to mapOf(
+            AppLanguage.SPANISH to "Actualizando calendario y clasificaciones…",
+            AppLanguage.ENGLISH to "Updating calendar and standings…",
+            AppLanguage.CATALAN to "Actualitzant calendari i classificacions…",
+            AppLanguage.FRENCH to "Mise à jour du calendrier et des classements…",
+            AppLanguage.GERMAN to "Kalender und Wertungen werden aktualisiert…"
+        ),
+        "offline_banner_message" to mapOf(
+            AppLanguage.SPANISH to "Sin conexión — mostrando la última actualización guardada",
+            AppLanguage.ENGLISH to "Offline — showing the last saved update",
+            AppLanguage.CATALAN to "Sense connexió — mostrant l'última actualització desada",
+            AppLanguage.FRENCH to "Hors ligne — affichage de la dernière mise à jour enregistrée",
+            AppLanguage.GERMAN to "Offline — letzte gespeicherte Aktualisierung wird angezeigt"
         )
     )
 

@@ -55,6 +55,7 @@ import com.pitboard.app.standings.StandingsCategory
 import com.pitboard.app.standings.StandingsRepository
 import com.pitboard.app.i18n.AppLanguage
 import com.pitboard.app.i18n.LocalAppLanguage
+import com.pitboard.app.i18n.tr
 import com.pitboard.app.ui.CategoryStandingsScreen
 import com.pitboard.app.ui.EventsScreen
 import com.pitboard.app.ui.LanguagePickerScreen
@@ -77,7 +78,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private data class BottomDestination(val route: String, val label: String, val icon: ImageVector)
+// 05/09/2026 (Fase 3, i18n): "labelKey" en vez del texto ya traducido — bottomDestinations()
+// es una función normal, no @Composable, así que no puede llamar a tr() (@ReadOnlyComposable)
+// para resolver el idioma actual; se traduce en el sitio de uso (PitBoardBottomBar), que sí
+// es @Composable.
+private data class BottomDestination(val route: String, val labelKey: String, val icon: ImageVector)
 
 /**
  * Pestañas de la barra inferior.
@@ -92,10 +97,10 @@ private data class BottomDestination(val route: String, val label: String, val i
  * ahora sencillamente no está en la barra.
  */
 private fun bottomDestinations(standingsEnabled: Boolean): List<BottomDestination> = listOfNotNull(
-    BottomDestination("events", "Eventos", Icons.Default.Event),
-    BottomDestination("standings", "Clasificaciones", Icons.Default.EmojiEvents)
+    BottomDestination("events", "events_title", Icons.Default.Event),
+    BottomDestination("standings", "standings_title", Icons.Default.EmojiEvents)
         .takeIf { standingsEnabled },
-    BottomDestination("settings", "Ajustes", Icons.Default.Settings)
+    BottomDestination("settings", "settings_title", Icons.Default.Settings)
 )
 
 @Composable
@@ -284,7 +289,7 @@ private fun StartupLoadingScreen() {
             )
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             Text(
-                "Actualizando calendario y clasificaciones…",
+                tr("startup_loading_message"),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -308,8 +313,8 @@ private fun PitBoardBottomBar(navController: NavHostController, standingsEnabled
                         restoreState = true
                     }
                 },
-                icon = { Icon(dest.icon, contentDescription = dest.label) },
-                label = { Text(dest.label) }
+                icon = { Icon(dest.icon, contentDescription = tr(dest.labelKey)) },
+                label = { Text(tr(dest.labelKey)) }
             )
         }
     }

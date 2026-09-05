@@ -790,6 +790,22 @@ public enum Strings {
             .catalan: "Edita les sèries actives",
             .french: "Modifier les séries actives",
             .german: "Aktive Serien bearbeiten"
+        ],
+
+        // --- i18n (Fase 3, 05/09/2026): mismas claves/traducciones que Strings.kt. ---
+        "startup_loading_message": [
+            .spanish: "Actualizando calendario y clasificaciones…",
+            .english: "Updating calendar and standings…",
+            .catalan: "Actualitzant calendari i classificacions…",
+            .french: "Mise à jour du calendrier et des classements…",
+            .german: "Kalender und Wertungen werden aktualisiert…"
+        ],
+        "offline_banner_message": [
+            .spanish: "Sin conexión — mostrando la última actualización guardada",
+            .english: "Offline — showing the last saved update",
+            .catalan: "Sense connexió — mostrant l'última actualització desada",
+            .french: "Hors ligne — affichage de la dernière mise à jour enregistrée",
+            .german: "Offline — letzte gespeicherte Aktualisierung wird angezeigt"
         ]
     ]
 
