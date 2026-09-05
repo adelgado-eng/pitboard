@@ -72,8 +72,11 @@ public final class GtWorldChallengeScheduleSource: RaceScheduleSource, @unchecke
         var sessions: [(name: String, startTimeUtc: Date)] = []
         let tables = try doc.select("table.timetable__table").array()
         for table in tables {
+            // 04/09/2026: un único "try" cubriendo toda la expresión "??" — dos "try"
+            // repartidos entre los dos lados del operador es justo lo que el compilador
+            // rechaza con "Operator can throw but expression is not marked with 'try'".
             let captionText = try table.select(".timetable__caption span").first()?.text()
-                ?? (try table.select("caption").first()?.text())
+                ?? table.select("caption").first()?.text()
             guard let captionText, let dateComponents = parseCaptionDate(captionText, year: year) else { continue }
 
             let headers = try table.select("thead th").array().map { try $0.text().trimmingCharacters(in: .whitespacesAndNewlines) }

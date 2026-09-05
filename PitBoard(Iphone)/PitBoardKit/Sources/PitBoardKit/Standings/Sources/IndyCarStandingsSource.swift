@@ -53,7 +53,9 @@ public final class IndyCarStandingsSource: StandingsSource, @unchecked Sendable 
             let driverCell = cells[driverIndex]
 
             let linkText = try driverCell.select("a").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines)
-            let rawName = (linkText?.isEmpty == false ? linkText : nil) ?? (try driverCell.text().trimmingCharacters(in: .whitespacesAndNewlines))
+            // 04/09/2026: "try" tiene que cubrir toda la expresión "??", no solo el lado
+            // derecho entre paréntesis — ver el mismo fix en DriverDbStandingsSource.swift.
+            let rawName = try (linkText?.isEmpty == false ? linkText : nil) ?? driverCell.text().trimmingCharacters(in: .whitespacesAndNewlines)
             let name = rawName.replacingOccurrences(of: "^#?\\d+\\s+", with: "", options: .regularExpression)
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             guard !name.isEmpty else { return nil }

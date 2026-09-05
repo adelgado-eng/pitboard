@@ -162,7 +162,11 @@ public final class DriverDbStandingsSource: StandingsSource, @unchecked Sendable
             let driverCell = cells[driverIndex]
 
             let linkText = try driverCell.select("a").first()?.text().trimmingCharacters(in: .whitespacesAndNewlines)
-            let rawName = (linkText?.isEmpty == false ? linkText : nil) ?? (try driverCell.text().trimmingCharacters(in: .whitespacesAndNewlines))
+            // 04/09/2026: "try" tiene que cubrir toda la expresión "??", no solo el lado
+            // derecho entre paréntesis — si no, el compilador lo rechaza con "Operator
+            // can throw but expression is not marked with 'try'" (lo detectó el CI de
+            // GitHub Actions al llegar por fin a compilar este archivo).
+            let rawName = try (linkText?.isEmpty == false ? linkText : nil) ?? driverCell.text().trimmingCharacters(in: .whitespacesAndNewlines)
             let name = rawName.replacingOccurrences(of: "^#?\\d+\\s+", with: "", options: .regularExpression)
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             guard !name.isEmpty else { continue }
