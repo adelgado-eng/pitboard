@@ -2,60 +2,30 @@ package com.pitboard.app.ui
 
 import android.app.Application
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.WifiOff
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -64,35 +34,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.runtime.LaunchedEffect
 import com.pitboard.app.data.AppDatabase
 import com.pitboard.app.data.AppSettingsRepository
 import com.pitboard.app.data.EventEntity
 import com.pitboard.app.data.RaceSeries
 import com.pitboard.app.data.SeriesConfigEntity
-import com.pitboard.app.data.SessionBadgeType
 import com.pitboard.app.data.TimeDisplayMode
 import com.pitboard.app.i18n.tr
 import com.pitboard.app.schedule.RaceScheduleRepository
 import com.pitboard.app.standings.ConnectivityHelper
-import com.pitboard.app.ui.theme.BadgeColors
-import com.pitboard.app.util.ColorContrast
-import com.pitboard.app.util.DateTimeFormatters
 import com.pitboard.app.ui.components.EmptyState
-import com.pitboard.app.ui.components.OfflineBanner
 import com.pitboard.app.util.EventWeekendGrouper
 import com.pitboard.app.util.EventWeekendGroups
 import com.pitboard.app.util.SeasonWindow
-import com.pitboard.app.weather.WeatherRepository
-import com.pitboard.app.weather.WeatherResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -101,15 +61,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
-/** Tipos de sesión que se pueden elegir en el filtro rápido — se deja fuera OTHER ("" — sin
- *  clasificar), que no es algo que nadie elija filtrar a propósito. */
-private val SESSION_TYPE_FILTER_OPTIONS = listOf(
-    SessionBadgeType.RACE,
-    SessionBadgeType.QUALY,
-    SessionBadgeType.SPRINT,
-    SessionBadgeType.PRACTICE
-)
 
 class EventsViewModel(application: Application) : AndroidViewModel(application) {
     private val database = AppDatabase.getInstance(application)
@@ -198,7 +149,20 @@ class EventsViewModel(application: Application) : AndroidViewModel(application) 
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+/** Pantalla de Eventos — orquesta el panel de filtro ([EventsFilterPanel]), la lista
+ *  ([EventsList]) y los dos diálogos ([SeriesConfigSheet]/[EventDetailsSheet]), cada uno ya
+ *  en su propio archivo.
+ *
+ *  05/09/2026 (Fase 4 del diagnóstico): este archivo concentraba navegación + filtros +
+ *  lista + diálogos en un único sitio de 872 líneas — coincidía con la comunidad de menor
+ *  cohesión de todo el grafo de graphify (0,05 sobre 40 nodos). Se hace DESPUÉS de la Fase 1
+ *  (red de tests de los parsers) a propósito: es el refactor de más riesgo del plan, así que
+ *  se apoya en que Android e iOS ya compilan y pasan sus tests reales antes de tocarlo. Pura
+ *  extracción de código verbatim a otros archivos — ningún comportamiento cambia, cada
+ *  composable extraído recibe exactamente los mismos parámetros con los que ya se llamaba
+ *  aquí mismo.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
     val groups by viewModel.eventGroups.collectAsState()
@@ -299,87 +263,16 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
             val laterEvents = allLaterEvents.filter(::matchesSearch)
             val nothingMatchesQuickFilters = !noEventsAtAll && weekendEvents.isEmpty() && laterEvents.isEmpty()
 
-            // Antes esto se ocultaba también con "&& !noEventsAtAll": si un filtro dejaba la
-            // lista a cero eventos, el panel con los chips de serie —la única forma de QUITAR
-            // ese filtro sin salir de la pantalla— desaparecía con la lista, dejando al botón
-            // de embudo sin ningún efecto visible. El panel ahora se ve siempre que se pida,
-            // haya o no eventos que mostrar debajo.
-            AnimatedVisibility(
+            EventsFilterPanel(
                 visible = showFilterPanel,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
-            ) {
-                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text(tr("events_search_placeholder")) },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                        trailingIcon = {
-                            if (searchQuery.isNotEmpty()) {
-                                IconButton(onClick = { searchQuery = "" }) {
-                                    Icon(Icons.Default.Close, contentDescription = tr("events_clear_search"))
-                                }
-                            }
-                        },
-                        singleLine = true,
-                        shape = MaterialTheme.shapes.small
-                    )
-
-                    FlowRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        FilterChip(
-                            selected = selectedSeries.isEmpty(),
-                            onClick = { viewModel.updateActiveSeries(emptySet()) },
-                            label = { Text(tr("events_filter_all_series")) }
-                        )
-                        RaceSeries.entries.forEach { series ->
-                            val active = series in selectedSeries
-                            FilterChip(
-                                selected = active,
-                                onClick = {
-                                    viewModel.updateActiveSeries(
-                                        if (active) selectedSeries - series else selectedSeries + series
-                                    )
-                                },
-                                label = { Text(seriesConfigByKey[series]?.tag ?: series.defaultTag) }
-                            )
-                        }
-                    }
-
-                    FlowRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        FilterChip(
-                            selected = selectedSessionTypes.isEmpty(),
-                            onClick = { viewModel.updateActiveSessionTypes(emptySet()) },
-                            label = { Text(tr("events_filter_all_sessions")) }
-                        )
-                        SESSION_TYPE_FILTER_OPTIONS.forEach { badge ->
-                            val active = badge in selectedSessionTypes
-                            FilterChip(
-                                selected = active,
-                                onClick = {
-                                    viewModel.updateActiveSessionTypes(
-                                        if (active) selectedSessionTypes - badge else selectedSessionTypes + badge
-                                    )
-                                },
-                                label = { Text(tr(SessionBadgeType.labelKey(badge))) }
-                            )
-                        }
-                    }
-                }
-            }
+                searchQuery = searchQuery,
+                onSearchQueryChange = { searchQuery = it },
+                selectedSeries = selectedSeries,
+                onSeriesChange = viewModel::updateActiveSeries,
+                seriesConfigByKey = seriesConfigByKey,
+                selectedSessionTypes = selectedSessionTypes,
+                onSessionTypesChange = viewModel::updateActiveSessionTypes
+            )
 
             if (noEventsAtAll && selectedSeries.isNotEmpty()) {
                 // Va ANTES que el aviso de "sin conexión": con un filtro de por medio, "no hay
@@ -440,73 +333,15 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
                     } else null
                 )
             } else {
-                if (!isOnline) {
-                    OfflineBanner()
-                }
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    if (weekendEvents.isNotEmpty()) {
-                        item {
-                            Column {
-                                Text(
-                                    text = tr(groups?.weekendLabelKey.orEmpty()).uppercase(),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
-                                )
-                                ElevatedCard(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = MaterialTheme.shapes.large,
-                                    colors = CardDefaults.elevatedCardColors(
-                                        containerColor = MaterialTheme.colorScheme.surface
-                                    )
-                                ) {
-                                    Column(modifier = Modifier.padding(vertical = 4.dp)) {
-                                        weekendEvents.forEachIndexed { index, event ->
-                                            EventRow(
-                                                event = event,
-                                                config = seriesConfigByKey[event.series],
-                                                timeDisplayMode = timeDisplayMode,
-                                                onClick = { detailsEvent = event }
-                                            )
-                                            if (index < weekendEvents.size - 1) {
-                                                HorizontalDivider(
-                                                    modifier = Modifier.padding(horizontal = 16.dp),
-                                                    thickness = 0.5.dp,
-                                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (laterEvents.isNotEmpty()) {
-                        item {
-                            Text(
-                                text = tr("events_later_section"),
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 4.dp)
-                            )
-                        }
-                        items(laterEvents, key = { "later_${it.id}" }) { event ->
-                            EventCard(
-                                event = event,
-                                config = seriesConfigByKey[event.series],
-                                timeDisplayMode = timeDisplayMode,
-                                onClick = { detailsEvent = event }
-                            )
-                        }
-                    }
-                }
+                EventsList(
+                    isOnline = isOnline,
+                    weekendEvents = weekendEvents,
+                    weekendLabelKey = groups?.weekendLabelKey.orEmpty(),
+                    laterEvents = laterEvents,
+                    seriesConfigByKey = seriesConfigByKey,
+                    timeDisplayMode = timeDisplayMode,
+                    onEventClick = { detailsEvent = it }
+                )
             }
         }
     }
@@ -521,352 +356,5 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel()) {
 
     detailsEvent?.let { event ->
         EventDetailsSheet(event = event, onDismiss = { detailsEvent = null })
-    }
-}
-
-/** Botón lápiz de la barra superior: en vez de filtrar eventos, aquí se configura el tag
- *  corto (iniciales, ej. "NCU") y el color de cada una de las 15 series — ya no hay
- *  calendarios que agrupen esto, así que es una lista plana. */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SeriesConfigSheet(
-    seriesConfigByKey: Map<RaceSeries, SeriesConfigEntity>,
-    onDismiss: () -> Unit,
-    onSave: (SeriesConfigEntity) -> Unit
-) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var editing by remember { mutableStateOf<SeriesConfigEntity?>(null) }
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        dragHandle = null
-    ) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.85f),
-            color = MaterialTheme.colorScheme.surface
-        ) {
-            Column(modifier = Modifier.padding(20.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        tr("events_edit_series"),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                    IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = tr("events_close"))
-                    }
-                }
-                Text(
-                    tr("events_edit_series_subtitle"),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(RaceSeries.entries, key = { it.name }) { series ->
-                        val config = seriesConfigByKey[series]
-                            ?: SeriesConfigEntity(series, series.defaultTag, series.defaultColorHex)
-                        SeriesConfigRow(config = config, onClick = { editing = config })
-                    }
-                }
-            }
-        }
-    }
-
-    editing?.let { config ->
-        EditSeriesConfigDialog(
-            config = config,
-            onDismiss = { editing = null },
-            onSave = { updated ->
-                onSave(updated)
-                editing = null
-            }
-        )
-    }
-}
-
-@Composable
-private fun SeriesConfigRow(config: SeriesConfigEntity, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(14.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ColorSwatch(hex = config.colorHex)
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 12.dp)
-            ) {
-                Text(config.series.displayName, style = MaterialTheme.typography.titleSmall)
-                Text(
-                    tr("events_series_tag_prefix").format(config.tag),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Text(
-                tr("events_edit"),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
-
-@Composable
-private fun EditSeriesConfigDialog(
-    config: SeriesConfigEntity,
-    onDismiss: () -> Unit,
-    onSave: (SeriesConfigEntity) -> Unit
-) {
-    var tag by remember { mutableStateOf(config.tag) }
-    var colorHex by remember { mutableStateOf(config.colorHex) }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(config.series.displayName) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = tag,
-                    onValueChange = { tag = it.uppercase().take(5) },
-                    label = { Text(tr("events_tag_label")) },
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = colorHex,
-                    onValueChange = { colorHex = it },
-                    label = { Text(tr("events_color_label")) },
-                    singleLine = true
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(tr("events_preview_label"), style = MaterialTheme.typography.bodySmall)
-                    ColorSwatch(hex = colorHex)
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                onSave(config.copy(tag = tag.ifBlank { config.tag }, colorHex = colorHex))
-            }) { Text(tr("events_save")) }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(tr("events_cancel")) }
-        }
-    )
-}
-
-@Composable
-private fun ColorSwatch(hex: String) {
-    Box(
-        modifier = Modifier
-            .size(28.dp)
-            .clip(CircleShape)
-            .background(ColorContrast.safeParseColor(hex))
-    )
-}
-
-@Composable
-private fun EventRow(
-    event: EventEntity,
-    config: SeriesConfigEntity?,
-    timeDisplayMode: TimeDisplayMode,
-    onClick: () -> Unit
-) {
-    val tagColor = ColorContrast.ensureContrast(
-        config?.colorHex?.let { ColorContrast.safeParseColor(it) } ?: BadgeColors.fallback,
-        MaterialTheme.colorScheme.surface
-    )
-
-    // 03/09/2026 (2): sustituido el panel desplegable dentro de la propia fila por un popup
-    // (ModalBottomSheet, ver EventDetailsSheet) — pedido explícito tras probar la primera
-    // versión ("algo más estilo un pop up").
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .width(44.dp)
-                .height(44.dp)
-                .clip(MaterialTheme.shapes.extraSmall)
-                .background(tagColor),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                config?.tag ?: event.series.defaultTag,
-                color = ColorContrast.readableTextColor(tagColor),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelLarge
-            )
-        }
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 12.dp)
-        ) {
-            Text(
-                event.fullTitle,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
-                maxLines = 2
-            )
-            Text(
-                DateTimeFormatters.formatEventDateTime(event.startTimeUtc, timeDisplayMode, event.timeZoneId),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        }
-        if (event.inferredBadge.isNotEmpty()) {
-            SessionBadgeChip(event.inferredBadge)
-        }
-    }
-}
-
-/** Popup con el detalle de un evento, al tocarlo — solo campos que YA trae [EventEntity], sin
- *  ninguna petición de red adicional (pedido explícito). "Hora local del circuito" solo se
- *  enseña cuando la fuente trajo [EventEntity.timeZoneId] (ver las fuentes de
- *  com.pitboard.app.schedule.sources que sí lo rellenan, ej. EspnNascarScheduleSource/
- *  ImsaScheduleSource) — si no, se omite en vez de enseñar una hora inventada. Mismo patrón
- *  de ModalBottomSheet que CarDriversSheet/SeriesConfigSheet en este mismo archivo. */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun EventDetailsSheet(event: EventEntity, onDismiss: () -> Unit) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    // Clima del circuito bajo demanda: solo se pide al abrir ESTE evento (nunca para toda la
-    // lista de golpe), y solo si Open-Meteo puede tener algo que decir (circuito reconocido +
-    // dentro de los ~15 días de previsión) — ver WeatherRepository.
-    var weather by remember(event.id) { mutableStateOf<WeatherResult?>(null) }
-    LaunchedEffect(event.id) {
-        weather = WeatherRepository.fetch(event.fullTitle, event.startTimeUtc, System.currentTimeMillis())
-    }
-
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 24.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    event.series.displayName.uppercase(),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
-                )
-                if (event.inferredBadge.isNotEmpty()) {
-                    SessionBadgeChip(event.inferredBadge)
-                }
-            }
-            Text(
-                event.fullTitle,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 12.dp),
-                thickness = 0.5.dp,
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                DetailLine(tr("events_detail_your_time"), DateTimeFormatters.formatEventDateTimeLong(event.startTimeUtc))
-                event.timeZoneId?.let { zoneId ->
-                    DateTimeFormatters.formatEventDateTimeInZone(event.startTimeUtc, zoneId)?.let { local ->
-                        DetailLine(tr("events_detail_track_time").format(zoneId), local)
-                    }
-                }
-                DetailLine(tr("events_detail_series"), event.series.displayName)
-                if (event.inferredBadge.isNotEmpty()) {
-                    DetailLine(tr("events_detail_session_type"), tr(SessionBadgeType.labelKey(event.inferredBadge)))
-                }
-                // Sin fila cuando el circuito no se reconoce o está demasiado lejos en el
-                // futuro — no aporta nada un "Clima: —" para el 90% de los eventos de la
-                // temporada que todavía no tienen previsión.
-                when (val w = weather) {
-                    is WeatherResult.Available -> DetailLine(
-                        tr("events_detail_weather"),
-                        tr("events_detail_weather_value").format(w.tempCelsius.toInt(), w.rainProbabilityPercent)
-                    )
-                    else -> {}
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DetailLine(label: String, value: String) {
-    Column {
-        Text(
-            label.uppercase(),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            value,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
-
-@Composable
-private fun EventCard(
-    event: EventEntity,
-    config: SeriesConfigEntity?,
-    timeDisplayMode: TimeDisplayMode,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-    ) {
-        EventRow(event, config, timeDisplayMode, onClick)
-    }
-}
-
-@Composable
-private fun SessionBadgeChip(badge: String) {
-    val bg = BadgeColors.forBadge(badge)
-    Box(
-        modifier = Modifier
-            .size(28.dp)
-            .clip(CircleShape)
-            .background(bg),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(badge, color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
     }
 }

@@ -1,18 +1,27 @@
-name: iOS — PitBoardKit tests
+name: iOS — PitBoard app + PitBoardKit tests
 
 # Corre en un runner macOS gratuito de GitHub Actions (gratis e ilimitado en repos
 # públicos) — es la comprobación real que este proyecto no puede hacer localmente sin un
-# Mac. Compila el paquete SwiftPM PitBoardKit y ejecuta PitBoardKitTests contra el
-# simulador de iOS, lo mismo que haría Xcode con Cmd+U.
+# Mac.
+#
+# 05/09/2026: hasta ahora este workflow SOLO compilaba el paquete SwiftPM PitBoardKit
+# (donde vive toda la lógica de parsing/datos) — NUNCA llegaba a compilar el target real de
+# la app (PitBoard(Iphone)/PitBoard/, con EventsScreen.swift, SettingsScreen.swift,
+# StandingsScreen.swift, RootTabView.swift...), porque ese target usa un .xcodeproj
+# GENERADO por XcodeGen a partir de project.yml (no versionado en el repo, ver
+# .gitignore) — sin generarlo antes, no había ningún .xcodeproj que compilar. Todos los
+# cambios de las Fases 2-4 del diagnóstico tocaron justo esos archivos sin que ningún CI
+# los verificase de verdad. Se añade xcodegen + el scheme PitBoard (que además compila
+# PitBoardWidgetExtension y corre PitBoardTests/PitBoardUITests) para cerrar ese hueco.
 
 on:
   push:
     paths:
-      - "PitBoard(Iphone)/PitBoardKit/**"
+      - "PitBoard(Iphone)/**"
       - ".github/workflows/ios-tests.yml"
   pull_request:
     paths:
-      - "PitBoard(Iphone)/PitBoardKit/**"
+      - "PitBoard(Iphone)/**"
       - ".github/workflows/ios-tests.yml"
   workflow_dispatch:
 
@@ -21,7 +30,7 @@ jobs:
     runs-on: macos-15
     defaults:
       run:
-        working-directory: PitBoard(Iphone)/PitBoardKit
+        working-directory: PitBoard(Iphone)
     steps:
       - uses: actions/checkout@v4
 
@@ -34,10 +43,25 @@ jobs:
       - name: Listar simuladores de iPhone ya instalados (diagnóstico)
         run: xcrun simctl list devices available | grep -i iphone
 
-      - name: Compilar y correr PitBoardKitTests en el simulador de iOS
+      - name: Compilar y correr PitBoardKitTests en el simulador de iOS (Fase 1)
+        working-directory: PitBoard(Iphone)/PitBoardKit
         run: >
           xcodebuild test
           -scheme PitBoardKit
+          -destination 'platform=iOS Simulator,name=iPhone 16'
+          -skipMacroValidation
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Generar PitBoard.xcodeproj desde project.yml
+        run: xcodegen generate
+
+      - name: Compilar y correr PitBoardTests/PitBoardUITests de la app real en el simulador de iOS
+        run: >
+          xcodebuild test
+          -project PitBoard.xcodeproj
+          -scheme PitBoard
           -destination 'platform=iOS Simulator,name=iPhone 16'
           -skipMacroValidation
 
@@ -46,5 +70,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: xcodebuild-result-bundle
-          path: PitBoard(Iphone)/PitBoardKit/**/*.xcresult
+          path: |
+            PitBoard(Iphone)/PitBoardKit/**/*.xcresult
+            PitBoard(Iphone)/**/*.xcresult
           if-no-files-found: ignore
