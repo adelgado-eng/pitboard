@@ -28,8 +28,16 @@ final class StandingsScreenUITests: PitBoardUITestCase {
             app.staticTexts["Formula 1"].waitForExistence(timeout: 5),
             "CategoryStandingsScreen debería mostrar el nombre de la categoría en la barra superior."
         )
+        // `StandingRowView` aplica `.accessibilityElement(children: .combine)` (para que
+        // VoiceOver lea posición/nombre/equipo/puntos como un solo elemento) — eso funde el
+        // `Text` del nombre dentro de un elemento combinado, así que ya no existe como
+        // `staticTexts` independiente. Mismo problema que la fila de la lista de categorías
+        // (comentario más arriba): hay que buscar por `label` en vez de por tipo exacto.
+        let driverRow = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label CONTAINS[c] %@", "Piloto de Prueba"))
+            .firstMatch
         XCTAssertTrue(
-            app.staticTexts["Piloto de Prueba"].waitForExistence(timeout: 5),
+            driverRow.waitForExistence(timeout: 5),
             "El piloto sembrado en posición 1 (StandingModel de UITestFixtures) debería verse en la lista."
         )
 
