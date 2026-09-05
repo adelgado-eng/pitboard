@@ -201,12 +201,20 @@ private struct EventItemRow: View {
     let showTrackTime: Bool
     let language: AppLanguage
 
+    // 05/09/2026: `body` es @ViewBuilder (requisito del protocolo `View`) — el `if let`
+    // que solo mutaba `subtitle` se interpretaba como código que debe producir una View,
+    // no una mutación de variable. Detectado por el CI al compilar por primera vez el
+    // target real de la app (mismo patrón que PitBoardTheme.swift, Fase 1).
+    private var subtitle: String {
+        var text = DateTimeFormatters.formatEventDateTime(event.startTimeUtc)
+        if showTrackTime, let trackTime = widgetTrackTimeLabel(startTimeUtc: event.startTimeUtc, timeZoneId: event.timeZoneId) {
+            text += " (\(trackTime))"
+        }
+        return text
+    }
+
     var body: some View {
         let textOnTag = ColorContrast.readableTextColor(background: tagColor)
-        var subtitle = DateTimeFormatters.formatEventDateTime(event.startTimeUtc)
-        if showTrackTime, let trackTime = widgetTrackTimeLabel(startTimeUtc: event.startTimeUtc, timeZoneId: event.timeZoneId) {
-            subtitle += " (\(trackTime))"
-        }
 
         HStack(spacing: 10) {
             VStack(spacing: 2) {
